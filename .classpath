@@ -10,5 +10,6 @@
 	<classpathentry kind="var" path="ICY_HOME/plugins/adufour/blocks/Blocks.jar"/>
 	<classpathentry kind="var" path="ICY_HOME/plugins/adufour/ezplug/EzPlug.jar"/>
 	<classpathentry kind="var" path="ICY_HOME/plugins/tprovoost/javadocparser/JavaDocParser.jar"/>
+	<classpathentry kind="var" path="ICY_PLUGINS/stef/library/JavaCLPlugin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

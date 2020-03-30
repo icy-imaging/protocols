@@ -324,10 +324,10 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
                     BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
 
-                    innerFlow.getBlockPanel(targetInnerlBlock).refresh();
+                    innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
                 }
                 else
-                    dstBlockPanel.refresh();
+                    dstBlockPanel.refreshNow();
 
                 repaint();
             }
@@ -582,7 +582,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void linkAdded(WorkFlow targetWorkFlow, Link<?> link)
+    public void linkAdded(WorkFlow targetWorkFlow, final Link<?> link)
     {
         if (targetWorkFlow != this.workFlow)
             return;
@@ -656,10 +656,10 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
                 BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
 
-                innerFlow.getBlockPanel(targetInnerlBlock).refresh();
+                innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
             }
             else
-                dstBlockPanel.refresh();
+                dstBlockPanel.refreshNow();
         }
 
         repaint();

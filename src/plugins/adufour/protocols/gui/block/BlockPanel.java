@@ -621,7 +621,15 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener
     @Override
     public void blockVariableAdded(BlockDescriptor block, Var<?> variable)
     {
-        refresh();
+        ThreadUtil.invokeNow(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                refreshNow();
+            }
+        });
+        // refresh();
     }
 
     @Override

@@ -315,21 +315,29 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                 BlockPanel srcBlockPanel = getBlockPanel(link.srcBlock);
                 BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
 
-                linkLines.put(link, new RoundedSquareLine(srcBlockPanel, dstBlockPanel, link));
-
-                // refresh the target block
-                if (dstBlockPanel instanceof WorkFlowPanel)
+                if ((srcBlockPanel == null) || (dstBlockPanel == null))
                 {
-                    WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
-
-                    BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
-
-                    innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
+                    System.err.println("Warning: cannot recover link between " + link.srcBlock.getDefinedName()
+                            + " and " + link.dstBlock.getDefinedName() + " !");
                 }
                 else
-                    dstBlockPanel.refreshNow();
+                {
+                    linkLines.put(link, new RoundedSquareLine(srcBlockPanel, dstBlockPanel, link));
 
-                repaint();
+                    // refresh the target block
+                    if (dstBlockPanel instanceof WorkFlowPanel)
+                    {
+                        WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
+
+                        BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
+
+                        innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
+                    }
+                    else
+                        dstBlockPanel.refreshNow();
+                    
+                    repaint();
+                }
             }
         }, true);
     }
@@ -638,15 +646,12 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         Line line = linkLines.remove(link);
 
         if (line == null)
-        {
             System.err.println("Warning: missing link, cannot be removed properly");
-        }
         else
-        {
             line.dispose();
-        }
 
         BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
+
         if (dstBlockPanel != null)
         {
             // refresh the target block

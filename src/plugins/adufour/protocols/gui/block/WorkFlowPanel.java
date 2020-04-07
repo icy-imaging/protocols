@@ -297,6 +297,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                     public void run()
                     {
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
+                        
                         exposingLinks.put(variable, new RoundedSquareLine(WorkFlowPanel.this, ownerPanel, variable)
                         {
                             @Override
@@ -360,6 +361,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                     {
                         
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
+                        
                         exposingLinks.put(variable, new RoundedSquareLine(ownerPanel, WorkFlowPanel.this, variable)
                         {
                             @Override

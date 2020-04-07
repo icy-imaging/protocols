@@ -90,13 +90,18 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener
             if (dragging)
             {
                 WorkFlow wf = workFlowPane.getWorkFlow();
+                
                 if (wf.isBlockSelected(blockDesc))
+                {
                     for (BlockDescriptor bd : wf.getBlockSelection())
                     {
                         BlockPanel bp = workFlowPane.getBlockPanel(bd);
-                        bp.setBounds(Math.max(0, dx - pressedX + bp.getX()), Math.max(0, dy - pressedY + bp.getY()),
-                                bp.getWidth(), bp.getHeight());
+
+                        if (bp != null)
+                            bp.setBounds(Math.max(0, dx - pressedX + bp.getX()), Math.max(0, dy - pressedY + bp.getY()),
+                                    bp.getWidth(), bp.getHeight());
                     }
+                }
                 else
                     setBounds(Math.max(0, dx - pressedX + x), Math.max(0, dy - pressedY + y), w, h);
             }

@@ -1132,22 +1132,27 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener
     public Point getDragZoneLocation(Var<?> output)
     {
         if (blockDesc.isCollapsed() && !(this instanceof WorkFlowPanel))
-        {
             return new Point(getX() + getWidth() - SHADOW_SIZE, getY() + getHeight() / 2);
-        }
+
         DragDropZone dz = getDragZone(output);
+        if (!dz.isVisible())
+            return new Point(getX() + getWidth() - SHADOW_SIZE, getY() + getHeight() / 2);
+
         int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
         int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
+
         return new Point(x + dz.getWidth(), y + dz.getHeight() / 2);
     }
 
     public Point getDropZoneLocation(Var<?> input)
     {
         if (blockDesc.isCollapsed() && !(this instanceof WorkFlowPanel))
-        {
             return new Point(getX() + SHADOW_SIZE, getY() + getHeight() / 2);
-        }
+
         DragDropZone dz = getDropZone(input);
+        if (!dz.isVisible())
+            return new Point(getX() + SHADOW_SIZE, getY() + getHeight() / 2);
+
         int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
         int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
         return new Point(x, y + dz.getHeight() / 2);

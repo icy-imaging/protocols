@@ -1,14 +1,5 @@
 package plugins.adufour.protocols;
 
-import icy.file.FileUtil;
-import icy.main.Icy;
-import icy.plugin.PluginLoader;
-import icy.plugin.abstract_.PluginActionable;
-import icy.preferences.PluginsPreferences;
-import icy.preferences.XMLPreferences;
-import icy.system.thread.ThreadUtil;
-import icy.util.XMLUtil;
-
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -29,6 +20,14 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import icy.file.FileUtil;
+import icy.main.Icy;
+import icy.plugin.PluginLoader;
+import icy.plugin.abstract_.PluginActionable;
+import icy.preferences.PluginsPreferences;
+import icy.preferences.XMLPreferences;
+import icy.system.thread.ThreadUtil;
+import icy.util.XMLUtil;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.blocks.util.BlocksML;
 import plugins.adufour.blocks.util.BlocksReloadedException;
@@ -196,40 +195,31 @@ public class Protocols extends PluginActionable
 
         mainFrame = new MainFrame(this);
 
-        DocumentBuilder builder;
         try
         {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-            // Reload potential temporary protocols from the preferences
-
             int x = preferences.getInt("Window X", mainFrame.getX());
             int y = preferences.getInt("Window Y", mainFrame.getY());
             mainFrame.setLocation(x, y);
 
-            ArrayList<XMLPreferences> protocols = preferences.getChildren();
+            String protocolPath = parseCommandLineArgs(false);
 
-            if (protocols.size() == 0)
+            // we have a protocol filename specified ?
+            if (protocolPath != null)
             {
-                mainFrame.addProtocolPane(new ProtocolPanel(mainFrame));
-            }
-            else
-                for (XMLPreferences node : preferences.getChildren())
+                ProtocolPanel panel = new ProtocolPanel(mainFrame);
+                Document xml = XMLUtil.loadDocument(protocolPath);
+
+                // Discard invalid files
+                if (xml != null)
+                    panel.setFile(new File(protocolPath));
+
+                mainFrame.addProtocolPane(panel);
+
+                if (xml != null)
                 {
-                    ProtocolPanel panel = new ProtocolPanel(mainFrame);
-                    String fileName = node.get("fileName", null);
-                    if (fileName != null)
-                        panel.setFile(new File(fileName));
-                    mainFrame.addProtocolPane(panel);
-
-                    Document xml = builder.parse(new InputSource(new StringReader(node.get("xml", null))));
-
                     try
                     {
-                        panel.loadWorkFlow(xml, node.getBoolean("dirty", false));
-
-                        // if the protocol loads correctly, remove it from the preferences
-                        preferences.remove(node.name());
+                        panel.loadWorkFlow(xml, true);
                     }
                     catch (BlocksReloadedException e)
                     {
@@ -237,7 +227,44 @@ public class Protocols extends PluginActionable
                         return;
                     }
                 }
+            }
+            else
+            {
+                // Reload potential temporary protocols from the preferences
+                ArrayList<XMLPreferences> protocols = preferences.getChildren();
 
+                // no protocol info in XML preference
+                if (protocols.size() == 0)
+                    mainFrame.addProtocolPane(new ProtocolPanel(mainFrame));
+                else
+                {
+                    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+                    for (XMLPreferences node : preferences.getChildren())
+                    {
+                        ProtocolPanel panel = new ProtocolPanel(mainFrame);
+                        String fileName = node.get("fileName", null);
+                        if (fileName != null)
+                            panel.setFile(new File(fileName));
+                        mainFrame.addProtocolPane(panel);
+
+                        Document xml = builder.parse(new InputSource(new StringReader(node.get("xml", null))));
+
+                        try
+                        {
+                            panel.loadWorkFlow(xml, node.getBoolean("dirty", false));
+
+                            // if the protocol loads correctly, remove it from the preferences
+                            preferences.remove(node.name());
+                        }
+                        catch (BlocksReloadedException e)
+                        {
+                            reload(xml, panel.getFile().getAbsolutePath());
+                            return;
+                        }
+                    }
+                }
+            }
         }
         catch (ParserConfigurationException e)
         {
@@ -256,24 +283,35 @@ public class Protocols extends PluginActionable
         mainFrame.setVisible(true);
     }
 
-    private static void runHeadless()
+    /**
+     * Build the command line arguments map and return protocol path if any is specified
+     */
+    private static String parseCommandLineArgs(boolean verify)
     {
         String[] clargs = Icy.getCommandLinePluginArgs();
-
-        String protocolFile = null;
+        String result = null;
+        boolean ok = false;
 
         for (String clarg : clargs)
         {
             // Sanity check
             if (!clarg.contains("="))
             {
-                throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+                if (verify)
+                    throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+
+                // next arg
+                continue;
             }
 
             String[] keyValuePair = clarg.split("=");
             if (keyValuePair.length != 2)
             {
-                throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+                if (verify)
+                    throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+
+                // next arg
+                continue;
             }
 
             String key = keyValuePair[0];
@@ -281,31 +319,47 @@ public class Protocols extends PluginActionable
 
             if (key.isEmpty())
             {
-                throw new IllegalArgumentException("Invalid command line argument (no key): " + clarg);
+                if (verify)
+                    throw new IllegalArgumentException("Invalid command line argument (no key): " + clarg);
+
+                // next arg
+                continue;
             }
 
             if (value.isEmpty())
             {
-                throw new IllegalArgumentException("Invalid command line argument (no value): " + clarg);
+                if (verify)
+                    throw new IllegalArgumentException("Invalid command line argument (no value): " + clarg);
+
+                // next arg
+                continue;
             }
 
             if (key.equalsIgnoreCase("protocol"))
             {
-                protocolFile = value;
+                result = value;
+                ok = true;
             }
             else
-            {
                 commandLineArguments.put(key, value);
-            }
         }
+
+        // we correctly parsed arguments ? --> clear it so no other plugin can re-parse them
+        if (ok)
+            Icy.clearCommandLinePluginArgs();
+
+        return result;
+    }
+
+    private static void runHeadless()
+    {
+        String protocolFile = parseCommandLineArgs(true);
 
         Document xml = XMLUtil.loadDocument(protocolFile);
 
         // Discard invalid files
         if (xml == null)
-        {
             throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
-        }
 
         System.out.println("Loading workflow...");
         WorkFlow workFlow = new WorkFlow();

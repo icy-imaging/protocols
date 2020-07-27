@@ -14,7 +14,6 @@ import java.io.IOException;
 import javax.swing.ImageIcon;
 
 import org.w3c.dom.Node;
-
 import plugins.adufour.protocols.Protocols;
 
 public class ProtocolDescriptor implements XMLPersistent

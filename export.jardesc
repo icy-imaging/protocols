@@ -11,6 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=Protocols/src"/>
+        <javaElement handleIdentifier="=Protocols/src\/main\/resources"/>
+        <javaElement handleIdentifier="=Protocols/src\/test\/java"/>
+        <javaElement handleIdentifier="=Protocols/src\/main\/java"/>
     </selectedElements>
 </jardesc>

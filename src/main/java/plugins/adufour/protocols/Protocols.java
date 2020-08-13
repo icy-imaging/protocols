@@ -362,7 +362,7 @@ public class Protocols extends PluginActionable
             throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
 
         System.out.println("Loading workflow...");
-        WorkFlow workFlow = new WorkFlow();
+        WorkFlow workFlow = new WorkFlow(true);
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);
 
         workFlow.run();

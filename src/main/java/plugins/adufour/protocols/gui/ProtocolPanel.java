@@ -80,7 +80,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     
     public ProtocolPanel(MainFrame frame)
     {
-        this(null, new WorkFlow(), frame);
+        this(null, new WorkFlow(true), frame);
     }
     
     private ProtocolPanel(File file, final WorkFlow workFlow, MainFrame frame)

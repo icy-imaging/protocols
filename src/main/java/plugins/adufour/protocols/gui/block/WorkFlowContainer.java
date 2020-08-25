@@ -335,7 +335,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                     }
                     else
                         dstBlockPanel.refreshNow();
-                    
+
                     repaint();
                 }
             }
@@ -368,8 +368,29 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                 }
 
                 panel.drawPanel();
+
                 blockPanels.put(blockDesc, panel);
                 add(panel);
+
+                // FIX: get exposed links correctly restored on copy/paste as setVisibility isn't called in that case (Stephane)
+                // this is really an ugly fix but the whole stuff is a complete mess honestly :-/
+                if (blockDesc.isWorkFlow())
+                {
+                    synchronized (blockDesc.inputVars)
+                    {
+                        // update exposed links
+                        for (Var<?> var : blockDesc.inputVars)
+                            ((WorkFlowPanel) panel).updateExposedLink(var, blockDesc.inputVars.isVisible(var));
+                    }
+
+                    synchronized (blockDesc.outputVars)
+                    {
+                        // update exposed links
+                        for (Var<?> var : blockDesc.outputVars)
+                            ((WorkFlowPanel) panel).updateExposedLink(var, blockDesc.outputVars.isVisible(var));
+                    }
+                }
+
                 // Layer 0 for blocks
                 // Layer 1 for work flows
                 setLayer(panel, blockDesc.isWorkFlow() ? 1 : 0, 0);
@@ -531,9 +552,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                 workFlow.removeBlock(workFlow.getBlock(i), true);
         }
 
-        workFlow.addBlock(embed.getBlockDescriptor());
-
         MainFrame.pasteSelection(embed, true);
+        
+        workFlow.addBlock(embed.getBlockDescriptor());
     }
 
     /**

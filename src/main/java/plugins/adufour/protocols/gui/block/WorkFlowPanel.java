@@ -40,25 +40,25 @@ import plugins.adufour.vars.lang.Var;
 public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
 {
     private final WorkFlow innerWorkFlow;
-    
+
     protected final JScrollPane scrollPane;
-    
+
     protected final WorkFlowContainer innerFlowPane;
-    
+
     private final HashMap<Var<?>, Line> exposingLinks = new HashMap<Var<?>, Line>();
-    
+
     private final MouseAdapter mouseAdapter;
-    
+
     protected Box varBox;
-    
+
     protected final JMenuItem menuRemoveEnclosure = new JMenuItem("Remove block but keep contents");
-    
+
     public WorkFlowPanel(WorkFlowContainer wfPane, final BlockDescriptor blockDesc)
     {
         super(wfPane, blockDesc);
-        
+
         this.innerWorkFlow = (WorkFlow) blockDesc.getBlock();
-        
+
         mouseAdapter = new MouseAdapter()
         {
             @Override
@@ -67,55 +67,56 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                 int xShift = innerFlowPane.getLocationOnScreen().x - getLocationOnScreen().x;
                 int yShift = innerFlowPane.getLocationOnScreen().y - getLocationOnScreen().y;
                 Point realPoint = new Point(e.getX() + xShift, e.getY() + yShift);
-                
+
                 for (Var<?> var : exposingLinks.keySet())
                     if (exposingLinks.get(var).isOverCloseButton(realPoint))
                     {
                         VarList vars = blockDesc.inputVars;
-                        
-                        if (!vars.contains(var)) vars = blockDesc.outputVars;
-                        
+
+                        if (!vars.contains(var))
+                            vars = blockDesc.outputVars;
+
                         vars.setVisible(var, !vars.isVisible(var));
-                        
+
                         // prevent concurrent modification
                         break;
                     }
             }
-            
+
             @Override
             public void mouseMoved(MouseEvent e)
             {
                 int xShift = innerFlowPane.getLocationOnScreen().x - getLocationOnScreen().x;
                 int yShift = innerFlowPane.getLocationOnScreen().y - getLocationOnScreen().y;
                 Point realPoint = new Point(e.getX() + xShift, e.getY() + yShift);
-                
+
                 for (Line l : exposingLinks.values())
                     l.setCustomColor(l.contains(realPoint.x, realPoint.y));
             }
         };
-        
+
         blockDesc.inputVars.addVisibilityListener(this);
         blockDesc.outputVars.addVisibilityListener(this);
-        
+
         this.innerFlowPane = new WorkFlowContainer(innerWorkFlow, wfPane.isEditable());
         this.innerFlowPane.setParentPanel(this);
-        
+
         this.innerFlowPane.addMouseListener(mouseAdapter);
         this.innerFlowPane.addMouseMotionListener(mouseAdapter);
-        
+
         this.scrollPane = new JScrollPane(innerFlowPane);
         scrollPane.setOpaque(false);
         scrollPane.setPreferredSize(new Dimension());
-        
+
         // XXX
         varBox = Box.createVerticalBox();
         varBox.setOpaque(false);
         varBox.setVisible(false);
         add(varBox, BorderLayout.SOUTH);
-        
+
         // check whether the descriptor has a stored size
         Dimension size = innerWorkFlow.getBlockDescriptor().getDimension();
-        
+
         if (size.width != 0)
         {
             // use it
@@ -127,13 +128,13 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             setPreferredSize(new Dimension(400, 400));
         }
         setResizeable(!blockDesc.isCollapsed());
-        
+
         // add an extra option to close the work flow while preserving its contents
         menuRemoveEnclosure.addActionListener(this);
         menuRemoveEnclosure.setIcon(ICON_REMOVE);
         menuRemoveEnclosure.setToolTipText("<html><h4>Remove this block but keep its contents</h4></html>");
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e)
     {
@@ -142,31 +143,32 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             innerFlowPane.selectAllBlocks();
             workFlowPane.getWorkFlow().removeBlock(blockDesc, true);
         }
-        else super.actionPerformed(e);
+        else
+            super.actionPerformed(e);
     }
-    
+
     @Override
     protected void drawMenu()
     {
         super.drawMenu();
-        
+
         // add an extra option to close the work flow while preserving its contents
         super.menu.add(menuRemoveEnclosure);
     }
-    
+
     @Override
     protected void drawContent()
     {
         int maxRow = drawExposedLinks(0);
-        
+
         drawInnerWorkFlowContainer(maxRow + 1);
     }
-    
+
     /**
      * Draws the drag'n'drop zones representing the exposed variables of the inner work flow
      * 
      * @param gridRow
-     *            the row where to start drawing within the {@link GridBagLayout}
+     *        the row where to start drawing within the {@link GridBagLayout}
      * @return the last row used in the {@link GridBagLayout}
      */
     protected int drawExposedLinks(int row)
@@ -175,13 +177,16 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
         for (Var<?> input : innerWorkFlow.getBlockDescriptor().inputVars)
         {
             // don't show hidden variable
-            if (!blockDesc.inputVars.isVisible(input)) continue;
-            
+            if (!blockDesc.inputVars.isVisible(input))
+                continue;
+
             // don't show local loop variables
-            if (blockDesc.isLoop() && ((Loop) blockDesc.getBlock()).isLoopVariable(input)) continue;
-            
-            if (!varDropZones.containsKey(input)) varDropZones.put(input, createVarDropZone(input, true, DragDropZone.LINK_RIGHT));
-            
+            if (blockDesc.isLoop() && ((Loop) blockDesc.getBlock()).isLoopVariable(input))
+                continue;
+
+            if (!varDropZones.containsKey(input))
+                varDropZones.put(input, createVarDropZone(input, true, DragDropZone.LINK_RIGHT));
+
             GridBagConstraints gbc_dropZone = new GridBagConstraints();
             gbc_dropZone.anchor = GridBagConstraints.WEST;
             gbc_dropZone.fill = GridBagConstraints.NONE;
@@ -192,18 +197,21 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             DragDropZone dropZone = varDropZones.get(input);
             jPanelContent.add(dropZone, gbc_dropZone);
         }
-        
+
         int rowOut = row;
         for (Var<?> output : innerWorkFlow.getBlockDescriptor().outputVars)
         {
             // don't show hidden variable
-            if (!blockDesc.outputVars.isVisible(output)) continue;
-            
+            if (!blockDesc.outputVars.isVisible(output))
+                continue;
+
             // don't show local loop variables
-            if (blockDesc.isLoop() && ((Loop) blockDesc.getBlock()).isLoopVariable(output)) continue;
-            
-            if (!varDragZones.containsKey(output)) varDragZones.put(output, createVarDragZone(output, true));
-            
+            if (blockDesc.isLoop() && ((Loop) blockDesc.getBlock()).isLoopVariable(output))
+                continue;
+
+            if (!varDragZones.containsKey(output))
+                varDragZones.put(output, createVarDragZone(output, true));
+
             GridBagConstraints gbc_dragZone = new GridBagConstraints();
             gbc_dragZone.anchor = GridBagConstraints.EAST;
             gbc_dragZone.fill = GridBagConstraints.NONE;
@@ -213,15 +221,15 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             DragDropZone dragZone = varDragZones.get(output);
             jPanelContent.add(dragZone, gbc_dragZone);
         }
-        
+
         return Math.max(rowIn, rowOut);
     }
-    
+
     /**
      * Draws the container representing the inner work flow
      * 
      * @param row
-     *            the row where the container should be added within the {@link GridBagLayout}
+     *        the row where the container should be added within the {@link GridBagLayout}
      */
     protected void drawInnerWorkFlowContainer(int row)
     {
@@ -236,41 +244,42 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
         gbc.weighty = 1;
         jPanelContent.add(scrollPane, gbc);
     }
-    
+
     @Override
     void dispose()
     {
         blockDesc.inputVars.addVisibilityListener(this);
         blockDesc.outputVars.addVisibilityListener(this);
-        
+
         menuRemoveEnclosure.removeActionListener(this);
-        
+
         innerFlowPane.removeMouseListener(mouseAdapter);
         innerFlowPane.removeMouseMotionListener(mouseAdapter);
-        
+
         innerFlowPane.dispose();
-        
+
         super.dispose();
     }
-    
+
     @Override
     public void paintChildren(Graphics g)
     {
-        Graphics gg = g.create();        
-        
+        Graphics gg = g.create();
+
         super.paintChildren(g);
-        
+
         Rectangle clip = scrollPane.getBounds();
         gg.clipRect(clip.x, clip.y, clip.width, clip.height);
-        if (!blockDesc.isCollapsed()) for (Line line : exposingLinks.values())
-        {
-            line.update();
-            line.paint((Graphics2D) gg);
-        }
+        if (!blockDesc.isCollapsed())
+            for (Line line : exposingLinks.values())
+            {
+                line.update();
+                line.paint((Graphics2D) gg);
+            }
         gg.dispose();
-        
+
     }
-    
+
     @Override
     public void visibilityChanged(final Var<?> variable, boolean isVisible)
     {
@@ -283,21 +292,25 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                 refreshNow();
             }
         });
-        
-        if (isVisible)
+
+        updateExposedLink(variable, isVisible);
+    }
+
+    public void updateExposedLink(final Var<?> variable, boolean visible)
+    {
+        if (visible)
         {
             if (innerWorkFlow.getInputOwner(variable) != null)
             {
                 // source is an input variable
-                
                 final BlockDescriptor innerBlock = innerWorkFlow.getInputOwner(variable);
-                
+
                 ThreadUtil.invokeLater(new Runnable()
                 {
                     public void run()
                     {
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
-                        
+
                         exposingLinks.put(variable, new RoundedSquareLine(WorkFlowPanel.this, ownerPanel, variable)
                         {
                             @Override
@@ -305,26 +318,27 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                             {
                                 return varDropZones.get(variable);
                             }
-                            
+
                             @Override
                             protected DragDropZone getP2Zone()
                             {
                                 return ownerPanel.varDropZones.get(variable);
                             }
-                            
+
                             @Override
                             public void updateP1()
                             {
-                                if (blockDesc.isCollapsed()) return;
-                                
+                                if (blockDesc.isCollapsed())
+                                    return;
+
                                 DragDropZone dz = varDropZones.get(variable);
                                 int y = dz.getLocationOnScreen().y;
                                 int offsetY = getLocationOnScreen().y;
-                                
+
                                 x1 = dz.getWidth();
                                 y1 = y - offsetY + dz.getHeight() / 2;
                             }
-                            
+
                             @Override
                             public void updateP2()
                             {
@@ -343,25 +357,20 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                 }
                             }
                         });
-                        
-                        refresh();
                     }
                 }, true);
-                
             }
             else
             {
                 // source is an output variable
-                
                 final BlockDescriptor innerBlock = innerWorkFlow.getOutputOwner(variable);
-                
+
                 ThreadUtil.invokeLater(new Runnable()
                 {
                     public void run()
                     {
-                        
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
-                        
+
                         exposingLinks.put(variable, new RoundedSquareLine(ownerPanel, WorkFlowPanel.this, variable)
                         {
                             @Override
@@ -369,13 +378,13 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                             {
                                 return ownerPanel.varDragZones.get(variable);
                             }
-                            
+
                             @Override
                             protected DragDropZone getP2Zone()
                             {
                                 return varDragZones.get(variable);
                             }
-                            
+
                             @Override
                             public void updateP1()
                             {
@@ -393,16 +402,17 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                     y1 = loc.y - getLocationOnScreen().y + dz.getHeight() / 2;
                                 }
                             }
-                            
+
                             @Override
                             public void updateP2()
                             {
-                                if (blockDesc.isCollapsed()) return;
-                                
+                                if (blockDesc.isCollapsed())
+                                    return;
+
                                 DragDropZone dz = varDragZones.get(variable);
                                 int y = dz.getLocationOnScreen().y;
                                 int innerY = getLocationOnScreen().y;
-                                
+
                                 x2 = dz.getLocation().x;
                                 y2 = y - innerY + dz.getHeight() / 2;
                             }
@@ -414,48 +424,49 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
         else if (exposingLinks.containsKey(variable))
         {
             variable.setReference(null);
-            
+
             exposingLinks.remove(variable).dispose();
-            
+
             BlockDescriptor block = innerWorkFlow.getInputOwner(variable);
-            
+
             WorkFlow parentWorkFlow = blockDesc.getContainer();
-            
+
             if (block != null)
             {
                 // source is an input variable
                 varDropZones.remove(variable);
                 blockDesc.getContainer().getBlockDescriptor().removeInput(variable);
-                
+
                 // remove links pointed to the exposed variable (if any)
-                if (parentWorkFlow.isLinked(variable)) parentWorkFlow.removeLink(variable);
+                if (parentWorkFlow.isLinked(variable))
+                    parentWorkFlow.removeLink(variable);
             }
             else
             {
                 block = innerWorkFlow.getOutputOwner(variable);
-                
+
                 if (block != null)
                 {
                     varDragZones.remove(variable);
                     blockDesc.getContainer().getBlockDescriptor().removeOutput(variable);
-                    
+
                     // remove links pointed to the exposed variable (if any)
                     ArrayList<Link<?>> linksToDelete = new ArrayList<Link<?>>();
                     for (Link<?> link : parentWorkFlow.getLinksIterator())
-                        if (link.srcVar == variable) linksToDelete.add(link);
-                        
+                        if (link.srcVar == variable)
+                            linksToDelete.add(link);
+
                     for (Link<?> link : linksToDelete)
                         parentWorkFlow.removeLink(link.dstVar);
                 }
             }
         }
-        
+
         repaint();
-        
         // Repaint the top-level container
         getParent().repaint();
     }
-    
+
     public void drawPanel()
     {
         super.drawPanel();
@@ -467,39 +478,39 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             gbc_dropZone.fill = GridBagConstraints.NONE;
             gbc_dropZone.insets = new Insets(2, 0, 0, 0);
             gbc_dropZone.gridx = 0;
-            
+
             GridBagConstraints gbc_varName = new GridBagConstraints();
             gbc_varName.anchor = GridBagConstraints.CENTER;
             gbc_varName.fill = GridBagConstraints.HORIZONTAL;
             gbc_varName.insets = new Insets(2, 5, 0, 0);
             gbc_varName.gridx = 1;
             gbc_varName.weightx = 1;
-            
+
             GridBagConstraints gbc_dragZone = new GridBagConstraints();
             gbc_dragZone.anchor = GridBagConstraints.EAST;
             gbc_dragZone.fill = GridBagConstraints.NONE;
             gbc_dragZone.insets = new Insets(2, 5, 0, 0);
             gbc_dragZone.gridx = 2;
-            
+
             LinkedHashMap<BlockDescriptor, ArrayList<Var<?>>> inputs = new LinkedHashMap<BlockDescriptor, ArrayList<Var<?>>>();
             LinkedHashMap<BlockDescriptor, ArrayList<Var<?>>> outputs = new LinkedHashMap<BlockDescriptor, ArrayList<Var<?>>>();
-            
+
             JPanel blockP;
             Box blockBox;
             JPanel varPanel;
-            
+
             varBox.removeAll();
-            
+
             ArrayList<Var<?>> in;
             ArrayList<Var<?>> out;
-            
+
             int nbExposingBlocks = 0;
-            
+
             for (BlockDescriptor bd : innerWorkFlow)
             {
                 in = new ArrayList<Var<?>>();
                 out = new ArrayList<Var<?>>();
-                
+
                 for (Var<?> v : bd.inputVars)
                     if (exposingLinks.keySet().contains(v))
                     {
@@ -523,58 +534,59 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                         }
                     }
             }
-            
+
             varBox.setPreferredSize(new Dimension(0, exposingLinks.size() * 20 + nbExposingBlocks * 25));
-            
+
             for (BlockDescriptor bd : inputs.keySet())
             {
                 varBox.add(new JSeparator(JSeparator.HORIZONTAL));
                 blockP = new JPanel(new BorderLayout());
                 blockP.setOpaque(false);
-                
+
                 JLabel blockName = new JLabel("\t" + bd.getDefinedName(), JLabel.CENTER);
                 blockName.setFont(blockName.getFont().deriveFont(Font.BOLD + Font.ITALIC, 12));
                 blockP.add(blockName, BorderLayout.NORTH);
-                
+
                 blockBox = Box.createVerticalBox();
                 blockBox.setOpaque(false);
                 blockP.add(blockBox, BorderLayout.CENTER);
-                
+
                 for (Var<?> v : inputs.get(bd))
                 {
                     varPanel = new JPanel(new GridBagLayout());
                     varPanel.setOpaque(false);
-                    
+
                     varPanel.add(varDropZones.get(v), gbc_dropZone);
                     varPanel.add(new JLabel("\t" + v.getName()), gbc_varName);
-                    
+
                     blockBox.add(varPanel);
                 }
-                
+
                 for (Var<?> v : outputs.get(bd))
                 {
                     varPanel = new JPanel(new GridBagLayout());
                     varPanel.setOpaque(false);
-                    
+
                     varPanel.add(new JLabel("\t\t\t"), gbc_dropZone);
                     varPanel.add(new JLabel("\t" + v.getName()), gbc_varName);
                     varPanel.add(varDragZones.get(v), gbc_dragZone);
-                    
+
                     blockBox.add(varPanel);
                 }
-                
+
                 varBox.add(blockP);
             }
             setSize(getPreferredSize());
         }
     }
-    
+
     public Dimension getPreferredSize()
     {
         Dimension d = super.getPreferredSize();
-        
-        if (!blockDesc.isCollapsed()) return d;
-        
+
+        if (!blockDesc.isCollapsed())
+            return d;
+
         return new Dimension(200, d.height + varBox.getPreferredSize().height);
     }
 }

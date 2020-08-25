@@ -1,8 +1,9 @@
-bin
 pluginfile-protocols*.jar
-target/
 .idea/
 .settings/
+bin/
+build/
+target/
 *.iml
-*.eml
-
+.classpath
+.project

@@ -8,7 +8,12 @@
     <artifactId>icy-protocols</artifactId>
     <version>3.0.9</version>
 
-    <name>protocols</name>
+    <packaging>jar</packaging>
+
+    <name>Protocols</name>
+    <description>
+        Protocols (GUI part) plugin for Icy
+    </description>
 
     <properties>
         <outputJar>${project.build.outputDirectory}/../plugin</outputJar>

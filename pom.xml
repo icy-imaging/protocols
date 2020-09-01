@@ -4,9 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.bioimageanalysis.icy</groupId>
+    <parent>
+        <artifactId>pom-icy</artifactId>
+        <groupId>org.bioimageanalysis.icy</groupId>
+        <version>1.0.4</version>
+    </parent>
+
     <artifactId>icy-protocols</artifactId>
-    <version>3.0.9</version>
+    <version>3.0.10</version>
 
     <packaging>jar</packaging>
 
@@ -14,31 +19,6 @@
     <description>
         Protocols (GUI part) plugin for Icy
     </description>
-
-    <properties>
-        <outputJar>${project.build.outputDirectory}/../plugin</outputJar>
-    </properties>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <outputDirectory>${outputJar}</outputDirectory>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>plugins.adufour.protocols.Protocols</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
@@ -73,17 +53,4 @@
             <url>https://icy-nexus.pasteur.fr/repository/Icy/</url>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>icy-prod</id>
-            <name>icy-prod</name>
-            <url>https://icy-nexus.pasteur.fr/repository/icy-core/</url>
-        </repository>
-        <snapshotRepository>
-            <id>icy-dev</id>
-            <name>icy-dev</name>
-            <url>https://icy-nexus-dev.pasteur.cloud/repository/icy-core/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

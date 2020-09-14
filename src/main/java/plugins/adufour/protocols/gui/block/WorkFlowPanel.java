@@ -331,12 +331,16 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                 if (blockDesc.isCollapsed())
                                     return;
 
-                                DragDropZone dz = varDropZones.get(variable);
-                                int y = dz.getLocationOnScreen().y;
-                                int offsetY = getLocationOnScreen().y;
+                                DragDropZone dz = getP1Zone();
 
-                                x1 = dz.getWidth();
-                                y1 = y - offsetY + dz.getHeight() / 2;
+                                if (dz != null)
+                                {
+                                    int y = dz.getLocationOnScreen().y;
+                                    int offsetY = getLocationOnScreen().y;
+
+                                    x1 = dz.getWidth();
+                                    y1 = y - offsetY + dz.getHeight() / 2;
+                                }
                             }
 
                             @Override

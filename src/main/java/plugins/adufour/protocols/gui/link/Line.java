@@ -120,12 +120,12 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
 
         if (p1z != null)
             p1z.addMouseListener(this);
-        else
-            System.err.print("source drag zone null !");
+//        else
+//            System.err.print("source drag zone null !");
         if (p2z != null)
             p2z.addMouseListener(this);
-        else
-            System.err.print("destination drop zone null !");
+//        else
+//            System.err.print("destination drop zone null !");
     }
 
     /**

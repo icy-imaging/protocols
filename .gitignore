@@ -1,4 +1,4 @@
-pluginfile-protocols*.jar
+*.jar
 .idea/
 .settings/
 bin/
@@ -8,3 +8,4 @@ target/
 *.eml
 .classpath
 .project
+export.jardesc

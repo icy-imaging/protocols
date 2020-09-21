@@ -553,7 +553,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         MainFrame.pasteSelection(embed, true);
-        
+
         workFlow.addBlock(embed.getBlockDescriptor());
     }
 
@@ -584,6 +584,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
     public BlockPanel getBlockPanel(BlockDescriptor blockInfo)
     {
+        if (blockInfo == null)
+            return null;
+
         if (blockInfo.getBlock() == workFlow)
             return getParentPanel();
 

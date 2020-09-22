@@ -42,7 +42,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
 
     private final Var<?> variable;
 
-    private int iconSize = DEFAULT_ICON_SIZE;
+    private final int iconSize = DEFAULT_ICON_SIZE;
 
     private Icon defaultIcon;
 
@@ -53,15 +53,13 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
     /**
      * Creates a new drop zone for the given variable
      * 
-     * @param flowPane
-     *        the flow pane where variable links will come from
      * @param block
      *        the box that owns the specified input
      * @param input
      *        the input variable to link to
      * @return
      */
-    public static <T> DragDropZone createDropZone(Image image, WorkFlow workFlow, BlockDescriptor block, Var<T> input)
+    public static <T> DragDropZone createDropZone(final Image image, final WorkFlow workFlow, final BlockDescriptor block, final Var<T> input)
     {
         return new DropZone<T>(image, workFlow, block, input);
     }
@@ -77,13 +75,13 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
      *        the input variable to link
      * @return
      */
-    public static <T> DragDropZone createDragZone(Image image, WorkFlow workFlow, BlockDescriptor block,
-            Var<T> variable)
+    public static <T> DragDropZone createDragZone(final Image image, final WorkFlow workFlow, final BlockDescriptor block,
+            final Var<T> variable)
     {
         return new DragZone<T>(image, workFlow, block, variable);
     }
 
-    protected DragDropZone(String toolTipText, Image image, Var<?> variable)
+    protected DragDropZone(final String toolTipText, final Image image, final Var<?> variable)
     {
         super("");
         this.variable = variable;
@@ -117,7 +115,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         {
             if (variable instanceof VarGenericArray)
             {
-                VarGenericArray<?> array = (VarGenericArray<?>) variable;
+                final VarGenericArray<?> array = (VarGenericArray<?>) variable;
                 dataType = array.getInnerType();
             }
             else if (dataType.isArray())
@@ -129,10 +127,10 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         defaultIcon = getLinkIcon(getColor(dataType));
     }
 
-    public Icon getLinkIcon(Color color)
+    public Icon getLinkIcon(final Color color)
     {
-        Image myImage = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D) myImage.getGraphics();
+        final Image myImage = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = (Graphics2D) myImage.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -142,7 +140,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
 
         // draw the white arrow
         g.setColor(Color.white);
-        Path2D.Float arrow = new Path2D.Float();
+        final Path2D.Float arrow = new Path2D.Float();
         arrow.moveTo(2.5f, 5);
         arrow.lineTo(6, 5);
         arrow.lineTo(6, 2.5f);
@@ -170,7 +168,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         setIcon(errorIcon);
     }
 
-    public void setIconSize(int size)
+    public void setIconSize(final int size)
     {
         // this.iconSize = size;
         setDefaultLinkIcon();
@@ -183,26 +181,26 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
     }
 
     @Override
-    public void valueChanged(Var<Boolean> source, Boolean oldValue, Boolean newValue)
+    public void valueChanged(final Var<Boolean> source, final Boolean oldValue, final Boolean newValue)
     {
         setDefaultLinkIcon();
     }
 
     @Override
-    public void referenceChanged(Var<Boolean> source, Var<? extends Boolean> oldReference,
-            Var<? extends Boolean> newReference)
+    public void referenceChanged(final Var<Boolean> source, final Var<? extends Boolean> oldReference,
+            final Var<? extends Boolean> newReference)
     {
         setDefaultLinkIcon();
     }
 
     @Override
-    public void typeChanged(Object source, Class<?> oldType, Class<?> newType)
+    public void typeChanged(final Object source, final Class<?> oldType, final Class<?> newType)
     {
         updateDefaultIcon();
         setDefaultLinkIcon();
     }
 
-    public static Color getColor(Class<?> type)
+    public static Color getColor(final Class<?> type)
     {
         if (type == null)
             return Color.gray;

@@ -64,7 +64,7 @@ public class Protocols extends PluginActionable
         return preferences.get(PREF_FOLDER, System.getProperty("user.home"));
     }
 
-    public static void setDefaultProtocolFolder(String path)
+    public static void setDefaultProtocolFolder(final String path)
     {
         preferences.put(PREF_FOLDER, path);
     }
@@ -87,22 +87,21 @@ public class Protocols extends PluginActionable
         return reloading;
     }
 
-    public static void setReloading(boolean value)
+    public static void setReloading(final boolean value)
     {
         reloading = value;
     }
 
     /**
-     * Saves the current state of the Protocols interface and restarts it.<br/>
-     * This method is useful when plug-ins have been modified (via the plug-in loader) and requires
-     * Protocols to restart to take into account the new changes
-     * 
-     * @param reloadingNode
-     *        the node that caused the reload operation (should be reloaded last)
-     * @throws TransformerFactoryConfigurationError
-     * @throws TransformerException
-     */
-    public void reload(Document reloadingXML, String reloadingPath)
+	 * Saves the current state of the Protocols interface and restarts it.
+	 * <p>
+	 * This method is useful when plug-ins have been modified (via the plug-in
+	 * loader) and requires Protocols to restart to take into account the new
+	 * changes
+	 * 
+	 * @throws TransformerFactoryConfigurationError
+	 */
+    public void reload(final Document reloadingXML, final String reloadingPath)
     {
         // 0) avoid silly situations...
         if (mainFrame == null)
@@ -118,11 +117,11 @@ public class Protocols extends PluginActionable
         int counter = 1;
 
         // save protocols to the preferences file one by one
-        for (ProtocolPanel protocol : mainFrame.getProtocolPanels())
+        for (final ProtocolPanel protocol : mainFrame.getProtocolPanels())
         {
             try
             {
-                File attachedFile = protocol.getFile();
+                final File attachedFile = protocol.getFile();
                 String xmlProtocol;
 
                 if (attachedFile != null && attachedFile.getAbsolutePath().equals(reloadingPath))
@@ -134,13 +133,13 @@ public class Protocols extends PluginActionable
                     xmlProtocol = BlocksML.getInstance().toString(protocol.getWorkFlow());
                 }
 
-                XMLPreferences node = preferences.node("Protocol #" + counter++);
+                final XMLPreferences node = preferences.node("Protocol #" + counter++);
                 node.putBoolean("dirty", protocol.isDirty());
                 node.put("xml", xmlProtocol);
                 if (attachedFile != null)
                     node.put("fileName", attachedFile.getAbsolutePath());
             }
-            catch (TransformerException e)
+            catch (final TransformerException e)
             {
                 System.err.println("Warning: couldn't store protocol " + protocol.getName() + ":");
                 e.printStackTrace();
@@ -154,14 +153,15 @@ public class Protocols extends PluginActionable
 
         ThreadUtil.invokeLater(new Runnable()
         {
-            public void run()
+            @Override
+			public void run()
             {
                 // 3) launch a new instance of the Protocols plug-in
                 try
                 {
                     ((PluginActionable) PluginLoader.getPluginClass(Protocols.class.getName()).newInstance()).run();
                 }
-                catch (Exception e)
+                catch (final Exception e)
                 {
                     e.printStackTrace();
                 }
@@ -197,17 +197,17 @@ public class Protocols extends PluginActionable
 
         try
         {
-            int x = preferences.getInt("Window X", mainFrame.getX());
-            int y = preferences.getInt("Window Y", mainFrame.getY());
+            final int x = preferences.getInt("Window X", mainFrame.getX());
+            final int y = preferences.getInt("Window Y", mainFrame.getY());
             mainFrame.setLocation(x, y);
 
-            String protocolPath = parseCommandLineArgs(false);
+            final String protocolPath = parseCommandLineArgs(false);
 
             // we have a protocol filename specified ?
             if (protocolPath != null)
             {
-                ProtocolPanel panel = new ProtocolPanel(mainFrame);
-                Document xml = XMLUtil.loadDocument(protocolPath);
+                final ProtocolPanel panel = new ProtocolPanel(mainFrame);
+                final Document xml = XMLUtil.loadDocument(protocolPath);
 
                 // Discard invalid files
                 if (xml != null)
@@ -221,7 +221,7 @@ public class Protocols extends PluginActionable
                     {
                         panel.loadWorkFlow(xml, true);
                     }
-                    catch (BlocksReloadedException e)
+                    catch (final BlocksReloadedException e)
                     {
                         reload(xml, panel.getFile().getAbsolutePath());
                         return;
@@ -231,24 +231,24 @@ public class Protocols extends PluginActionable
             else
             {
                 // Reload potential temporary protocols from the preferences
-                ArrayList<XMLPreferences> protocols = preferences.getChildren();
+                final ArrayList<XMLPreferences> protocols = preferences.getChildren();
 
                 // no protocol info in XML preference
                 if (protocols.size() == 0)
                     mainFrame.addProtocolPane(new ProtocolPanel(mainFrame));
                 else
                 {
-                    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-                    for (XMLPreferences node : preferences.getChildren())
+                    for (final XMLPreferences node : preferences.getChildren())
                     {
-                        ProtocolPanel panel = new ProtocolPanel(mainFrame);
-                        String fileName = node.get("fileName", null);
+                        final ProtocolPanel panel = new ProtocolPanel(mainFrame);
+                        final String fileName = node.get("fileName", null);
                         if (fileName != null)
                             panel.setFile(new File(fileName));
                         mainFrame.addProtocolPane(panel);
 
-                        Document xml = builder.parse(new InputSource(new StringReader(node.get("xml", null))));
+                        final Document xml = builder.parse(new InputSource(new StringReader(node.get("xml", null))));
 
                         try
                         {
@@ -257,7 +257,7 @@ public class Protocols extends PluginActionable
                             // if the protocol loads correctly, remove it from the preferences
                             preferences.remove(node.name());
                         }
-                        catch (BlocksReloadedException e)
+                        catch (final BlocksReloadedException e)
                         {
                             reload(xml, panel.getFile().getAbsolutePath());
                             return;
@@ -266,15 +266,15 @@ public class Protocols extends PluginActionable
                 }
             }
         }
-        catch (ParserConfigurationException e)
+        catch (final ParserConfigurationException e)
         {
             e.printStackTrace();
         }
-        catch (SAXException e)
+        catch (final SAXException e)
         {
             e.printStackTrace();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             e.printStackTrace();
         }
@@ -286,13 +286,13 @@ public class Protocols extends PluginActionable
     /**
      * Build the command line arguments map and return protocol path if any is specified
      */
-    private static String parseCommandLineArgs(boolean verify)
+    private static String parseCommandLineArgs(final boolean verify)
     {
-        String[] clargs = Icy.getCommandLinePluginArgs();
+        final String[] clargs = Icy.getCommandLinePluginArgs();
         String result = null;
         boolean ok = false;
 
-        for (String clarg : clargs)
+        for (final String clarg : clargs)
         {
             // Sanity check
             if (!clarg.contains("="))
@@ -304,7 +304,7 @@ public class Protocols extends PluginActionable
                 continue;
             }
 
-            String[] keyValuePair = clarg.split("=");
+            final String[] keyValuePair = clarg.split("=");
             if (keyValuePair.length != 2)
             {
                 if (verify)
@@ -314,8 +314,8 @@ public class Protocols extends PluginActionable
                 continue;
             }
 
-            String key = keyValuePair[0];
-            String value = keyValuePair[1];
+            final String key = keyValuePair[0];
+            final String value = keyValuePair[1];
 
             if (key.isEmpty())
             {
@@ -353,22 +353,22 @@ public class Protocols extends PluginActionable
 
     private static void runHeadless()
     {
-        String protocolFile = parseCommandLineArgs(true);
+        final String protocolFile = parseCommandLineArgs(true);
 
-        Document xml = XMLUtil.loadDocument(protocolFile);
+        final Document xml = XMLUtil.loadDocument(protocolFile);
 
         // Discard invalid files
         if (xml == null)
             throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
 
         System.out.println("Loading workflow...");
-        WorkFlow workFlow = new WorkFlow(true);
+        final WorkFlow workFlow = new WorkFlow(true);
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);
 
         workFlow.run();
     }
 
-    public static void loadWorkFlow(File file)
+    public static void loadWorkFlow(final File file)
     {
         if (mainFrame == null)
             new Protocols().run();
@@ -383,7 +383,7 @@ public class Protocols extends PluginActionable
         mainFrame = null;
     }
 
-    public static void dispatchEvent(KeyEvent key)
+    public static void dispatchEvent(final KeyEvent key)
     {
         if (mainFrame != null)
             mainFrame.getContentPane().dispatchEvent(key);

@@ -1,15 +1,5 @@
 package plugins.adufour.protocols.gui;
 
-import icy.file.FileUtil;
-import icy.file.Saver;
-import icy.gui.component.button.IcyButton;
-import icy.image.IcyBufferedImage;
-import icy.image.IcyBufferedImageUtil;
-import icy.resource.ResourceUtil;
-import icy.resource.icon.IcyIcon;
-import icy.system.IcyHandledException;
-import icy.system.thread.ThreadUtil;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -37,6 +27,17 @@ import javax.swing.JTextArea;
 
 import org.w3c.dom.Document;
 
+import com.ochafik.io.JTextAreaOutputStream;
+
+import icy.file.FileUtil;
+import icy.file.Saver;
+import icy.gui.component.button.IcyButton;
+import icy.image.IcyBufferedImage;
+import icy.image.IcyBufferedImageUtil;
+import icy.resource.ResourceUtil;
+import icy.resource.icon.IcyIcon;
+import icy.system.IcyHandledException;
+import icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.lang.Link;
@@ -52,8 +53,6 @@ import plugins.adufour.protocols.gui.block.WorkFlowContainer;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarString;
 import plugins.adufour.vars.util.VarListener;
-
-import com.ochafik.io.JTextAreaOutputStream;
 
 @SuppressWarnings("serial")
 public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyChangeListener
@@ -78,22 +77,22 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     
     private File                        xmlFile;
     
-    public ProtocolPanel(MainFrame frame)
+    public ProtocolPanel(final MainFrame frame)
     {
         this(null, new WorkFlow(true), frame);
     }
     
-    private ProtocolPanel(File file, final WorkFlow workFlow, MainFrame frame)
+    private ProtocolPanel(final File file, final WorkFlow workFlow, final MainFrame frame)
     {
         // Prepare the log panel
-        JTextArea logArea = new JTextArea();
+        final JTextArea logArea = new JTextArea();
         logArea.setOpaque(false);
         logStream = new JTextAreaOutputStream(logArea);
         
         logPanel = new JPanel(new BorderLayout());
         logPanel.setOpaque(false);
         logPanel.add(new JLabel("Execution log", JLabel.CENTER), BorderLayout.NORTH);
-        JScrollPane logScrollPane = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        final JScrollPane logScrollPane = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         logPanel.add(logScrollPane, BorderLayout.CENTER);
         
         this.xmlFile = file;
@@ -121,11 +120,12 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         statusListener = new VarListener<String>()
         {
             @Override
-            public void valueChanged(Var<String> source, String oldValue, final String newValue)
+            public void valueChanged(final Var<String> source, final String oldValue, final String newValue)
             {
                 ThreadUtil.invokeLater(new Runnable()
                 {
-                    public void run()
+                    @Override
+					public void run()
                     {
                         workFlowStatusLabel.setText(newValue);
                     }
@@ -133,7 +133,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
             }
             
             @Override
-            public void referenceChanged(Var<String> source, Var<? extends String> oldReference, Var<? extends String> newReference)
+            public void referenceChanged(final Var<String> source, final Var<? extends String> oldReference, final Var<? extends String> newReference)
             {
                 
             }
@@ -144,7 +144,8 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         
         ThreadUtil.invokeLater(new Runnable()
         {
-            public void run()
+            @Override
+			public void run()
             {
                 splitPane.setDividerLocation(1.0);
             }
@@ -152,43 +153,43 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
     
     @Override
-    public void blockAdded(WorkFlow source, BlockDescriptor addedBlock)
+    public void blockAdded(final WorkFlow source, final BlockDescriptor addedBlock)
     {
         setDirty(true);
     }
     
     @Override
-    public void blockCollapsed(WorkFlow source, BlockDescriptor block, boolean collapsed)
+    public void blockCollapsed(final WorkFlow source, final BlockDescriptor block, final boolean collapsed)
     {
         setDirty(true);
     }
     
     @Override
-    public void blockDimensionChanged(WorkFlow source, BlockDescriptor block, int newWidth, int newHeight)
+    public void blockDimensionChanged(final WorkFlow source, final BlockDescriptor block, final int newWidth, final int newHeight)
     {
         setDirty(true);
     }
     
     @Override
-    public void blockLocationChanged(WorkFlow source, BlockDescriptor block, int newX, int newY)
+    public void blockLocationChanged(final WorkFlow source, final BlockDescriptor block, final int newX, final int newY)
     {
         setDirty(true);
     }
     
     @Override
-    public void blockStatusChanged(WorkFlow source, BlockDescriptor block, BlockStatus status)
+    public void blockStatusChanged(final WorkFlow source, final BlockDescriptor block, final BlockStatus status)
     {
         
     }
     
     @Override
-    public void blockVariableAdded(WorkFlow source, BlockDescriptor block, Var<?> variable)
+    public void blockVariableAdded(final WorkFlow source, final BlockDescriptor block, final Var<?> variable)
     {
         setDirty(true);
     }
     
     @Override
-    public <T> void blockVariableChanged(WorkFlow source, BlockDescriptor block, Var<T> variable, T newValue)
+    public <T> void blockVariableChanged(final WorkFlow source, final BlockDescriptor block, final Var<T> variable, final T newValue)
     {
         // Mark the protocol as changed if a user input has changed
         if (block.inputVars.contains(variable) && variable.getReference() == null)
@@ -198,19 +199,19 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
     
     @Override
-    public void blockRemoved(WorkFlow source, BlockDescriptor removedBlock)
+    public void blockRemoved(final WorkFlow source, final BlockDescriptor removedBlock)
     {
         setDirty(true);
     }
     
     @Override
-    public void linkAdded(WorkFlow source, Link<?> addedLink)
+    public void linkAdded(final WorkFlow source, final Link<?> addedLink)
     {
         setDirty(true);
     }
     
     @Override
-    public void linkRemoved(WorkFlow source, Link<?> removedLink)
+    public void linkRemoved(final WorkFlow source, final Link<?> removedLink)
     {
         setDirty(true);
     }
@@ -235,12 +236,12 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         return workFlow.size() == 0;
     }
     
-    public void setFile(File file)
+    public void setFile(final File file)
     {
         this.xmlFile = file;
     }
     
-    void setDirty(boolean dirty)
+    void setDirty(final boolean dirty)
     {
         firePropertyChange(WORKFLOW_MODIFIED, this.xmlDirty, dirty);
         this.xmlDirty = dirty;
@@ -250,8 +251,6 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
      * Saves the protocol to a XML file on disk. If no file was currently known for this protocol, a
      * dialog appears to ask for one
      * 
-     * @param askForNewFile
-     *            set to true if the protocol should be saved to a new file (i.e. "save as")
      * @return true if the saving operation was successful, false if canceled
      * @throws BlocksException
      *             if an error occurred while saving to disk
@@ -260,7 +259,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     {
         if (xmlFile == null)
         {
-            JFileChooser jfc = new JFileChooser(Protocols.getDefaultProtocolFolder());
+            final JFileChooser jfc = new JFileChooser(Protocols.getDefaultProtocolFolder());
             
             jfc.setFileFilter(BlocksML.XML_FILE_FILTER);
             jfc.setDialogTitle("Save an Icy protocol...");
@@ -274,7 +273,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
             Protocols.setDefaultProtocolFolder(file.getParent());
             
             // add extension if omitted
-            String name = file.getPath();
+            final String name = file.getPath();
             
             if (!name.toLowerCase().endsWith(".xml") && !name.toLowerCase().endsWith(".protocol"))
             {
@@ -283,14 +282,14 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
             
             if (file.exists())
             {
-                int option = JOptionPane.showConfirmDialog(this, file.getPath() + " already exists. Overwrite ?", "Confirmation", JOptionPane.OK_CANCEL_OPTION);
+                final int option = JOptionPane.showConfirmDialog(this, file.getPath() + " already exists. Overwrite ?", "Confirmation", JOptionPane.OK_CANCEL_OPTION);
                 if (option != JOptionPane.OK_OPTION) return false;
             }
             
             xmlFile = file;
         }
         
-        boolean success = saveToDisk(xmlFile);
+        final boolean success = saveToDisk(xmlFile);
         
         if (success)
         {
@@ -309,7 +308,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
      * @throws BlocksException
      *             if an error occurred while saving to disk
      */
-    public boolean saveToDisk(File f) throws BlocksException
+    public boolean saveToDisk(final File f) throws BlocksException
     {
         if (f == null) return false;
         
@@ -317,18 +316,18 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         {
             BlocksML.getInstance().saveWorkFlow(workFlow, f);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new IcyHandledException(e.getMessage());
         }
         
-        File snapshotFile = new File(FileUtil.setExtension(f.getPath(), "_screenshot.png"));
+        final File snapshotFile = new File(FileUtil.setExtension(f.getPath(), "_screenshot.png"));
         
         try
         {
             Saver.saveImage(snapshot(), snapshotFile, true);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             throw new RuntimeException("Unable to save the snapshot. Reason: " + e.getLocalizedMessage());
         }
@@ -341,27 +340,27 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
      */
     public IcyBufferedImage snapshot()
     {
-        BufferedImage image = new BufferedImage(workFlowContainer.getWidth(), workFlowContainer.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage image = new BufferedImage(workFlowContainer.getWidth(), workFlowContainer.getHeight(), BufferedImage.TYPE_INT_ARGB);
         
-        Graphics2D g2d = image.createGraphics();
+        final Graphics2D g2d = image.createGraphics();
         
         workFlowContainer.paint(g2d);
         
-        Rectangle bounds = workFlowContainer.getContentsBoundingBox();
+        final Rectangle bounds = workFlowContainer.getContentsBoundingBox();
         
-        IcyBufferedImage icyImage = IcyBufferedImage.createFrom(image);
+        final IcyBufferedImage icyImage = IcyBufferedImage.createFrom(image);
         
         return IcyBufferedImageUtil.getSubImage(icyImage, bounds.x, bounds.y, bounds.width, bounds.height);
     }
     
     @Override
-    public void statusChanged(WorkFlow source, String message)
+    public void statusChanged(final WorkFlow source, final String message)
     {
         statusMessage.setValue(message);
     }
     
     @Override
-    public void workFlowReordered(WorkFlow source)
+    public void workFlowReordered(final WorkFlow source)
     {
         setDirty(true);
     }
@@ -372,7 +371,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
     
     @Override
-    public void propertyChange(PropertyChangeEvent evt)
+    public void propertyChange(final PropertyChangeEvent evt)
     {
         if (evt.getPropertyName() == WORKFLOW_REPLACED)
         {
@@ -380,7 +379,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         }
     }
     
-    private void setWorkFlow(WorkFlow workFlow)
+    private void setWorkFlow(final WorkFlow workFlow)
     {
         if (this.workFlow != null)
         {
@@ -403,20 +402,20 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         removeAll();
     }
     
-    public void showBlocksPopupMenu(Component invoker)
+    public void showBlocksPopupMenu(final Component invoker)
     {
-        JPopupMenu blocksPopupMenu = new JPopupMenu();
+        final JPopupMenu blocksPopupMenu = new JPopupMenu();
         new BlocksFinder().createJMenu(blocksPopupMenu, workFlowContainer, new Point());
         blocksPopupMenu.show(invoker, 0, invoker.getHeight());
     }
     
-    public void showBlocksEmbedMenu(Component invoker)
+    public void showBlocksEmbedMenu(final Component invoker)
     {
-        JPopupMenu embedPopupMenu = new JPopupMenu();
+        final JPopupMenu embedPopupMenu = new JPopupMenu();
         // new BlocksFinder().createEmbedJMenu(embedPopupMenu, container);
         
-        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-        Container c = (Container) focusOwner;
+        final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        final Container c = (Container) focusOwner;
         WorkFlowContainer wfc;
         if (!(c instanceof JLayeredPane))
         {
@@ -430,7 +429,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         embedPopupMenu.show(invoker, 0, invoker.getHeight());
     }
     
-    public void updateRunButton(IcyButton buttonRun)
+    public void updateRunButton(final IcyButton buttonRun)
     {
         switch (workFlow.getBlockDescriptor().getStatus())
         {
@@ -449,13 +448,14 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
      * @param isDirty
      * @throws BlocksException
      */
-    public void loadWorkFlow(Document xml, final boolean isDirty) throws BlocksException, BlocksReloadedException
+    public void loadWorkFlow(final Document xml, final boolean isDirty) throws BlocksException, BlocksReloadedException
     {
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);
         
         ThreadUtil.invokeLater(new Runnable()
         {
-            public void run()
+            @Override
+			public void run()
             {
                 repaint();
                 setDirty(isDirty);
@@ -463,12 +463,12 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         }, true);
     }
     
-    public void addBlockListener(BlockListener blockListener)
+    public void addBlockListener(final BlockListener blockListener)
     {
         workFlow.getBlockDescriptor().addBlockListener(blockListener);
     }
     
-    public void removeBlockListener(BlockListener blockListener)
+    public void removeBlockListener(final BlockListener blockListener)
     {
         workFlow.getBlockDescriptor().removeBlockListener(blockListener);
     }

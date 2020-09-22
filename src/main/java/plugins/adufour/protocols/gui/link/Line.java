@@ -48,7 +48,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
 
     private boolean isSelected = false;
 
-    private Stroke selectedStroke = new BasicStroke(8);
+    private final Stroke selectedStroke = new BasicStroke(8);
 
     /**
      * Creates a line representing a link between two variables
@@ -62,7 +62,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * @throws IllegalArgumentException
      *         if the <code>link</code> argument is <code>null</code>
      */
-    public Line(BlockPanel srcPanel, BlockPanel dstPanel, Link<?> link) throws IllegalArgumentException
+    public Line(final BlockPanel srcPanel, final BlockPanel dstPanel, final Link<?> link) throws IllegalArgumentException
     {
         if (link == null)
             throw new IllegalArgumentException("link cannot be null");
@@ -90,7 +90,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * @param exposedVariable
      *        the exposed variable
      */
-    public Line(BlockPanel srcPanel, BlockPanel dstPanel, Var<?> exposedVariable)
+    public Line(final BlockPanel srcPanel, final BlockPanel dstPanel, final Var<?> exposedVariable)
     {
         this.link = null;
         this.srcPanel = srcPanel;
@@ -129,22 +129,28 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
     }
 
     /**
-     * @return the drag'drop zone corresponding to the first extremity of this line. This method is
-     *         called once when creating the line, in order to attach a mouse listener to the
-     *         drag'n'drop zone to support line coloring<br/>
-     *         NOTE: This method *must* be overridden if this line is not backed by a non-null link.
-     */
+	 * @return the drag'drop zone corresponding to the first extremity of this
+	 *         line. This method is called once when creating the line, in order
+	 *         to attach a mouse listener to the drag'n'drop zone to support
+	 *         line coloring
+	 *         <p>
+	 *         NOTE: This method *must* be overridden if this line is not backed
+	 *         by a non-null link.
+	 */
     protected DragDropZone getP1Zone()
     {
         return srcPanel.getDragZone(link.srcVar);
     }
 
     /**
-     * @return the drag'drop zone corresponding to the second extremity of this line. This method is
-     *         called once when creating the line, in order to attach a mouse listener to the
-     *         drag'n'drop zone to support line coloring<br/>
-     *         NOTE: This method *must* be overridden if this line is not backed by a non-null link.
-     */
+	 * @return the drag'drop zone corresponding to the second extremity of this
+	 *         line. This method is called once when creating the line, in order
+	 *         to attach a mouse listener to the drag'n'drop zone to support
+	 *         line coloring
+	 *         <p>
+	 *         NOTE: This method *must* be overridden if this line is not backed
+	 *         by a non-null link.
+	 */
     protected DragDropZone getP2Zone()
     {
         return dstPanel.getDropZone(link.dstVar);
@@ -152,14 +158,14 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
 
     protected void updateP1()
     {
-        Point loc = srcPanel.getDragZoneLocation(link.srcVar);
+        final Point loc = srcPanel.getDragZoneLocation(link.srcVar);
         x1 = loc.x;
         y1 = loc.y;
     }
 
     protected void updateP2()
     {
-        Point loc = dstPanel.getDropZoneLocation(link.dstVar);
+        final Point loc = dstPanel.getDropZoneLocation(link.dstVar);
         x2 = loc.x;
         y2 = loc.y;
     }
@@ -172,7 +178,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      */
     public abstract void updateShape(Path2D thePath, Ellipse2D theCloseButton);
 
-    public void paint(Graphics2D g)
+    public void paint(final Graphics2D g)
     {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -194,9 +200,9 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
             paintCloseButton(g);
     }
 
-    private void paintCloseButton(Graphics g)
+    private void paintCloseButton(final Graphics g)
     {
-        Graphics2D g2 = (Graphics2D) g.create();
+        final Graphics2D g2 = (Graphics2D) g.create();
         g2.fill(closeButton);
         g2.setColor(Color.white);
         g2.drawLine((int) closeButton.x + 4, (int) closeButton.y + 4, (int) closeButton.x + 8, (int) closeButton.y + 8);
@@ -204,9 +210,9 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
         g2.dispose();
     }
 
-    protected void updateCloseButtonShape(Shape s)
+    protected void updateCloseButtonShape(final Shape s)
     {
-        Rectangle r = s.getBounds();
+        final Rectangle r = s.getBounds();
         closeButton.setFrame(r.x + r.width / 2 - 6, r.y + r.height / 2 - 6, 13, 13);
     }
 
@@ -218,7 +224,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      *        the point to check
      * @return true if p is within the virtual close button, false otherwise
      */
-    public boolean isOverCloseButton(Point p)
+    public boolean isOverCloseButton(final Point p)
     {
         return isOverCloseButton(p.x, p.y);
     }
@@ -227,19 +233,17 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * Indicates if the location p is inside the virtual close button. This method can be used to
      * check whether the user has clicked on the close button
      * 
-     * @param p
-     *        the point to check
      * @return true if p is within the virtual close button, false otherwise
      */
-    public boolean isOverCloseButton(double x, double y)
+    public boolean isOverCloseButton(final double x, final double y)
     {
         return closeButton.contains(x, y);
     }
 
     public void dispose()
     {
-        DragDropZone p1 = getP1Zone();
-        DragDropZone p2 = getP2Zone();
+        final DragDropZone p1 = getP1Zone();
+        final DragDropZone p2 = getP2Zone();
         if (p1 != null)
             p1.removeMouseListener(this); // TODO leak ?
         if (p2 != null)
@@ -250,50 +254,50 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
     }
 
     @Override
-    public void componentHidden(ComponentEvent arg0)
+    public void componentHidden(final ComponentEvent arg0)
     {
     }
 
     @Override
-    public void componentMoved(ComponentEvent arg0)
-    {
-        updateLine((BlockPanel) arg0.getSource());
-    }
-
-    @Override
-    public void componentResized(ComponentEvent arg0)
+    public void componentMoved(final ComponentEvent arg0)
     {
         updateLine((BlockPanel) arg0.getSource());
     }
 
     @Override
-    public void componentShown(ComponentEvent arg0)
+    public void componentResized(final ComponentEvent arg0)
+    {
+        updateLine((BlockPanel) arg0.getSource());
+    }
+
+    @Override
+    public void componentShown(final ComponentEvent arg0)
     {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e)
+    public void mouseClicked(final MouseEvent e)
     {
     }
 
     @Override
-    public void mousePressed(MouseEvent e)
+    public void mousePressed(final MouseEvent e)
     {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e)
+    public void mouseReleased(final MouseEvent e)
     {
     }
 
     @Override
-    public void mouseEntered(MouseEvent e)
+    public void mouseEntered(final MouseEvent e)
     {
         setCustomColor(true);
     }
 
     @Override
-    public void mouseExited(MouseEvent e)
+    public void mouseExited(final MouseEvent e)
     {
         setCustomColor(false);
     }
@@ -305,7 +309,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * 
      * @param custom
      */
-    public void setCustomColor(boolean custom)
+    public void setCustomColor(final boolean custom)
     {
         isHighlighted = custom;
         srcPanel.getWorkFlowContainer().repaint();
@@ -324,11 +328,11 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
                     updateP1();
                     updateP2();
                 }
-                catch (IllegalComponentStateException e)
+                catch (final IllegalComponentStateException e)
                 {
 
                 }
-                catch (NullPointerException e)
+                catch (final NullPointerException e)
                 {
 
                 }
@@ -336,7 +340,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
         });
     }
 
-    private void updateLine(BlockPanel panel)
+    private void updateLine(final BlockPanel panel)
     {
         if (panel == srcPanel)
         {
@@ -348,7 +352,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
         }
     }
 
-    public void setSelected(boolean selected)
+    public void setSelected(final boolean selected)
     {
         isSelected = selected;
     }

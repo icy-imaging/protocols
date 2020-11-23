@@ -10,7 +10,7 @@
         <version>1.0.4</version>
     </parent>
 
-    <artifactId>icy-protocols</artifactId>
+    <artifactId>protocols</artifactId>
     <version>3.0.12</version>
 
     <packaging>jar</packaging>
@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>icy-blocks</artifactId>
+            <artifactId>blocks</artifactId>
             <version>1.0.2</version>
         </dependency>
         <dependency>

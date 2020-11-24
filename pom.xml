@@ -7,7 +7,7 @@
     <parent>
         <artifactId>pom-icy</artifactId>
         <groupId>org.bioimageanalysis.icy</groupId>
-        <version>1.0.4</version>
+        <version>1.0.6</version>
     </parent>
 
     <artifactId>protocols</artifactId>
@@ -28,12 +28,12 @@
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>blocks</artifactId>
-            <version>1.0.2</version>
+            <version>${blocks.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>icy-javadocparser</artifactId>
-            <version>1.0.0</version>
+            <artifactId>javadocparser</artifactId>
+            <version>${javadocparser.version}</version>
         </dependency>
         <dependency>
             <groupId>com.nativelibs4java</groupId>
@@ -41,15 +41,4 @@
             <version>0.12</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>japa-repo</id>
-            <url>http://maven.geomajas.org/</url>
-        </repository>
-        <repository>
-            <id>icy</id>
-            <url>https://icy-nexus.pasteur.fr/repository/Icy/</url>
-        </repository>
-    </repositories>
 </project>

@@ -7,11 +7,11 @@
     <parent>
         <artifactId>pom-icy</artifactId>
         <groupId>org.bioimageanalysis.icy</groupId>
-        <version>1.0.6</version>
+        <version>1.0.8</version>
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>3.0.12</version>
+    <version>3.1.0</version>
 
     <packaging>jar</packaging>
 
@@ -23,8 +23,8 @@
     <dependencies>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>blocks</artifactId>
-            <version>${blocks.version}</version>
+            <artifactId>ezplug</artifactId>
+            <version>${ezplug.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
@@ -37,4 +37,11 @@
             <version>0.12</version>
         </dependency>
     </dependencies>
+    
+     <repositories>
+        <repository>
+            <id>icy</id>
+            <url>https://icy-nexus.pasteur.fr/repository/Icy/</url>
+        </repository>
+    </repositories>
 </project>

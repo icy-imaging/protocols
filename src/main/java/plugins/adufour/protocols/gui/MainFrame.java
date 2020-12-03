@@ -53,7 +53,6 @@ import icy.system.IcyExceptionHandler;
 import icy.system.IcyHandledException;
 import icy.system.thread.ThreadUtil;
 import icy.util.XMLUtil;
-import plugins.adufour.blocks.Blocks;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
@@ -107,7 +106,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
 
     public MainFrame(Protocols pluginInstance)
     {
-        super("Protocols editor (" + new Blocks().getFriendlyVersion() + ")", true, true, true, true, true);
+        super("Protocols editor (" + pluginInstance.getFriendlyVersion() + ")", true, true, true, true, true);
 
         this.pluginInstance = pluginInstance;
 

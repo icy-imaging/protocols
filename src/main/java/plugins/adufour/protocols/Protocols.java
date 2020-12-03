@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import icy.common.Version;
 import icy.file.FileUtil;
 import icy.main.Icy;
 import icy.plugin.PluginLoader;
@@ -93,14 +94,14 @@ public class Protocols extends PluginActionable
     }
 
     /**
-	 * Saves the current state of the Protocols interface and restarts it.
-	 * <p>
-	 * This method is useful when plug-ins have been modified (via the plug-in
-	 * loader) and requires Protocols to restart to take into account the new
-	 * changes
-	 * 
-	 * @throws TransformerFactoryConfigurationError
-	 */
+     * Saves the current state of the Protocols interface and restarts it.
+     * <p>
+     * This method is useful when plug-ins have been modified (via the plug-in
+     * loader) and requires Protocols to restart to take into account the new
+     * changes
+     * 
+     * @throws TransformerFactoryConfigurationError
+     */
     public void reload(final Document reloadingXML, final String reloadingPath)
     {
         // 0) avoid silly situations...
@@ -154,7 +155,7 @@ public class Protocols extends PluginActionable
         ThreadUtil.invokeLater(new Runnable()
         {
             @Override
-			public void run()
+            public void run()
             {
                 // 3) launch a new instance of the Protocols plug-in
                 try
@@ -388,4 +389,11 @@ public class Protocols extends PluginActionable
         if (mainFrame != null)
             mainFrame.getContentPane().dispatchEvent(key);
     }
+
+    public String getFriendlyVersion()
+    {
+        Version v = getDescriptor().getVersion();
+        return "Blocks engine v." + v.getMajor() + "." + v.getMinor();
+    }
+
 }

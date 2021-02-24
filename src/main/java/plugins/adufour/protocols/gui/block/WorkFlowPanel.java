@@ -165,14 +165,14 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
     }
 
     /**
-	 * Draws the drag'n'drop zones representing the exposed variables of the
-	 * inner work flow
-	 * 
-	 * @param row
-	 *            the row where to start drawing within the
-	 *            {@link GridBagLayout}
-	 * @return the last row used in the {@link GridBagLayout}
-	 */
+     * Draws the drag'n'drop zones representing the exposed variables of the
+     * inner work flow
+     * 
+     * @param row
+     *        the row where to start drawing within the
+     *        {@link GridBagLayout}
+     * @return the last row used in the {@link GridBagLayout}
+     */
     protected int drawExposedLinks(final int row)
     {
         int rowIn = row;
@@ -196,8 +196,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
             gbc_dropZone.gridx = 0;
             gbc_dropZone.gridy = rowIn++;
             gbc_dropZone.weighty = 0;
-            final DragDropZone dropZone = varDropZones.get(input);
-            jPanelContent.add(dropZone, gbc_dropZone);
+            jPanelContent.add(varDropZones.get(input), gbc_dropZone);
         }
 
         int rowOut = row;
@@ -310,7 +309,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                 ThreadUtil.invokeLater(new Runnable()
                 {
                     @Override
-					public void run()
+                    public void run()
                     {
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
 
@@ -361,9 +360,12 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                 else
                                 {
                                     final DragDropZone dz = ownerPanel.varDropZones.get(variable);
-                                    final Point loc = dz.getLocationOnScreen();
-                                    x2 = loc.x - getLocationOnScreen().x;
-                                    y2 = loc.y - getLocationOnScreen().y + dz.getHeight() / 2;
+                                    if (dz != null)
+                                    {
+                                        final Point loc = dz.getLocationOnScreen();
+                                        x2 = loc.x - getLocationOnScreen().x;
+                                        y2 = loc.y - getLocationOnScreen().y + dz.getHeight() / 2;
+                                    }
                                 }
                             }
                         });
@@ -378,7 +380,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                 ThreadUtil.invokeLater(new Runnable()
                 {
                     @Override
-					public void run()
+                    public void run()
                     {
                         final BlockPanel ownerPanel = innerFlowPane.getBlockPanel(innerBlock);
 
@@ -411,9 +413,13 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                 else
                                 {
                                     final DragDropZone dz = ownerPanel.varDragZones.get(variable);
-                                    final Point loc = dz.getLocationOnScreen();
-                                    x1 = loc.x - getLocationOnScreen().x + dz.getWidth();
-                                    y1 = loc.y - getLocationOnScreen().y + dz.getHeight() / 2;
+                                    
+                                    if (dz != null)
+                                    {
+                                        final Point loc = dz.getLocationOnScreen();
+                                        x1 = loc.x - getLocationOnScreen().x + dz.getWidth();
+                                        y1 = loc.y - getLocationOnScreen().y + dz.getHeight() / 2;
+                                    }
                                 }
                             }
 
@@ -424,11 +430,15 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                                     return;
 
                                 final DragDropZone dz = varDragZones.get(variable);
-                                final int y = dz.getLocationOnScreen().y;
-                                final int innerY = getLocationOnScreen().y;
+                                
+                                if (dz != null)
+                                {
+                                    final int y = dz.getLocationOnScreen().y;
+                                    final int innerY = getLocationOnScreen().y;
 
-                                x2 = dz.getLocation().x;
-                                y2 = y - innerY + dz.getHeight() / 2;
+                                    x2 = dz.getLocation().x;
+                                    y2 = y - innerY + dz.getHeight() / 2;
+                                }
                             }
                         });
                     }
@@ -482,7 +492,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
     }
 
     @Override
-	public void drawPanel()
+    public void drawPanel()
     {
         super.drawPanel();
         varBox.setVisible(blockDesc.isCollapsed());
@@ -571,10 +581,15 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
                     varPanel = new JPanel(new GridBagLayout());
                     varPanel.setOpaque(false);
 
-                    varPanel.add(varDropZones.get(v), gbc_dropZone);
-                    varPanel.add(new JLabel("\t" + v.getName()), gbc_varName);
+                    final DragDropZone dz = varDropZones.get(v);
 
-                    blockBox.add(varPanel);
+                    if (dz != null)
+                    {
+                        varPanel.add(dz, gbc_dropZone);
+                        varPanel.add(new JLabel("\t" + v.getName()), gbc_varName);
+
+                        blockBox.add(varPanel);
+                    }
                 }
 
                 for (final Var<?> v : outputs.get(bd))
@@ -584,9 +599,15 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
 
                     varPanel.add(new JLabel("\t\t\t"), gbc_dropZone);
                     varPanel.add(new JLabel("\t" + v.getName()), gbc_varName);
-                    varPanel.add(varDragZones.get(v), gbc_dragZone);
 
-                    blockBox.add(varPanel);
+                    final DragDropZone dz = varDragZones.get(v);
+
+                    if (dz != null)
+                    {
+                        varPanel.add(dz, gbc_dragZone);
+
+                        blockBox.add(varPanel);
+                    }
                 }
 
                 varBox.add(blockP);
@@ -596,7 +617,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener
     }
 
     @Override
-	public Dimension getPreferredSize()
+    public Dimension getPreferredSize()
     {
         final Dimension d = super.getPreferredSize();
 

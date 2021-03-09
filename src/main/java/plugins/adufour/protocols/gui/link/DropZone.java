@@ -155,6 +155,6 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
         
         // only available on java < 10
         if (SystemUtil.getJavaVersionAsNumber() < 10d)
-            dropTarget.getDropTargetContext().removeNotify();
+            dropTarget.getDropTargetContext().dropComplete(true);
     }
 }

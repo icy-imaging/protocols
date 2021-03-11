@@ -755,9 +755,9 @@ public class BlocksML
                         "Some plugins required by this protocol are missing,  but no internet connection is available");
 
             // Are we using Icy's plug-in loader (and not Eclipse)?
-            if (getClass().getClassLoader() == ClassLoader.getSystemClassLoader())
-                throw new IcyHandledException(
-                        "Cannot install missing blocks while using Icy4Eclipse in \"Debug\" or \"Run\" modes");
+//            if (getClass().getClassLoader() == ClassLoader.getSystemClassLoader())
+//                throw new IcyHandledException(
+//                        "Cannot install missing blocks while using Icy4Eclipse in \"Debug\" or \"Run\" modes");
 
             // we are live!
             String message = "[Protocols] Installing required plugins...";

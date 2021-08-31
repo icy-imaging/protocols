@@ -24,19 +24,23 @@ public class CallIJPlugin extends Plugin implements IJBlock
     {
         try
         {
-            IJ.run(varIp.getValue(true), pluginName.getValue(true), pluginParams.getValue(true));
+            ImagePlus imgPlus = varIp.getValue(false);
+            String params = pluginParams.getValue(false);
+            
+            if (imgPlus != null)
+                IJ.run(imgPlus, pluginName.getValue(true), params);
+            else
+                IJ.run(pluginName.getValue(true), params);
+
             // Set the output image (if available) with the following priority
-            ImagePlus output = WindowManager.getCurrentImage();
+            ImagePlus output = IJ.getImage();
+            // Default to the current "temporary" image (if any)
             if (output == null)
-            {
-                // Default to the current "temporary" image (if any)
                 output = WindowManager.getTempCurrentImage();
-            }
+            // Default to the input image (may have been modified "in-place"
             if (output == null)
-            {
-                // Default to the input image (may have been modified "in-place"
                 output = varIp.getValue();
-            }
+            
             varActiveIP.setValue(output);
         }
         catch (RuntimeException e)

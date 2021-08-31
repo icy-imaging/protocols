@@ -43,6 +43,7 @@ import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.blocks.tools.input.InputBlock;
+import plugins.adufour.blocks.tools.output.OutputBlock;
 import plugins.adufour.protocols.Protocols;
 import plugins.adufour.vars.gui.model.TypeSelectionModel;
 import plugins.adufour.vars.lang.Var;
@@ -598,7 +599,7 @@ public class BlocksML
             XMLUtil.setAttributeValue(blockNode, "definedName", blockData.getDefinedName());
             XMLUtil.setAttributeBooleanValue(blockNode, "keepsResults", blockData.keepsResults());
 
-            if (block instanceof InputBlock)
+            if ((block instanceof InputBlock) || (block instanceof OutputBlock))
                 XMLUtil.setAttributeValue(blockNode, "CommandLineID", blockData.getCommandLineID());
 
             if (blockData.isWorkFlow())
@@ -1360,7 +1361,7 @@ public class BlocksML
 
             blockDescriptor.keepResults(XMLUtil.getAttributeBooleanValue(blockNode, "keepsResults", true));
 
-            if (block instanceof InputBlock)
+            if ((block instanceof InputBlock) || (block instanceof OutputBlock))
                 blockDescriptor.setCommandLineID(XMLUtil.getAttributeValue(blockNode, "CommandLineID", ""));
 
             workFlow.addBlock(blockDescriptor);

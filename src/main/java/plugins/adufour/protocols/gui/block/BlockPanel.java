@@ -53,6 +53,7 @@ import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.blocks.tools.input.InputBlock;
+import plugins.adufour.blocks.tools.output.OutputBlock;
 import plugins.adufour.blocks.util.BlockListener;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.protocols.Protocols;
@@ -90,7 +91,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener
             if (dragging)
             {
                 WorkFlow wf = workFlowPane.getWorkFlow();
-                
+
                 if (wf.isBlockSelected(blockDesc))
                 {
                     for (BlockDescriptor bd : wf.getBlockSelection())
@@ -846,7 +847,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener
 
         menu.addSeparator();
 
-        if (blockDesc.getBlock() instanceof InputBlock)
+        if ((blockDesc.getBlock() instanceof InputBlock) || (blockDesc.getBlock() instanceof OutputBlock))
         {
             // option to retrieve parameter from command line
             String tooltip = "<html><h4>Identifier used to set the value from the command line</h4></html>";

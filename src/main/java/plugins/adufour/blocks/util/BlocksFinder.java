@@ -51,6 +51,7 @@ import plugins.adufour.blocks.tools.ToolsBlock;
 import plugins.adufour.blocks.tools.ij.IJBlock;
 import plugins.adufour.blocks.tools.input.InputBlock;
 import plugins.adufour.blocks.tools.io.IOBlock;
+import plugins.adufour.blocks.tools.output.OutputBlock;
 import plugins.adufour.blocks.tools.roi.ROIBlock;
 import plugins.adufour.blocks.tools.sequence.SequenceBlock;
 import plugins.adufour.protocols.gui.BlockSearchPanel;
@@ -311,6 +312,9 @@ public class BlocksFinder
         JMenu mnInput = new JMenu("Read...");
         mnInput.setIcon(new IcyIcon(ResourceUtil.ICON_REDO, 22));
 
+        JMenu mnOutput = new JMenu("Out...");
+        mnOutput.setIcon(new IcyIcon(ResourceUtil.ICON_UNDO, 22));
+
         JMenu mnIO = new JMenu("I/O...");
         mnIO.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE, 22));
 
@@ -432,6 +436,10 @@ public class BlocksFinder
                 {
                     mnInput.add(menuItem);
                 }
+                else if (OutputBlock.class.isAssignableFrom(blockClass))
+                {
+                    mnOutput.add(menuItem);
+                }
                 else if (SequenceBlock.class.isAssignableFrom(blockClass))
                 {
                     mnSeq.add(menuItem);
@@ -489,6 +497,7 @@ public class BlocksFinder
 
         splitLongMenus(mnBlocks, 15);
         splitLongMenus(mnInput, 15);
+        splitLongMenus(mnOutput, 15);
         splitLongMenus(mnSeq, 15);
         splitLongMenus(mnROI, 15);
         splitLongMenus(mnIO, 15);
@@ -498,6 +507,7 @@ public class BlocksFinder
 
         menuContainer.add(mnBlocks);
         menuContainer.add(mnInput);
+        menuContainer.add(mnOutput);
         menuContainer.add(mnSeq);
         menuContainer.add(mnROI);
         menuContainer.add(mnIO);

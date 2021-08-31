@@ -45,7 +45,7 @@ public class SequenceFileBatch extends FileBatch
     {
         try
         {
-            element.setValue(Loader.loadSequence(files[getIterationCounter().getValue()].getPath(), -1, false));
+            element.setValue(Loader.loadSequence(files[getIterationCounter().getValue()].getPath(), 0, false));
             Thread.yield();
         }
         catch (Exception e)

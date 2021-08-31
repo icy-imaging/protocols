@@ -156,6 +156,17 @@ public class VarList implements Iterable<Var<?>>
     }
 
     /**
+     * @return first contained variable in the {@link VarList} and <i>null</i> if VarList is empty
+     */
+    public Var<?> first()
+    {
+        for (Var<?> v : varMap.values())
+            return v;
+
+        return null;
+    }
+
+    /**
      * @deprecated Legacy method (used to load old XML work flows).
      * @param <T>
      *        Type of the variable value.

@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import icy.gui.dialog.ConfirmDialog;
 import icy.main.Icy;
@@ -16,6 +17,8 @@ import icy.system.IcyHandledException;
 import icy.system.thread.ThreadUtil;
 import icy.util.StringUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
+import plugins.adufour.blocks.tools.input.InputBlock;
+import plugins.adufour.blocks.tools.output.OutputBlock;
 import plugins.adufour.blocks.util.BlockListener;
 import plugins.adufour.blocks.util.BlocksException;
 import plugins.adufour.blocks.util.LinkCutException;
@@ -405,6 +408,61 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         }
 
         return srcDependsOnDst;
+    }
+
+    /**
+     * @param recursive
+     *        if we also want blocks from sub workflow
+     * @return all blocks contained in current workflow
+     */
+    public List<BlockDescriptor> getBlockDescriptors(boolean recursive)
+    {
+        final List<BlockDescriptor> result = new ArrayList<>();
+
+        synchronized (orderedBlocks)
+        {
+            for (BlockDescriptor block : orderedBlocks)
+            {
+                if (recursive && block.isWorkFlow())
+                    result.addAll(((WorkFlow) block.getBlock()).getBlockDescriptors(true));
+
+                result.add(block);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @param recursive
+     *        if we also want blocks from sub workflow
+     * @return all Input type blocks ({@link InputBlock} contained in current workflow
+     */
+    public List<BlockDescriptor> getInputBlockDescriptors(boolean recursive)
+    {
+        final List<BlockDescriptor> result = new ArrayList<>();
+
+        for (BlockDescriptor block : getBlockDescriptors(recursive))
+            if (block.isInput())
+                result.add(block);
+
+        return result;
+    }
+
+    /**
+     * @param recursive
+     *        if we also want blocks from sub workflow
+     * @return all Output type blocks ({@link OutputBlock} contained in current workflow
+     */
+    public List<BlockDescriptor> getOutputBlockDescriptors(boolean recursive)
+    {
+        final List<BlockDescriptor> result = new ArrayList<>();
+
+        for (BlockDescriptor block : getBlockDescriptors(recursive))
+            if (block.isOutput())
+                result.add(block);
+
+        return result;
     }
 
     public BlockDescriptor getBlock(int index)

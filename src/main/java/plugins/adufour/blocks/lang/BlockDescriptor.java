@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +26,15 @@ import icy.util.StringUtil;
 import icy.util.XMLUtil;
 import plugins.adufour.blocks.tools.Display;
 import plugins.adufour.blocks.tools.input.InputBlock;
-import plugins.adufour.blocks.util.*;
+import plugins.adufour.blocks.tools.output.OutputBlock;
+import plugins.adufour.blocks.util.BlockListener;
+import plugins.adufour.blocks.util.BlocksException;
+import plugins.adufour.blocks.util.BlocksFinder;
+import plugins.adufour.blocks.util.BlocksML;
+import plugins.adufour.blocks.util.BlocksReloadedException;
+import plugins.adufour.blocks.util.NoSuchVariableException;
+import plugins.adufour.blocks.util.VarList;
+import plugins.adufour.blocks.util.VarListListener;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.lang.VarMutableArray;
@@ -353,9 +362,19 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return block instanceof Loop;
     }
 
+    public boolean isInput()
+    {
+        return block instanceof InputBlock;
+    }
+
+    public boolean isOutput()
+    {
+        return block instanceof OutputBlock;
+    }
+
     public boolean isSingleBlock()
     {
-        return block instanceof Display || block instanceof InputBlock;
+        return block instanceof Display || block instanceof InputBlock || block instanceof OutputBlock;
     }
 
     public boolean isWorkFlow()
@@ -824,7 +843,48 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return definedName;
     }
 
-    private BlockDescriptor getBlockDescriptor(int blockId, Set<BlockDescriptor> bds)
+    public static BlockDescriptor findBlockDescriptor(int blockId, List<BlockDescriptor> blocks)
+    {
+        for (BlockDescriptor bd : blocks)
+            if (bd.getID().intValue() == blockId)
+                return bd;
+
+        return null;
+    }
+
+    /**
+     * @param commandLineId
+     *        commandLineId (see {@link BlockDescriptor#getCommandLineID()}
+     * @param blocks
+     *        list of {@link BlockDescriptor}
+     * @return Input block {@link InputBlock} with given commandLineId or <i>null</i> if it doesn't exist
+     */
+    public static BlockDescriptor findInputBlockDescriptor(String commandLineId, List<BlockDescriptor> blocks)
+    {
+        for (BlockDescriptor block : blocks)
+            if (block.isInput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
+                return block;
+
+        return null;
+    }
+
+    /**
+     * @param commandLineId
+     *        commandLineId (see {@link BlockDescriptor#getCommandLineID()}
+     * @param blocks
+     *        list of {@link BlockDescriptor}
+     * @return Output block {@link OutputBlock} with given commandLineId or <i>null</i> if it doesn't exist
+     */
+    public static BlockDescriptor findOutputBlockDescriptor(String commandLineId, List<BlockDescriptor> blocks)
+    {
+        for (BlockDescriptor block : blocks)
+            if (block.isOutput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
+                return block;
+
+        return null;
+    }
+
+    private static BlockDescriptor getBlockDescriptor(int blockId, Set<BlockDescriptor> bds)
     {
         for (BlockDescriptor bd : bds)
             if (bd.getID().intValue() == blockId)
@@ -1098,9 +1158,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     }
 
     /**
-     * (This method is used only if the block implements {@link InputBlock})
+     * (This method is used only if the block implements {@link InputBlock} or {@link OutputBlock})
      * 
-     * @return the command-line identifier for the input block's variable
+     * @return the command-line identifier for the input/ouput block's variable
      */
     public String getCommandLineID()
     {
@@ -1108,8 +1168,8 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     }
 
     /**
-     * (This method is used only if the block implements {@link InputBlock})
-     * Sets the command line identifier for this input block's variable
+     * (This method is used only if the block implements {@link InputBlock} or {@link OutputBlock})
+     * Sets the command line identifier for this input/output block's variable
      * 
      * @param id
      *        Block identifier when using the command line.
@@ -1117,5 +1177,14 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     public void setCommandLineID(String id)
     {
         commandLineID = id;
+    }
+
+    /**
+     * @return the single variable of this block, useful for single input block as {@link InputBlock} or {@link OutputBlock}
+     */
+    public Var<?> getVariable()
+    {
+        // OutputBlock actually store the variable in the input list only
+        return inputVars.first();
     }
 }

@@ -30,6 +30,7 @@ import icy.preferences.XMLPreferences;
 import icy.system.thread.ThreadUtil;
 import icy.util.XMLUtil;
 import plugins.adufour.blocks.lang.WorkFlow;
+import plugins.adufour.blocks.util.BlocksException;
 import plugins.adufour.blocks.util.BlocksML;
 import plugins.adufour.blocks.util.BlocksReloadedException;
 import plugins.adufour.protocols.gui.MainFrame;
@@ -227,6 +228,10 @@ public class Protocols extends PluginActionable
                         reload(xml, panel.getFile().getAbsolutePath());
                         return;
                     }
+                    catch (BlocksException e2)
+                    {
+                        e2.printStackTrace();
+                    }
                 }
             }
             else
@@ -262,6 +267,10 @@ public class Protocols extends PluginActionable
                         {
                             reload(xml, panel.getFile().getAbsolutePath());
                             return;
+                        }
+                        catch (BlocksException e2)
+                        {
+                            e2.printStackTrace();
                         }
                     }
                 }

@@ -12,13 +12,13 @@ import plugins.adufour.vars.lang.VarString;
 public class CallIJPlugin extends Plugin implements IJBlock
 {
     VarImagePlus varIp = new VarImagePlus("Input ImagePlus", null);
-    
+
     VarString pluginName = new VarString("plug-in name", "");
-    
+
     VarString pluginParams = new VarString("parameters", "");
-    
+
     VarImagePlus varActiveIP = new VarImagePlus("Output (active) ImagePlus", null);
-    
+
     @Override
     public void run()
     {
@@ -26,21 +26,31 @@ public class CallIJPlugin extends Plugin implements IJBlock
         {
             ImagePlus imgPlus = varIp.getValue(false);
             String params = pluginParams.getValue(false);
-            
+
             if (imgPlus != null)
                 IJ.run(imgPlus, pluginName.getValue(true), params);
             else
                 IJ.run(pluginName.getValue(true), params);
 
-            // Set the output image (if available) with the following priority
-            ImagePlus output = IJ.getImage();
+            ImagePlus output = null;
+            
+            try
+            {
+                // Set the output image (if available) with the following priority
+                output = WindowManager.getCurrentImage();
+            }
+            catch (RuntimeException e)
+            {
+                // just in case
+            }
+
             // Default to the current "temporary" image (if any)
             if (output == null)
                 output = WindowManager.getTempCurrentImage();
             // Default to the input image (may have been modified "in-place"
             if (output == null)
                 output = varIp.getValue();
-            
+
             varActiveIP.setValue(output);
         }
         catch (RuntimeException e)
@@ -48,7 +58,7 @@ public class CallIJPlugin extends Plugin implements IJBlock
             throw new IcyHandledException(e.getLocalizedMessage());
         }
     }
-    
+
     @Override
     public void declareInput(VarList inputMap)
     {
@@ -56,7 +66,7 @@ public class CallIJPlugin extends Plugin implements IJBlock
         inputMap.add("ImageJ plug-in name", pluginName);
         inputMap.add("ImageJ plug-in parameters", pluginParams);
     }
-    
+
     @Override
     public void declareOutput(VarList outputMap)
     {

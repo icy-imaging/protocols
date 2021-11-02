@@ -27,7 +27,7 @@ public class GetActiveImagePlus extends Plugin implements IJBlock
     public void run()
     {
         // Set the output image (if available) with the following priority
-        ImagePlus imgPlus = IJ.getImage();
+        ImagePlus imgPlus = WindowManager.getCurrentImage();
         // Default to the current "temporary" image (if any)
         if (imgPlus == null)
             imgPlus = WindowManager.getTempCurrentImage();

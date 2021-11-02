@@ -10,7 +10,6 @@ import java.awt.dnd.InvalidDnDOperationException;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
-import sun.awt.dnd.SunDragSourceContextPeer;
 
 /**
  * Button defining an area on a panel from where an output variable can be dragged to another panel
@@ -56,16 +55,7 @@ public class DragZone<T> extends DragDropZone implements DragGestureListener
         }
         catch (final InvalidDnDOperationException idoe)
         {
-            try
-            {
-                SunDragSourceContextPeer.setDragDropInProgress(false);
-            }
-            catch (Throwable t)
-            {
-
-            }
-
-            DragSource.getDefaultDragSource().startDrag(dge, DragSource.DefaultLinkDrop, transferable, null);
+            dge.startDrag(DragSource.DefaultLinkDrop, transferable, null);
         }
     }
 }

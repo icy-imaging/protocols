@@ -18,7 +18,14 @@ public class SubtractROI extends Plugin implements ROIBlock
     @Override
     public void run()
     {
-        roiOut.setValue(subtractROI(roiA.getValue(true), roiB.getValue(true)));
+        try
+        {
+            roiOut.setValue(subtractROI(roiA.getValue(true), roiB.getValue(true)));
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
@@ -42,8 +49,10 @@ public class SubtractROI extends Plugin implements ROIBlock
      * @param roiB
      *        ROIs subtracted from the first group of ROIs.
      * @return A - B. The group of ROIs resulting from the subtraction from the each element of the group A and each element of the group B.
+     * @throws InterruptedException
+     * @throws UnsupportedOperationException
      */
-    public static ROI[] subtractROI(ROI[] roiA, ROI[] roiB)
+    public static ROI[] subtractROI(ROI[] roiA, ROI[] roiB) throws UnsupportedOperationException, InterruptedException
     {
         ArrayList<ROI> out = new ArrayList<ROI>(roiA.length);
 

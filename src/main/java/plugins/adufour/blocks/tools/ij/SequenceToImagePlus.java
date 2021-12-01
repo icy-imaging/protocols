@@ -5,6 +5,7 @@ import icy.plugin.abstract_.Plugin;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarImagePlus;
 import plugins.adufour.vars.lang.VarSequence;
+import plugins.adufour.vars.util.VarException;
 
 public class SequenceToImagePlus extends Plugin implements IJBlock
 {
@@ -14,7 +15,22 @@ public class SequenceToImagePlus extends Plugin implements IJBlock
     @Override
     public void run()
     {
-        vip.setValue(ImageJUtil.convertToImageJImage(vs.getValue(true), null));
+        try
+        {
+            vip.setValue(ImageJUtil.convertToImageJImage(vs.getValue(true), null));
+        }
+        catch (IllegalAccessError e)
+        {
+            throw new VarException(vs, e.getMessage());
+        }
+        catch (VarException e)
+        {
+            throw e;
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
     
     @Override

@@ -44,11 +44,21 @@ public class SequenceScreenshot extends Plugin implements SequenceBlock
 
         final Canvas2D canvas2D = canvas2DP[0];
 
-        for (int t = 0; t < time; t++)
-            for (int z = 0; z < depth; z++)
-                out.setImage(t, z, canvas2D.getRenderedImage(t, z, -1, false));
-
-        viewer.close();
+        try
+        {
+            for (int t = 0; t < time; t++)
+                for (int z = 0; z < depth; z++)
+                    out.setImage(t, z, canvas2D.getRenderedImage(t, z, -1, false));
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+            return;
+        }
+        finally
+        {
+            viewer.close();
+        }
 
         seqOut.setValue(out);
     }

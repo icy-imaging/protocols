@@ -14,34 +14,40 @@ import plugins.adufour.vars.lang.VarROIArray;
 public class MergeROI extends Plugin implements ROIBlock
 {
     VarEnum<BooleanOperator> operation = new VarEnum<BooleanOperator>("Merge operation", BooleanOperator.AND);
-    
-    VarROIArray              roiIn     = new VarROIArray("List of ROI");
-    
-    VarROIArray              roiOut    = new VarROIArray("Merged ROI");
-    
+
+    VarROIArray roiIn = new VarROIArray("List of ROI");
+
+    VarROIArray roiOut = new VarROIArray("Merged ROI");
+
     @Override
     public void run()
     {
         roiOut.setValue(new ROI[0]);
-        
-        List<ROI> rois = Arrays.asList(roiIn.getValue());
-        
-        ROI merge = ROIUtil.merge(rois, operation.getValue());
-        
-        if (merge != null) roiOut.add(merge);
+
+        try
+        {
+            List<ROI> rois = Arrays.asList(roiIn.getValue());
+            ROI merge = ROIUtil.merge(rois, operation.getValue());
+            if (merge != null)
+                roiOut.add(merge);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
-    
+
     @Override
     public void declareInput(VarList inputMap)
     {
         inputMap.add("List of ROI", roiIn);
         inputMap.add("Merge operation", operation);
     }
-    
+
     @Override
     public void declareOutput(VarList outputMap)
     {
         outputMap.add("Merged ROI", roiOut);
     }
-    
+
 }

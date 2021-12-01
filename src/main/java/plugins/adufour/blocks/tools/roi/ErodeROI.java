@@ -24,16 +24,23 @@ public class ErodeROI extends MorphROI
     @Override
     public void run()
     {
-        switch (unit.getValue())
+        try
         {
-            case PIXELS:
-                roiOUT.setValue(erodeROI(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
-                break;
-            case PERCENTAGE:
-                roiOUT.setValue(erodeROIByPercentage(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
-                break;
-            default:
-                throw new VarException(unit, "Unsupported unit");
+            switch (unit.getValue())
+            {
+                case PIXELS:
+                    roiOUT.setValue(erodeROI(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
+                    break;
+                case PERCENTAGE:
+                    roiOUT.setValue(erodeROIByPercentage(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
+                    break;
+                default:
+                    throw new VarException(unit, "Unsupported unit");
+            }
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -50,8 +57,9 @@ public class ErodeROI extends MorphROI
      * @param zRadius
      *        the radius (in pixels) along Z (not used if <code>roi</code> is 2D)
      * @return a new set of eroded ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI[] erodeROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius)
+    public static ROI[] erodeROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius) throws InterruptedException
     {
         ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
 
@@ -81,8 +89,9 @@ public class ErodeROI extends MorphROI
      * @param zPct
      *        the percentage (from 0 to 100) to erode along Z (not used in 2D)
      * @return a new set of eroded ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI[] erodeROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct)
+    public static ROI[] erodeROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct) throws InterruptedException
     {
         ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
 
@@ -113,8 +122,9 @@ public class ErodeROI extends MorphROI
      * @param zPct
      *        the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new, dilated ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI erodeROIByPercentage(ROI roi, int xPct, int yPct, int zPct)
+    public static ROI erodeROIByPercentage(ROI roi, int xPct, int yPct, int zPct) throws InterruptedException
     {
         int xRadius = percentageToRadiusX(roi, xPct);
         int yRadius = percentageToRadiusY(roi, yPct);
@@ -135,8 +145,9 @@ public class ErodeROI extends MorphROI
      * @param zRadius
      *        the radius in pixels along Z (not used if <code>roi</code> is 2D)
      * @return a new, eroded ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI erodeROI(ROI roi, int xRadius, int yRadius, int zRadius)
+    public static ROI erodeROI(ROI roi, int xRadius, int yRadius, int zRadius) throws InterruptedException
     {
         // The basis of this erosion operator is to remove all pixels within a distance of "radius"
         // from the border. Since we have easy access to the contour points of the ROI, we will

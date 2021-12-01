@@ -24,16 +24,23 @@ public class DilateROI extends MorphROI
     @Override
     public void run()
     {
-        switch (unit.getValue())
+        try
         {
-            case PIXELS:
-                roiOUT.setValue(dilateROI(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
-                break;
-            case PERCENTAGE:
-                roiOUT.setValue(dilateROIByPercentage(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
-                break;
-            default:
-                throw new VarException(unit, "Unsupported unit");
+            switch (unit.getValue())
+            {
+                case PIXELS:
+                    roiOUT.setValue(dilateROI(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
+                    break;
+                case PERCENTAGE:
+                    roiOUT.setValue(dilateROIByPercentage(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
+                    break;
+                default:
+                    throw new VarException(unit, "Unsupported unit");
+            }
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -50,8 +57,9 @@ public class DilateROI extends MorphROI
      * @param zRadius
      *        the radius (in pixels) along Z (not used if <code>roi</code> is 2D)
      * @return a new set of dilated ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI[] dilateROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius)
+    public static ROI[] dilateROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius) throws InterruptedException
     {
         ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
 
@@ -81,8 +89,9 @@ public class DilateROI extends MorphROI
      * @param zPct
      *        the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new set of dilated ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI[] dilateROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct)
+    public static ROI[] dilateROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct) throws InterruptedException
     {
         ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
 
@@ -113,8 +122,9 @@ public class DilateROI extends MorphROI
      * @param zPct
      *        the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new, dilated ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI dilateROIByPercentage(ROI roi, int xPct, int yPct, int zPct)
+    public static ROI dilateROIByPercentage(ROI roi, int xPct, int yPct, int zPct) throws InterruptedException
     {
         int xRadius = percentageToRadiusX(roi, xPct);
         int yRadius = percentageToRadiusY(roi, yPct);
@@ -135,8 +145,9 @@ public class DilateROI extends MorphROI
      * @param zRadius
      *        the radius in pixels along Z (not used if <code>roi</code> is 2D)
      * @return a new, dilated ROI of type "area"
+     * @throws InterruptedException
      */
-    public static ROI dilateROI(ROI roi, int xRadius, int yRadius, int zRadius)
+    public static ROI dilateROI(ROI roi, int xRadius, int yRadius, int zRadius) throws InterruptedException
     {
         int rx = xRadius, rrx = rx * rx;
         int ry = yRadius, rry = ry * ry;

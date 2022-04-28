@@ -926,8 +926,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     @SuppressWarnings("unchecked")
     public BlockDescriptor clone(boolean embedding, Map<BlockDescriptor, BlockDescriptor> copies)
     {
-        Class<? extends Block> blockClass = PluginLoader.getPlugin(getBlock().getClass().getName()).getPluginClass()
-                .asSubclass(Block.class);
+        // TODO: Why we were using the PluginLoader to retrieve the plugin class ?? (Stephane)
+        // could give issue when for some reasons a Block class isn't present in the PluginLoader plugin list
+//        Class<? extends Block> blockClass = PluginLoader.getPlugin(getBlock().getClass().getName()).getPluginClass()
+//                .asSubclass(Block.class);
+        Class<? extends Block> blockClass = getBlock().getClass().asSubclass(Block.class);
         WorkFlow wf = null;
         WorkFlow wfCpy = null;
         BlockDescriptor cpy = null;

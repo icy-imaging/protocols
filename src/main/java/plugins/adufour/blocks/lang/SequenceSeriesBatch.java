@@ -87,6 +87,10 @@ public class SequenceSeriesBatch extends Batch
         {
             throw new VarException(multiSeriesFile, "Unable to read " + path);
         }
+        catch (InterruptedException e)
+        {
+            throw new VarException(multiSeriesFile, "Process interrupted !");
+        }
     }
 
     @Override

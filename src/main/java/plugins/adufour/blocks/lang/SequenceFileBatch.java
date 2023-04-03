@@ -15,18 +15,15 @@ import plugins.adufour.vars.lang.VarSequence;
  * series to process. However only the first selected series will be loaded. To
  * batch process entire multi-series files, use the {@link SequenceSeriesBatch
  * Sequence series batch} instead.
- * 
+ *
  * @author Alexandre Dufour
  */
-public class SequenceFileBatch extends FileBatch
-{
+public class SequenceFileBatch extends FileBatch {
     VarSequence element;
 
     @Override
-    public VarSequence getBatchElement()
-    {
-        if (element == null)
-        {
+    public VarSequence getBatchElement() {
+        if (element == null) {
             // WARNING: do *not* change the name of this variable
             // why? see declareInput() and VarList.add()
             element = new VarSequence("Sequence", null);
@@ -35,21 +32,17 @@ public class SequenceFileBatch extends FileBatch
     }
 
     @Override
-    public boolean accept(File f)
-    {
+    public boolean accept(File f) {
         return f.isDirectory() || super.accept(f) && Loader.isSupportedImageFile(f.getPath());
     }
 
     @Override
-    public void beforeIteration()
-    {
-        try
-        {
+    public void beforeIteration() {
+        try {
             element.setValue(Loader.loadSequence(files[getIterationCounter().getValue()].getPath(), 0, false));
             Thread.yield();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             Thread.currentThread().interrupt();
         }
     }

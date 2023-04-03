@@ -6,26 +6,22 @@ import plugins.adufour.vars.lang.VarString;
 
 /**
  * Text input
- * 
+ *
  * @author Alexandre Dufour
  */
-public class TextOutput extends Plugin implements OutputBlock
-{
+public class TextOutput extends Plugin implements OutputBlock {
     @Override
-    public void run()
-    {
-        
+    public void run() {
+
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("text", new VarString("text", ""));
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
-        
+    public void declareOutput(VarList outputMap) {
+
     }
 }

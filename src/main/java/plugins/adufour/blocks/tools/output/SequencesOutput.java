@@ -6,25 +6,21 @@ import plugins.adufour.vars.lang.VarSequenceArray;
 
 /**
  * Utility block reading a list of {@link icy.sequence.Sequence} objects
- * 
+ *
  * @author Alexandre Dufour
  */
-public class SequencesOutput extends Plugin implements OutputBlock
-{
+public class SequencesOutput extends Plugin implements OutputBlock {
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         VarSequenceArray vsa = new VarSequenceArray("sequence");
         inputMap.add("input sequence", vsa);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
 }

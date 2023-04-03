@@ -14,20 +14,15 @@ import plugins.adufour.vars.util.VarException;
 import plugins.kernel.roi.roi2d.ROI2DArea;
 import plugins.kernel.roi.roi3d.ROI3DArea;
 
-public class DilateROI extends MorphROI
-{
-    public DilateROI()
-    {
+public class DilateROI extends MorphROI {
+    public DilateROI() {
         roiOUT = new VarROIArray("Dilated ROI");
     }
 
     @Override
-    public void run()
-    {
-        try
-        {
-            switch (unit.getValue())
-            {
+    public void run() {
+        try {
+            switch (unit.getValue()) {
                 case PIXELS:
                     roiOUT.setValue(dilateROI(roiIN.getValue(), x.getValue(), y.getValue(), z.getValue()));
                     break;
@@ -38,8 +33,7 @@ public class DilateROI extends MorphROI
                     throw new VarException(unit, "Unsupported unit");
             }
         }
-        catch (InterruptedException e)
-        {
+        catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -47,24 +41,18 @@ public class DilateROI extends MorphROI
     /**
      * Perform a morphological dilation on the specified set of ROI by the given amount in each
      * dimension
-     * 
-     * @param inputRoi
-     *        The ROI to dilate
-     * @param xRadius
-     *        the radius (in pixels) along X
-     * @param yRadius
-     *        the radius (in pixels) along X
-     * @param zRadius
-     *        the radius (in pixels) along Z (not used if <code>roi</code> is 2D)
+     *
+     * @param inputRoi The ROI to dilate
+     * @param xRadius  the radius (in pixels) along X
+     * @param yRadius  the radius (in pixels) along X
+     * @param zRadius  the radius (in pixels) along Z (not used if <code>roi</code> is 2D)
      * @return a new set of dilated ROI of type "area"
      * @throws InterruptedException
      */
-    public static ROI[] dilateROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius) throws InterruptedException
-    {
-        ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
+    public static ROI[] dilateROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius) throws InterruptedException {
+        ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
-        for (ROI roi : inputRoi)
-        {
+        for (ROI roi : inputRoi) {
             if (Thread.currentThread().isInterrupted())
                 break;
 
@@ -79,24 +67,18 @@ public class DilateROI extends MorphROI
     /**
      * Perform a morphological dilation on the specified set of ROI by the given percentage in each
      * dimension
-     * 
-     * @param inputRoi
-     *        the ROI to dilate
-     * @param xPct
-     *        the percentage (from 0 to 100) to dilate along X
-     * @param yPct
-     *        the percentage (from 0 to 100) to dilate along Y
-     * @param zPct
-     *        the percentage (from 0 to 100) to dilate along Z (not used in 2D)
+     *
+     * @param inputRoi the ROI to dilate
+     * @param xPct     the percentage (from 0 to 100) to dilate along X
+     * @param yPct     the percentage (from 0 to 100) to dilate along Y
+     * @param zPct     the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new set of dilated ROI of type "area"
      * @throws InterruptedException
      */
-    public static ROI[] dilateROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct) throws InterruptedException
-    {
-        ArrayList<ROI> out = new ArrayList<ROI>(inputRoi.length);
+    public static ROI[] dilateROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct) throws InterruptedException {
+        ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
-        for (ROI roi : inputRoi)
-        {
+        for (ROI roi : inputRoi) {
             if (Thread.currentThread().isInterrupted())
                 break;
 
@@ -111,21 +93,16 @@ public class DilateROI extends MorphROI
     /**
      * Perform a morphological dilation on the specified ROI by the given percentage in each
      * dimension
-     * 
-     * @author Joel Rogers, Alexandre Dufour
-     * @param roi
-     *        the ROI to dilate
-     * @param xPct
-     *        the percentage (from 0 to 100) to dilate along X
-     * @param yPct
-     *        the percentage (from 0 to 100) to dilate along Y
-     * @param zPct
-     *        the percentage (from 0 to 100) to dilate along Z (not used in 2D)
+     *
+     * @param roi  the ROI to dilate
+     * @param xPct the percentage (from 0 to 100) to dilate along X
+     * @param yPct the percentage (from 0 to 100) to dilate along Y
+     * @param zPct the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new, dilated ROI of type "area"
      * @throws InterruptedException
+     * @author Joel Rogers, Alexandre Dufour
      */
-    public static ROI dilateROIByPercentage(ROI roi, int xPct, int yPct, int zPct) throws InterruptedException
-    {
+    public static ROI dilateROIByPercentage(ROI roi, int xPct, int yPct, int zPct) throws InterruptedException {
         int xRadius = percentageToRadiusX(roi, xPct);
         int yRadius = percentageToRadiusY(roi, yPct);
         int zRadius = percentageToRadiusZ(roi, zPct);
@@ -135,26 +112,20 @@ public class DilateROI extends MorphROI
 
     /**
      * Perform a morphological dilation on the specified ROI by the given radius in each dimension
-     * 
-     * @param roi
-     *        the ROI to dilate
-     * @param xRadius
-     *        the radius in pixels along X
-     * @param yRadius
-     *        the radius in pixels along X
-     * @param zRadius
-     *        the radius in pixels along Z (not used if <code>roi</code> is 2D)
+     *
+     * @param roi     the ROI to dilate
+     * @param xRadius the radius in pixels along X
+     * @param yRadius the radius in pixels along X
+     * @param zRadius the radius in pixels along Z (not used if <code>roi</code> is 2D)
      * @return a new, dilated ROI of type "area"
      * @throws InterruptedException
      */
-    public static ROI dilateROI(ROI roi, int xRadius, int yRadius, int zRadius) throws InterruptedException
-    {
+    public static ROI dilateROI(ROI roi, int xRadius, int yRadius, int zRadius) throws InterruptedException {
         int rx = xRadius, rrx = rx * rx;
         int ry = yRadius, rry = ry * ry;
         int rz = zRadius, rrz = rz * rz;
 
-        if (roi instanceof ROI2D)
-        {
+        if (roi instanceof ROI2D) {
             BooleanMask2D m2 = ((ROI2D) roi).getBooleanMask(true);
             ROI2DArea r2 = new ROI2DArea(m2);
             r2.setC(((ROI2D) roi).getC());
@@ -164,17 +135,14 @@ public class DilateROI extends MorphROI
 
             r2.beginUpdate();
 
-            for (Point p : m2.getContourPoints())
-            {
+            for (Point p : m2.getContourPoints()) {
                 // Brute force
                 for (int y = -ry; y <= ry; y++)
-                    for (int x = -rx; x <= rx; x++)
-                    {
+                    for (int x = -rx; x <= rx; x++) {
                         double xr2 = rrx == 0 ? 0 : x * x / rrx;
                         double yr2 = rry == 0 ? 0 : y * y / rry;
 
-                        if (xr2 + yr2 <= 1.0)
-                        {
+                        if (xr2 + yr2 <= 1.0) {
                             if (!m2.contains(p.x + x, p.y + y))
                                 r2.addPoint(p.x + x, p.y + y);
                         }
@@ -215,8 +183,7 @@ public class DilateROI extends MorphROI
 
             return r2;
         }
-        else if (roi instanceof ROI3D)
-        {
+        else if (roi instanceof ROI3D) {
             ROI3D roi3D = (ROI3D) roi;
 
             BooleanMask3D m3 = roi3D.getBooleanMask(true);
@@ -228,37 +195,30 @@ public class DilateROI extends MorphROI
 
             r3.beginUpdate();
 
-            for (Point3D.Integer p : m3.getContourPoints())
-            { // Brute force
+            for (Point3D.Integer p : m3.getContourPoints()) { // Brute force
 
-                if (rrz == 0)
-                {
+                if (rrz == 0) {
                     int z = 0;
                     for (int y = -ry; y <= ry; y++)
-                        for (int x = -rx; x <= rx; x++)
-                        {
+                        for (int x = -rx; x <= rx; x++) {
                             double xr2 = rrx == 0 ? 0 : x * x / rrx;
                             double yr2 = rry == 0 ? 0 : y * y / rry;
 
-                            if (xr2 + yr2 <= 1.0)
-                            {
+                            if (xr2 + yr2 <= 1.0) {
                                 if (!m3.contains(p.x + x, p.y + y, p.z + z))
                                     r3.addPoint(p.x + x, p.y + y, p.z + z);
                             }
                         }
                 }
-                else
-                {
+                else {
                     for (int z = -rz; z <= rz; z++)
                         for (int y = -ry; y <= ry; y++)
-                            for (int x = -rx; x <= rx; x++)
-                            {
+                            for (int x = -rx; x <= rx; x++) {
                                 double xr2 = rrx == 0 ? 0 : x * x / rrx;
                                 double yr2 = rry == 0 ? 0 : y * y / rry;
                                 double zr2 = rrz == 0 ? 0 : z * z / rrz;
 
-                                if (xr2 + yr2 + zr2 <= 1.0)
-                                {
+                                if (xr2 + yr2 + zr2 <= 1.0) {
                                     if (!m3.contains(p.x + x, p.y + y, p.z + z))
                                         r3.addPoint(p.x + x, p.y + y, p.z + z);
                                 }

@@ -27,9 +27,7 @@ import plugins.adufour.protocols.gui.link.DragDropZone;
 import plugins.adufour.protocols.gui.link.DragZone;
 import plugins.adufour.vars.lang.Var;
 
-@SuppressWarnings("serial")
-public class LoopPanel extends WorkFlowPanel
-{
+public class LoopPanel extends WorkFlowPanel {
     private final Loop loop;
 
     private final JPanel innerLoopPanel;
@@ -39,17 +37,14 @@ public class LoopPanel extends WorkFlowPanel
      */
     protected final JCheckBox menuStopOnFirstError = new JCheckBox("Stop on first error");
 
-    public LoopPanel(WorkFlowContainer wfPane, BlockDescriptor blockInfo)
-    {
+    public LoopPanel(WorkFlowContainer wfPane, BlockDescriptor blockInfo) {
         super(wfPane, blockInfo);
         this.loop = (Loop) blockDesc.getBlock();
 
         // create a special panel to receive the loop variables
-        innerLoopPanel = new JPanel(new GridBagLayout())
-        {
+        innerLoopPanel = new JPanel(new GridBagLayout()) {
             @Override
-            public void paintChildren(Graphics g)
-            {
+            public void paintChildren(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
 
                 Point2D p1 = gradient.getPoint1();
@@ -72,10 +67,8 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getSource() == menuStopOnFirstError)
-        {
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == menuStopOnFirstError) {
             loop.stopOnFirstError.setValue(menuStopOnFirstError.isSelected());
         }
         else
@@ -83,8 +76,7 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    protected void drawMenu()
-    {
+    protected void drawMenu() {
         super.drawMenu();
 
         // add an extra option to close the work flow while preserving its contents
@@ -92,8 +84,7 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    protected void drawContent()
-    {
+    protected void drawContent() {
         innerLoopPanel.removeAll();
 
         int nextRow = 0;
@@ -103,11 +94,9 @@ public class LoopPanel extends WorkFlowPanel
             nextRow = drawBatchVariables(nextRow);
 
         // add other loop variables
-        for (Var<?> loopVariable : loop.getLoopVariables())
-        {
+        for (Var<?> loopVariable : loop.getLoopVariables()) {
             // don't re-draw batch elements again...
-            if (blockDesc.getBlock() instanceof Batch)
-            {
+            if (blockDesc.getBlock() instanceof Batch) {
                 Batch batch = (Batch) blockDesc.getBlock();
                 if (loopVariable == batch.getBatchSource() || loopVariable == batch.getBatchElement())
                     continue;
@@ -126,8 +115,7 @@ public class LoopPanel extends WorkFlowPanel
         drawInnerWorkFlowContainer(nextRow + 1);
     }
 
-    private int drawBatchVariables(int row)
-    {
+    private int drawBatchVariables(int row) {
         Batch batch = (Batch) blockDesc.getBlock();
 
         // Batch variables (source and element) are drawn in a peculiar way:
@@ -136,7 +124,7 @@ public class LoopPanel extends WorkFlowPanel
         // create drop zone and editor for the batch source
         Var<?> batchSource = batch.getBatchSource();
         if (!varDropZones.containsKey(batchSource))
-            varDropZones.put(batchSource, createVarDropZone(batchSource, true, DragDropZone.LINK_RIGHT));
+            varDropZones.put(batchSource, createVarDropZone(batchSource, true));
         if (!varEditors.containsKey(batchSource))
             varEditors.put(batchSource, createVarEditor(batchSource));
 
@@ -192,19 +180,17 @@ public class LoopPanel extends WorkFlowPanel
         return row + 1;
     }
 
-    private int drawLoopVariable(int startRow, Var<?> loopVar)
-    {
+    private int drawLoopVariable(int startRow, Var<?> loopVar) {
         boolean isLoopInput = loop.getBlockDescriptor().inputVars.contains(loopVar);
 
         if (!varDropZones.containsKey(loopVar) && isLoopInput)
-            varDropZones.put(loopVar, createVarDropZone(loopVar, true, DragDropZone.LINK_RIGHT));
+            varDropZones.put(loopVar, createVarDropZone(loopVar, true));
         if (!varEditors.containsKey(loopVar))
             varEditors.put(loopVar, createVarEditor(loopVar));
         if (!varDragZones.containsKey(loopVar))
             varDragZones.put(loopVar, createVarDragZone(loopVar, true));
 
-        if (isLoopInput)
-        {
+        if (isLoopInput) {
             GridBagConstraints gbc_dropZone = new GridBagConstraints();
             gbc_dropZone.anchor = GridBagConstraints.WEST;
             gbc_dropZone.fill = GridBagConstraints.NONE;
@@ -253,17 +239,14 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    public Point getDragZoneLocation(Var<?> output)
-    {
+    public Point getDragZoneLocation(Var<?> output) {
         if (blockDesc.isCollapsed())
             return super.getDragZoneLocation(output);
 
-        if (loop.isLoopVariable(output))
-        {
+        if (loop.isLoopVariable(output)) {
             DragDropZone dz = varDragZones.get(output);
-            
-            if (dz != null)
-            {
+
+            if (dz != null) {
                 int x = dz.getLocationOnScreen().x - innerFlowPane.getLocationOnScreen().x;
                 int y = dz.getLocationOnScreen().y - innerFlowPane.getLocationOnScreen().y;
                 return new Point(x + dz.getWidth(), y + dz.getHeight() / 2);
@@ -274,23 +257,19 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    public int getVarPanelWidth()
-    {
+    public int getVarPanelWidth() {
         return innerLoopPanel.getWidth();
     }
 
     @Override
-    public int getVarPanelHeight()
-    {
+    public int getVarPanelHeight() {
         // return innerLoopPanel.getHeight() + 2;
         return getHeight();
     }
 
-    public void drawPanel()
-    {
+    public void drawPanel() {
         super.drawPanel();
-        if (blockDesc.isCollapsed())
-        {
+        if (blockDesc.isCollapsed()) {
             for (Component c : innerLoopPanel.getComponents())
                 if (c instanceof DragZone<?>)
                     c.setPreferredSize(new Dimension());
@@ -309,8 +288,7 @@ public class LoopPanel extends WorkFlowPanel
     }
 
     @Override
-    void dispose()
-    {
+    void dispose() {
         menuStopOnFirstError.removeActionListener(this);
 
         super.dispose();

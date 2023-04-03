@@ -6,24 +6,20 @@ import plugins.adufour.vars.lang.VarDoubleArrayNative;
 
 /**
  * Utility block reading an array of double-precision floating-point values
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Decimals extends Plugin implements InputBlock
-{
+public class Decimals extends Plugin implements InputBlock {
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("decimals", new VarDoubleArrayNative("decimals", new double[0]));
     }
-    
+
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
 }

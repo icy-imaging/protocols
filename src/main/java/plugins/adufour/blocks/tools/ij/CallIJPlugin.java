@@ -9,8 +9,7 @@ import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarImagePlus;
 import plugins.adufour.vars.lang.VarString;
 
-public class CallIJPlugin extends Plugin implements IJBlock
-{
+public class CallIJPlugin extends Plugin implements IJBlock {
     VarImagePlus varIp = new VarImagePlus("Input ImagePlus", null);
 
     VarString pluginName = new VarString("plug-in name", "");
@@ -20,10 +19,8 @@ public class CallIJPlugin extends Plugin implements IJBlock
     VarImagePlus varActiveIP = new VarImagePlus("Output (active) ImagePlus", null);
 
     @Override
-    public void run()
-    {
-        try
-        {
+    public void run() {
+        try {
             ImagePlus imgPlus = varIp.getValue(false);
             String params = pluginParams.getValue(false);
 
@@ -33,14 +30,12 @@ public class CallIJPlugin extends Plugin implements IJBlock
                 IJ.run(pluginName.getValue(true), params);
 
             ImagePlus output = null;
-            
-            try
-            {
+
+            try {
                 // Set the output image (if available) with the following priority
                 output = WindowManager.getCurrentImage();
             }
-            catch (RuntimeException e)
-            {
+            catch (RuntimeException e) {
                 // just in case
             }
 
@@ -53,23 +48,20 @@ public class CallIJPlugin extends Plugin implements IJBlock
 
             varActiveIP.setValue(output);
         }
-        catch (RuntimeException e)
-        {
+        catch (RuntimeException e) {
             throw new IcyHandledException(e.getLocalizedMessage());
         }
     }
 
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("Input ImagePlus", varIp);
         inputMap.add("ImageJ plug-in name", pluginName);
         inputMap.add("ImageJ plug-in parameters", pluginParams);
     }
 
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
         outputMap.add("Output ImagePlus", varActiveIP);
     }
 }

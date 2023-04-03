@@ -6,31 +6,26 @@ import plugins.adufour.vars.lang.VarSequence;
 
 /**
  * Utility block reading a {@link icy.sequence.Sequence} object
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Sequence extends Plugin implements InputBlock
-{
+public class Sequence extends Plugin implements InputBlock {
     private final VarSequence vs = new VarSequence("sequence", null);
-    
+
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("input sequence", vs);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
-    
-    public VarSequence getVariable()
-    {
+
+    public VarSequence getVariable() {
         return vs;
     }
 }

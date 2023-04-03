@@ -19,11 +19,10 @@ import plugins.kernel.importer.LociImporterPlugin;
  * .lif) file, allowing to process all the series with a single work-flow. It can be used in
  * combination with the {@link FileBatch File batch} to batch process entire folders of multi-series
  * files.
- * 
+ *
  * @author Alexandre Dufour
  */
-public class SequenceSeriesBatch extends Batch
-{
+public class SequenceSeriesBatch extends Batch {
     private VarFile multiSeriesFile;
 
     private int nbSeries;
@@ -31,10 +30,8 @@ public class SequenceSeriesBatch extends Batch
     private VarSequence element;
 
     @Override
-    public VarFile getBatchSource()
-    {
-        if (multiSeriesFile == null)
-        {
+    public VarFile getBatchSource() {
+        if (multiSeriesFile == null) {
             // WARNING: do *not* change the name of this variable
             // why? see declareInput() and VarList.add()
             multiSeriesFile = new VarFile("Series file", null);
@@ -45,10 +42,8 @@ public class SequenceSeriesBatch extends Batch
     }
 
     @Override
-    public VarSequence getBatchElement()
-    {
-        if (element == null)
-        {
+    public VarSequence getBatchElement() {
+        if (element == null) {
             // WARNING: do *not* change the name of this variable
             // why? see declareInput() and VarList.add()
             element = new VarSequence("Sequence", null);
@@ -58,8 +53,7 @@ public class SequenceSeriesBatch extends Batch
     }
 
     @Override
-    public void initializeLoop()
-    {
+    public void initializeLoop() {
         if (multiSeriesFile.getValue() == null)
             throw new VarException(multiSeriesFile, "No file indicated");
 
@@ -69,8 +63,7 @@ public class SequenceSeriesBatch extends Batch
 
         String path = f.getPath();
 
-        try
-        {
+        try {
             final SequenceFileImporter importer = Loader.getSequenceFileImporter(path, true);
 
             // FIX: force un-grouping to get number of series (Stephane)
@@ -79,23 +72,19 @@ public class SequenceSeriesBatch extends Batch
 
             nbSeries = MetaDataUtil.getNumSeries(Loader.getOMEXMLMetaData(importer, path));
         }
-        catch (UnsupportedFormatException e)
-        {
+        catch (UnsupportedFormatException e) {
             throw new VarException(multiSeriesFile, path + " is not an imaging file");
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             throw new VarException(multiSeriesFile, "Unable to read " + path);
         }
-        catch (InterruptedException e)
-        {
+        catch (InterruptedException e) {
             throw new VarException(multiSeriesFile, "Process interrupted !");
         }
     }
 
     @Override
-    public void beforeIteration()
-    {
+    public void beforeIteration() {
         final String path = multiSeriesFile.getValue().getPath();
         final SequenceFileImporter importer = Loader.getSequenceFileImporter(path, true);
 
@@ -107,8 +96,7 @@ public class SequenceSeriesBatch extends Batch
     }
 
     @Override
-    public boolean isStopConditionReached()
-    {
+    public boolean isStopConditionReached() {
         return getIterationCounter().getValue() == nbSeries;
     }
 }

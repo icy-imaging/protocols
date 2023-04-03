@@ -23,11 +23,10 @@ import plugins.adufour.vars.util.VarException;
  * is up to the user to indicate inside the work-flow how these files should be
  * read (for the particular case of image files, use the
  * {@link SequenceFileBatch Sequence file batch} instead).
- * 
+ *
  * @author Alexandre Dufour
  */
-public class FileBatch extends Batch implements FileFilter
-{
+public class FileBatch extends Batch implements FileFilter {
     // loop variables //
 
     private VarFile element;
@@ -46,10 +45,8 @@ public class FileBatch extends Batch implements FileFilter
     protected File[] files;
 
     @Override
-    public Var<?> getBatchSource()
-    {
-        if (folder == null)
-        {
+    public Var<?> getBatchSource() {
+        if (folder == null) {
             // WARNING: do *not* change the name of this variable
             // why? see declareInput() and VarList.add()
             folder = new VarFile("folder", null);
@@ -59,17 +56,14 @@ public class FileBatch extends Batch implements FileFilter
     }
 
     @Override
-    public boolean accept(File f)
-    {
+    public boolean accept(File f) {
         String ext = extension.getValue();
         return f.isDirectory() || ext.isEmpty() || f.getPath().toLowerCase().endsWith(ext.toLowerCase());
     }
 
     @Override
-    public Var<?> getBatchElement()
-    {
-        if (element == null)
-        {
+    public Var<?> getBatchElement() {
+        if (element == null) {
             // WARNING: do *not* change the name of this variable
             // why? see declareInput() and VarList.add()
             element = new VarFile("file", null);
@@ -78,8 +72,7 @@ public class FileBatch extends Batch implements FileFilter
     }
 
     @Override
-    public void initializeLoop()
-    {
+    public void initializeLoop() {
         if (folder.getValue() == null)
             throw new VarException(folder, "No folder indicated");
 
@@ -99,20 +92,17 @@ public class FileBatch extends Batch implements FileFilter
     }
 
     @Override
-    public void beforeIteration()
-    {
+    public void beforeIteration() {
         element.setValue(files[getIterationCounter().getValue()]);
     }
 
     @Override
-    public boolean isStopConditionReached()
-    {
+    public boolean isStopConditionReached() {
         return getIterationCounter().getValue() == files.length;
     }
 
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         super.declareInput(inputMap);
 
         inputMap.add("extension", extension = new VarString("extension", ""));
@@ -120,8 +110,7 @@ public class FileBatch extends Batch implements FileFilter
     }
 
     @Override
-    public void declareLoopVariables(List<Var<?>> loopVariables)
-    {
+    public void declareLoopVariables(List<Var<?>> loopVariables) {
         super.declareLoopVariables(loopVariables);
 
         loopVariables.add(extension);

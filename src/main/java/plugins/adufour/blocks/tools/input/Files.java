@@ -8,27 +8,23 @@ import plugins.adufour.vars.lang.VarFileArray;
 
 /**
  * Input block reading a list of files
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Files extends Plugin implements InputBlock
-{
+public class Files extends Plugin implements InputBlock {
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         VarFileArray vf = new VarFileArray("files", new java.io.File[0]);
         vf.setDefaultEditorModel(new FileTypeListModel("", FileMode.FILES, null, false));
         inputMap.add("files", vf);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
-    
+
 }

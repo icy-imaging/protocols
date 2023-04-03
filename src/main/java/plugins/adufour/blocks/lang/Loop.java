@@ -3,7 +3,6 @@ package plugins.adufour.blocks.lang;
 import icy.system.IcyHandledException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
@@ -18,24 +17,22 @@ import plugins.adufour.vars.lang.VarInteger;
 
 /**
  * Special work flow that will repeat its contents forever until is it manually stopped by the user.
- * 
+ *
+ * @author Alexandre Dufour
  * @see Batch
  * @see RangeLoop
  * @see FileBatch
  * @see SequenceFileBatch
  * @see SequenceSeriesBatch
- * @author Alexandre Dufour
  */
-public class Loop extends WorkFlow
-{
-    private final ArrayList<Var<?>> loopVariables = new ArrayList<Var<?>>();
+public class Loop extends WorkFlow {
+    private final ArrayList<Var<?>> loopVariables = new ArrayList<>();
 
     private VarInteger iterationCounter;
 
     public final VarBoolean stopOnFirstError = new VarBoolean("Stop on first error", false);
 
-    public Loop()
-    {
+    public Loop() {
         super(false);
 
         declareLoopVariables(loopVariables);
@@ -45,8 +42,7 @@ public class Loop extends WorkFlow
     }
 
     @Override
-    public BlockDescriptor getBlock(int blockID)
-    {
+    public BlockDescriptor getBlock(int blockID) {
         if (blockID == -1)
             return getBlockDescriptor();
 
@@ -54,92 +50,75 @@ public class Loop extends WorkFlow
     }
 
     @Override
-    public BlockDescriptor getInputOwner(Var<?> var)
-    {
+    public BlockDescriptor getInputOwner(Var<?> var) {
         return loopVariables.contains(var) ? getBlockDescriptor() : super.getInputOwner(var);
     }
 
     @Override
-    public BlockDescriptor getOutputOwner(Var<?> var)
-    {
+    public BlockDescriptor getOutputOwner(Var<?> var) {
         return loopVariables.contains(var) ? getBlockDescriptor() : super.getOutputOwner(var);
     }
 
-    public String getInputVarID(Var<?> variable)
-    {
+    public String getInputVarID(Var<?> variable) {
         for (Var<?> innerVar : loopVariables)
-            if (variable == innerVar)
-            {
+            if (variable == innerVar) {
                 return getBlockDescriptor().inputVars.getID(variable);
             }
 
         return super.getInputVarID(variable);
     }
 
-    public String getOutputVarID(Var<?> variable)
-    {
+    public String getOutputVarID(Var<?> variable) {
         for (Var<?> innerVar : loopVariables)
-            if (variable == innerVar)
-            {
+            if (variable == innerVar) {
                 return getBlockDescriptor().outputVars.getID(variable);
             }
 
         return super.getOutputVarID(variable);
     }
 
-    public VarInteger getIterationCounter()
-    {
+    public VarInteger getIterationCounter() {
         return iterationCounter;
     }
 
     /**
      * Adds the specified variable to the list of inner loop variables, i.e., variables describing
      * the parameters of the loop, which can be referenced from inside the loop by other blocks.
-     * 
+     *
+     * @param loopVar the variable to register
      * @deprecated The process of declaring loop variables has changed. Override
-     *             {@link #declareLoopVariables(List)} instead.
-     * @param loopVar
-     *        the variable to register
+     * {@link #declareLoopVariables(List)} instead.
      */
     @Deprecated
-    protected void addLoopVariable(Var<?> loopVar)
-    {
+    protected void addLoopVariable(Var<?> loopVar) {
         loopVariables.add(loopVar);
     }
 
     /**
-     * @param var
-     *        the variable to look for
+     * @param var the variable to look for
      * @return true if <code>var</code> is a loop variable, false otherwise
      */
-    public boolean isLoopVariable(Var<?> var)
-    {
+    public boolean isLoopVariable(Var<?> var) {
         return loopVariables.contains(var);
     }
 
-    public List<Var<?>> getLoopVariables()
-    {
+    public List<Var<?>> getLoopVariables() {
         return loopVariables;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         iterationCounter.setValue(0);
         initializeLoop();
 
-        List<IcyHandledException> exceptions = new ArrayList<IcyHandledException>();
+        List<IcyHandledException> exceptions = new ArrayList<>();
 
-        while (!Thread.currentThread().isInterrupted() && !isStopConditionReached())
-        {
+        while (!Thread.currentThread().isInterrupted() && !isStopConditionReached()) {
             // FIXED (Stephane)
             // we need to reset to dirty state for all contained blocks before the iteration
             // as we never expect any contained block to keep value from previous iteration
-            final Iterator<BlockDescriptor> blockIt = iterator();
 
-            while (blockIt.hasNext())
-            {
-                final BlockDescriptor block = blockIt.next();
+            for (BlockDescriptor block : this) {
                 // put block back in dirty state
                 if (block.getStatus() == BlockStatus.READY)
                     block.setStatus(BlockStatus.DIRTY);
@@ -147,12 +126,10 @@ public class Loop extends WorkFlow
 
             beforeIteration();
 
-            try
-            {
+            try {
                 super.run();
             }
-            catch (IcyHandledException e)
-            {
+            catch (IcyHandledException e) {
                 exceptions.add(e);
                 if (stopOnFirstError.getValue())
                     break;
@@ -162,8 +139,7 @@ public class Loop extends WorkFlow
             afterIteration();
         }
 
-        if (exceptions.size() > 0)
-        {
+        if (exceptions.size() > 0) {
             String message = "The following errors occurred during the loop:\n\n";
             for (Exception e : exceptions)
                 message += " - " + e.getMessage() + "\n";
@@ -176,8 +152,7 @@ public class Loop extends WorkFlow
      * is called once before actually starting the loop. Note that the iteration counter is already
      * reset before calling this method.
      */
-    public void initializeLoop()
-    {
+    public void initializeLoop() {
         // nothing to do in an infinite loop
     }
 
@@ -186,8 +161,7 @@ public class Loop extends WorkFlow
      * method. This method is typically used to fetch array or iterator values necessary for the
      * core code execution.
      */
-    public void beforeIteration()
-    {
+    public void beforeIteration() {
         // nothing to do in an infinite loop
     }
 
@@ -196,8 +170,7 @@ public class Loop extends WorkFlow
      * increments or iterators to move forward before executing the next iteration. Note that the
      * iteration counter is automatically increased before calling this method.
      */
-    public void afterIteration()
-    {
+    public void afterIteration() {
         // release other threads for a very short time
         // (especially the AWT, to receive user interruption and display stuff)
         Thread.yield();
@@ -207,24 +180,20 @@ public class Loop extends WorkFlow
     /**
      * NB: this method must be called by overriding methods to ensure that the loop can be
      * interrupted correctly upon request
-     * 
+     *
      * @return true if the stopping condition is reached, false otherwise.
      */
-    public boolean isStopConditionReached()
-    {
+    public boolean isStopConditionReached() {
         // infinite loop
         return false;
     }
 
     @Override
-    protected <T> void checkScope(Link<T> link) throws ScopeException
-    {
-        try
-        {
+    protected <T> void checkScope(Link<T> link) throws ScopeException {
+        try {
             super.checkScope(link);
         }
-        catch (ScopeException e)
-        {
+        catch (ScopeException e) {
             // authorize links coming from variable loops
             if (!loopVariables.contains(link.srcVar))
                 throw e;
@@ -232,17 +201,13 @@ public class Loop extends WorkFlow
     }
 
     @Override
-    protected <T> void checkLoop(Link<T> link) throws LoopException
-    {
-        try
-        {
+    protected <T> void checkLoop(Link<T> link) throws LoopException {
+        try {
             super.checkLoop(link);
         }
-        catch (LoopException e)
-        {
+        catch (LoopException e) {
             // authorize loops only if the destination is a "ReLoop" block
-            if (link.dstBlock.getBlock() instanceof ReLoop)
-            {
+            if (link.dstBlock.getBlock() instanceof ReLoop) {
                 ReLoop reLoop = (ReLoop) link.dstBlock.getBlock();
 
                 if (link.dstVar == reLoop.reloopValue)
@@ -254,8 +219,7 @@ public class Loop extends WorkFlow
     }
 
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
         super.declareOutput(outputMap);
 
         iterationCounter = new VarInteger("iteration", 0);
@@ -267,12 +231,10 @@ public class Loop extends WorkFlow
      * Declares the necessary loop variables by adding them to the specified list. Loop variables
      * describe the parameters of the loop, which can be referenced from inside the loop by other
      * blocks.
-     * 
-     * @param loopVars
-     *        the variable to register
+     *
+     * @param loopVars the variable to register
      */
-    public void declareLoopVariables(List<Var<?>> loopVars)
-    {
+    public void declareLoopVariables(List<Var<?>> loopVars) {
         // a loop has no inner variable
     }
 }

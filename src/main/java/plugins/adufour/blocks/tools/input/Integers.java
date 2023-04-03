@@ -6,24 +6,20 @@ import plugins.adufour.vars.lang.VarIntegerArrayNative;
 
 /**
  * Utility block reading an array of 32-bit integer values
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Integers extends Plugin implements InputBlock
-{
+public class Integers extends Plugin implements InputBlock {
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("integers", new VarIntegerArrayNative("integers", new int[0]));
     }
-    
+
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
 }

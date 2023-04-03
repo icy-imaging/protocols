@@ -15,11 +15,10 @@ import plugins.adufour.vars.util.MutableType;
 
 /**
  * Class describing a link between two variables within a work flow
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Link<T> implements XMLPersistent
-{
+public class Link<T> implements XMLPersistent {
     private final WorkFlow workFlow;
 
     public BlockDescriptor srcBlock;
@@ -34,18 +33,15 @@ public class Link<T> implements XMLPersistent
      * Creates a new (empty) link in the specified work flow. This constructor is generally followed
      * by a call to {@link #loadFromXML(Node)} to restore the link status from a previously saved
      * state (e.g. XML file)
-     * 
-     * @param workFlow
-     *        Workflow containing the new link.
+     *
+     * @param workFlow Workflow containing the new link.
      */
-    public Link(WorkFlow workFlow)
-    {
+    public Link(WorkFlow workFlow) {
         this.workFlow = workFlow;
     }
 
     public Link(WorkFlow workFlow, final BlockDescriptor srcBlock, final Var<T> output, final BlockDescriptor dstBlock,
-            final Var<T> input)
-    {
+                final Var<T> input) {
         this(workFlow);
 
         this.srcBlock = srcBlock;
@@ -54,15 +50,13 @@ public class Link<T> implements XMLPersistent
         this.dstVar = input;
     }
 
-    public Class<?> getType()
-    {
+    public Class<?> getType() {
         return srcVar.getType();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public boolean loadFromXML(Node node)
-    {
+    public boolean loadFromXML(Node node) {
         Element linkNode = (Element) node;
 
         int srcBlockID = XMLUtil.getAttributeIntValue(linkNode, "srcBlockID", -1);
@@ -76,32 +70,25 @@ public class Link<T> implements XMLPersistent
         if (theSrcVar == null)
             theSrcVar = theSrcBlock.inputVars.get(srcVarID);
 
-        if (theSrcVar == null)
-        {
+        if (theSrcVar == null) {
             System.err.println("Cannot create a link from variable " + srcVarID + " (from block " + theSrcBlock + ")");
             return false;
         }
 
-        if (theSrcVar instanceof MutableType)
-        {
+        if (theSrcVar instanceof MutableType) {
             String type = XMLUtil.getAttributeValue(linkNode, "srcVarType", null);
-            if (type != null)
-            {
-                try
-                {
-                    if (theSrcVar instanceof VarMutable)
-                    {
+            if (type != null) {
+                try {
+                    if (theSrcVar instanceof VarMutable) {
                         Class<?> mutableType = BlocksML.getPrimitiveType(type);
                         ((MutableType) theSrcVar).setType(mutableType != null ? mutableType : Class.forName(type));
                     }
-                    else if (theSrcVar instanceof VarMutableArray)
-                    {
+                    else if (theSrcVar instanceof VarMutableArray) {
                         type = "[L" + type + ";";
                         ((MutableType) theSrcVar).setType(Class.forName(type));
                     }
                 }
-                catch (ClassNotFoundException e1)
-                {
+                catch (ClassNotFoundException e1) {
                     throw new BlocksException("Cannot create link: unknown type " + type, true);
                 }
             }
@@ -118,8 +105,7 @@ public class Link<T> implements XMLPersistent
     }
 
     @Override
-    public boolean saveToXML(Node node)
-    {
+    public boolean saveToXML(Node node) {
         // TODO Auto-generated method stub
         return false;
     }

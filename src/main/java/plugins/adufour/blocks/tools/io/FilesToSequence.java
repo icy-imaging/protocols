@@ -15,43 +15,38 @@ import plugins.adufour.vars.util.VarException;
 
 /**
  * Utility block that reads multiple image files from disk into a {@link Sequence}
- * 
+ *
  * @author Alexandre Dufour
  */
-public class FilesToSequence extends Plugin implements IOBlock
-{
-    VarFileArray inputFiles     = new VarFileArray("input file", new File[] {});
-    VarSequence  outputSequence = new VarSequence("sequence", null);
-    
-    @Override
-    public void run()
-    {
-        try
-        {
-            File[] files = inputFiles.getValue(true);
-            List<String> paths = new ArrayList<String>(files.length);
+public class FilesToSequence extends Plugin implements IOBlock {
+    VarFileArray inputFiles = new VarFileArray("input file", new File[]{});
+    VarSequence outputSequence = new VarSequence("sequence", null);
 
-            for (int i = 0; i < files.length; i++)
-                if (files[i] != null) paths.add(files[i].getPath());
-            
+    @Override
+    public void run() {
+        try {
+            File[] files = inputFiles.getValue(true);
+            List<String> paths = new ArrayList<>(files.length);
+
+            for (File file : files)
+                if (file != null)
+                    paths.add(file.getPath());
+
             outputSequence.setValue(Loader.loadSequence(paths, false));
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw new VarException(inputFiles, "unable to read files");
         }
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("input file", inputFiles);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
         outputMap.add("sequence", outputSequence);
     }
-    
+
 }

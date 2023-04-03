@@ -4,23 +4,19 @@ import icy.plugin.abstract_.Plugin;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarBoolean;
 
-public class BooleanOutput extends Plugin implements OutputBlock
-{
+public class BooleanOutput extends Plugin implements OutputBlock {
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("boolean", new VarBoolean("Boolean", false));
     }
 
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
         //
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         //
     }
 }

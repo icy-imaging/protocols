@@ -8,27 +8,23 @@ import plugins.adufour.vars.lang.VarFileArray;
 
 /**
  * Input block reading a list of folders
- * 
+ *
  * @author Alexandre Dufour
  */
-public class FoldersOutput extends Plugin implements OutputBlock
-{
+public class FoldersOutput extends Plugin implements OutputBlock {
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         VarFileArray vf = new VarFileArray("folders", new java.io.File[0]);
         vf.setDefaultEditorModel(new FileTypeListModel("", FileMode.FOLDERS, null, false));
         inputMap.add("folders", vf);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
-    
+
 }

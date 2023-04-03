@@ -4,10 +4,8 @@ import plugins.adufour.blocks.lang.Block;
 
 /**
  * Interface used to flag pure input blocks
- * 
+ *
  * @author Alexandre Dufour
- * 
  */
-public interface InputBlock extends Block
-{
+public interface InputBlock extends Block {
 }

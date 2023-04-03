@@ -8,27 +8,23 @@ import plugins.adufour.vars.lang.VarFile;
 
 /**
  * Input block reading a folder
- * 
+ *
  * @author Alexandre Dufour
  */
-public class Folder extends Plugin implements InputBlock
-{
+public class Folder extends Plugin implements InputBlock {
     @Override
-    public void run()
-    {
+    public void run() {
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         VarFile vf = new VarFile("folder", null);
         vf.setDefaultEditorModel(new FileTypeModel("", FileMode.FOLDERS, null, false));
         inputMap.add("folder", vf);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
     }
-    
+
 }

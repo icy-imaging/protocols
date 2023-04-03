@@ -8,12 +8,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.TransferHandler;
+import javax.swing.*;
 
-import icy.resource.ResourceUtil;
 import icy.sequence.Sequence;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
@@ -23,22 +19,10 @@ import plugins.adufour.vars.util.MutableType;
 import plugins.adufour.vars.util.TypeChangeListener;
 import plugins.adufour.vars.util.VarListener;
 
-@SuppressWarnings("serial")
-public abstract class DragDropZone extends JButton implements VarListener<Boolean>, TypeChangeListener
-{
+public abstract class DragDropZone extends JButton implements VarListener<Boolean>, TypeChangeListener {
     protected static final int DRAGnDROP_ACTION = TransferHandler.LINK;
 
     public static final int DEFAULT_ICON_SIZE = 13;
-
-    public static final Image LINK_RIGHT = ResourceUtil.getAlphaIconAsImage("round_arrow_right.png");
-
-    public static final Image LINK_LEFT = ResourceUtil.getAlphaIconAsImage("round_arrow_left.png");
-
-    public static final Image PIN_LEFT = ResourceUtil.getAlphaIconAsImage("pin_map_left.png");
-
-    public static final Image PIN_RIGHT = ResourceUtil.getAlphaIconAsImage("pin_map_right.png");
-
-    public static final Image BUTTON = ResourceUtil.getAlphaIconAsImage("round.png");
 
     private final Var<?> variable;
 
@@ -48,48 +32,37 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
 
     private final Icon errorIcon;
 
-    private final Icon emptyIcon = new ImageIcon(ResourceUtil.ICON_NULL);
-
     /**
      * Creates a new drop zone for the given variable
-     * 
-     * @param block
-     *        the box that owns the specified input
-     * @param input
-     *        the input variable to link to
-     * @return
+     *
+     * @param block the box that owns the specified input
+     * @param input the input variable to link to
+     * @return the drop zone
      */
-    public static <T> DragDropZone createDropZone(final Image image, final WorkFlow workFlow, final BlockDescriptor block, final Var<T> input)
-    {
-        return new DropZone<T>(image, workFlow, block, input);
+    public static <T> DragDropZone createDropZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> input) {
+        return new DropZone<>(workFlow, block, input);
     }
 
     /**
      * Creates a new drag zone for the given variable
-     * 
-     * @param workFlow
-     *        the work flow where variable links will go to
-     * @param block
-     *        the box that owns the specified output
-     * @param variable
-     *        the input variable to link
-     * @return
+     *
+     * @param workFlow the work flow where variable links will go to
+     * @param block    the box that owns the specified output
+     * @param variable the input variable to link
+     * @return the drag zone
      */
-    public static <T> DragDropZone createDragZone(final Image image, final WorkFlow workFlow, final BlockDescriptor block,
-            final Var<T> variable)
-    {
-        return new DragZone<T>(image, workFlow, block, variable);
+    public static <T> DragDropZone createDragZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> variable) {
+        return new DragZone<>(workFlow, block, variable);
     }
 
-    protected DragDropZone(final String toolTipText, final Image image, final Var<?> variable)
-    {
-        super("");
+    protected DragDropZone(final String toolTipText, final Var<?> variable) {
+        super();
         this.variable = variable;
 
         if (variable instanceof MutableType)
             ((MutableType) variable).addTypeChangeListener(this);
 
-        setToolTipText("<html><h4>" + toolTipText.replace("\n", "<br/>") + "</h4></html>");
+        setToolTipText(toolTipText);
         setDefaultLinkIcon();
         setContentAreaFilled(false);
         setFocusable(false);
@@ -104,22 +77,18 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         setMinimumSize(getPreferredSize());
     }
 
-    private void updateDefaultIcon()
-    {
+    private void updateDefaultIcon() {
         Class<?> dataType = null;
 
         if (variable != null)
             dataType = variable.getType();
 
-        if (dataType != null)
-        {
-            if (variable instanceof VarGenericArray)
-            {
+        if (dataType != null) {
+            if (variable instanceof VarGenericArray) {
                 final VarGenericArray<?> array = (VarGenericArray<?>) variable;
                 dataType = array.getInnerType();
             }
-            else if (dataType.isArray())
-            {
+            else if (dataType.isArray()) {
                 dataType = dataType.getComponentType();
             }
         }
@@ -127,8 +96,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         defaultIcon = getLinkIcon(getColor(dataType));
     }
 
-    public Icon getLinkIcon(final Color color)
-    {
+    public Icon getLinkIcon(final Color color) {
         final Image myImage = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g = (Graphics2D) myImage.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -153,67 +121,54 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         return new ImageIcon(myImage);
     }
 
-    public void setEmptyIcon()
-    {
-        setIcon(emptyIcon);
-    }
-
-    public void setDefaultLinkIcon()
-    {
+    public void setDefaultLinkIcon() {
         setIcon(defaultIcon);
     }
 
-    public void setErrorLinkIcon()
-    {
+    public void setErrorLinkIcon() {
         setIcon(errorIcon);
     }
 
-    public void setIconSize(final int size)
-    {
-        // this.iconSize = size;
-        setDefaultLinkIcon();
-    }
-
-    public void dispose()
-    {
+    public void dispose() {
         if (variable instanceof MutableType)
             ((MutableType) variable).removeTypeChangeListener(this);
     }
 
     @Override
-    public void valueChanged(final Var<Boolean> source, final Boolean oldValue, final Boolean newValue)
-    {
+    public void valueChanged(final Var<Boolean> source, final Boolean oldValue, final Boolean newValue) {
         setDefaultLinkIcon();
     }
 
     @Override
-    public void referenceChanged(final Var<Boolean> source, final Var<? extends Boolean> oldReference,
-            final Var<? extends Boolean> newReference)
-    {
+    public void referenceChanged(final Var<Boolean> source, final Var<? extends Boolean> oldReference, final Var<? extends Boolean> newReference) {
         setDefaultLinkIcon();
     }
 
     @Override
-    public void typeChanged(final Object source, final Class<?> oldType, final Class<?> newType)
-    {
+    public void typeChanged(final Object source, final Class<?> oldType, final Class<?> newType) {
         updateDefaultIcon();
         setDefaultLinkIcon();
     }
 
-    public static Color getColor(final Class<?> type)
-    {
+    public static Color getColor(final Class<?> type) {
+        final Color cNull = Color.GRAY;
+        final Color cSequence = new Color(31, 72, 176);
+        final Color cBoolean = new Color(229, 148, 0);
+        final Color cPrimitive = new Color(156, 90, 156);
+        final Color cOther = new Color(53, 123, 53);
+
         if (type == null)
-            return Color.gray;
+            return cNull;
 
         if (type == Sequence.class)
-            return Color.blue;
+            return cSequence;
 
         if (type == Boolean.class || type == Boolean.TYPE)
-            return Color.orange.darker().darker();
+            return cBoolean;
 
         if (type.isPrimitive() || Number.class.isAssignableFrom(type))
-            return Color.magenta.darker().darker();
+            return cPrimitive;
 
-        return Color.black;
+        return cOther;
     }
 }

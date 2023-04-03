@@ -17,98 +17,85 @@ import plugins.adufour.vars.lang.VarGenericArray;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.lang.VarSequence;
 
-public class CropSequenceToROI extends Plugin implements ROIBlock
-{
-    VarSequence                 input  = new VarSequence("Sequence to crop", null);
-    
-    VarROIArray                 rois   = new VarROIArray("List of ROI");
-    
-    VarGenericArray<Sequence[]> output = new VarGenericArray<Sequence[]>("List of crops", Sequence[].class, new Sequence[] {});
-    
+public class CropSequenceToROI extends Plugin implements ROIBlock {
+    VarSequence input = new VarSequence("Sequence to crop", null);
+
+    VarROIArray rois = new VarROIArray("List of ROI");
+
+    VarGenericArray<Sequence[]> output = new VarGenericArray<Sequence[]>("List of crops", Sequence[].class, new Sequence[]{});
+
     @Override
-    public void run()
-    {
+    public void run() {
         Sequence seq = input.getValue(true);
-        
+
         int nbROIs = rois.getValue(true).length;
-        
-        ArrayList<Sequence> crops = new ArrayList<Sequence>(nbROIs);
-        
+
+        ArrayList<Sequence> crops = new ArrayList<>(nbROIs);
+
         int cpt = 1;
         int digitSize = 1 + (int) Math.log10(nbROIs);
-        
-        for (ROI roi : rois.getValue())
-        {
+
+        for (ROI roi : rois.getValue()) {
             final Sequence result = new Sequence(OMEUtil.createOMEXMLMetadata(seq.getOMEXMLMetadata()));
-            
+
             Rectangle5D.Integer region = roi.getBounds5D().toInteger();
-            
+
             final Rectangle region2d = region.toRectangle2D().getBounds();
             final int startZ;
             final int endZ;
             final int startT;
             final int endT;
-            
-            if (region.isInfiniteZ())
-            {
+
+            if (region.isInfiniteZ()) {
                 startZ = 0;
                 endZ = seq.getSizeZ();
             }
-            else
-            {
+            else {
                 startZ = Math.max(0, region.z);
                 endZ = Math.min(seq.getSizeZ(), region.z + region.sizeZ);
             }
-            if (region.isInfiniteT())
-            {
+            if (region.isInfiniteT()) {
                 startT = 0;
                 endT = seq.getSizeT();
             }
-            else
-            {
+            else {
                 startT = Math.max(0, region.t);
                 endT = (int) Math.min(seq.getSizeT(), (long) region.t + (long) region.sizeT);
             }
-            
+
             result.beginUpdate();
-            try
-            {
-                for (int t = startT; t < endT; t++)
-                {
-                    for (int z = startZ; z < endZ; z++)
-                    {
+            try {
+                for (int t = startT; t < endT; t++) {
+                    for (int z = startZ; z < endZ; z++) {
                         IcyBufferedImage img = seq.getImage(t, z);
-                        
+
                         if (img != null) img = IcyBufferedImageUtil.getSubImage(img, region2d, region.c, region.sizeC);
-                        
+
                         result.setImage(t - startT, z - startZ, img);
                     }
                 }
             }
-            finally
-            {
+            finally {
                 result.endUpdate();
             }
-            
+
             result.setName(seq.getName() + "_crop" + StringUtil.toString(cpt, digitSize));
             crops.add(result);
             cpt++;
         }
-        
+
         output.setValue(crops.toArray(new Sequence[crops.size()]));
     }
-    
+
     @Override
-    public void declareInput(VarList inputMap)
-    {
+    public void declareInput(VarList inputMap) {
         inputMap.add("sequence to crop", input);
         inputMap.add("list of ROI", rois);
     }
-    
+
     @Override
-    public void declareOutput(VarList outputMap)
-    {
+    public void declareOutput(VarList outputMap) {
         outputMap.add("list of crops", output);
     }
-    
+
 }

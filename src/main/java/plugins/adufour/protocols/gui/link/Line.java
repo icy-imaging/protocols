@@ -1,22 +1,22 @@
-package plugins.adufour.protocols.gui.link;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.IllegalComponentStateException;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
+package plugins.adufour.protocols.gui.link;
 
 import icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.Link;
@@ -24,6 +24,15 @@ import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.protocols.gui.block.BlockPanel;
 import plugins.adufour.protocols.gui.block.WorkFlowContainer;
 import plugins.adufour.vars.lang.Var;
+
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 
 public abstract class Line extends Line2D.Float implements ComponentListener, MouseListener {
     private final Link<?> link;
@@ -154,9 +163,6 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
 
     /**
      * updates the path describing the line and the shape and location of the close button
-     *
-     * @param thePath
-     * @param theCloseButton
      */
     public abstract void updateShape(Path2D thePath, Ellipse2D theCloseButton);
 
@@ -271,8 +277,6 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * Sets whether the line should appear with a custom color (reflecting the type of transferred
      * data) or false if the default look'n'feel based color should be used. This method causes the
      * line container to repaint
-     *
-     * @param custom
      */
     public void setCustomColor(final boolean custom) {
         isHighlighted = custom;

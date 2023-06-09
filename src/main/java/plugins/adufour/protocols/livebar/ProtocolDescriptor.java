@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.livebar;
 
 import icy.file.FileUtil;
@@ -5,16 +23,14 @@ import icy.file.xml.XMLPersistent;
 import icy.network.NetworkUtil;
 import icy.plugin.PluginLoader;
 import icy.util.XMLUtil;
+import org.w3c.dom.Node;
+import plugins.adufour.protocols.Protocols;
 
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.swing.ImageIcon;
-
-import org.w3c.dom.Node;
-import plugins.adufour.protocols.Protocols;
 
 public class ProtocolDescriptor implements XMLPersistent {
     private String filePath;
@@ -29,7 +45,7 @@ public class ProtocolDescriptor implements XMLPersistent {
 
     private String author;
 
-    public ProtocolDescriptor(Node node) {
+    public ProtocolDescriptor(final Node node) {
         loadFromXML(node);
     }
 
@@ -59,21 +75,21 @@ public class ProtocolDescriptor implements XMLPersistent {
 
     public File getFile() {
         try {
-            FileOutputStream stream = new FileOutputStream(filePath);
+            final FileOutputStream stream = new FileOutputStream(filePath);
             stream.write(NetworkUtil.download(fileDownloadURL, null, false));
             stream.flush();
             stream.close();
 
             return new File(filePath);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public boolean loadFromXML(Node node) {
+    public boolean loadFromXML(final Node node) {
         this.name = XMLUtil.getValue(XMLUtil.getElement(node, "name"), "No name");
 
         this.author = XMLUtil.getValue(XMLUtil.getElement(node, "author"), "No author");
@@ -93,8 +109,7 @@ public class ProtocolDescriptor implements XMLPersistent {
     }
 
     @Override
-    public boolean saveToXML(Node node) {
-        // TODO Auto-generated method stub
+    public boolean saveToXML(final Node node) {
         return false;
     }
 

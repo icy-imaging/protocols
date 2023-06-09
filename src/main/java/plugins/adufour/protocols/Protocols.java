@@ -1,24 +1,22 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols;
-
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import icy.common.Version;
 import icy.file.FileUtil;
@@ -29,6 +27,9 @@ import icy.preferences.PluginsPreferences;
 import icy.preferences.XMLPreferences;
 import icy.system.thread.ThreadUtil;
 import icy.util.XMLUtil;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.blocks.util.BlocksException;
 import plugins.adufour.blocks.util.BlocksML;
@@ -36,15 +37,28 @@ import plugins.adufour.blocks.util.BlocksReloadedException;
 import plugins.adufour.protocols.gui.MainFrame;
 import plugins.adufour.protocols.gui.ProtocolPanel;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Protocols plugin
  */
 public class Protocols extends PluginActionable {
-    // "command" on mac, "ctrl" on others
+    // "command" on Mac, "ctrl" on others
     public static final int MENU_SHORTCUT_KEY;
 
     static {
-        MENU_SHORTCUT_KEY = GraphicsEnvironment.isHeadless() ? 0 : Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        MENU_SHORTCUT_KEY = GraphicsEnvironment.isHeadless() ? 0 : Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
     }
 
     private static final String PREF_FOLDER = "protocolFolder";
@@ -56,8 +70,7 @@ public class Protocols extends PluginActionable {
     public static final String downloadedProtocolFolder = FileUtil.getApplicationDirectory() + File.separator
             + "protocols";
 
-    private static volatile XMLPreferences preferences = PluginsPreferences.getPreferences()
-            .node(Protocols.class.getName());
+    private static final XMLPreferences preferences = PluginsPreferences.getPreferences().node(Protocols.class.getName());
 
     public static String getDefaultProtocolFolder() {
         return preferences.get(PREF_FOLDER, System.getProperty("user.home"));
@@ -93,8 +106,6 @@ public class Protocols extends PluginActionable {
      * This method is useful when plug-ins have been modified (via the plug-in
      * loader) and requires Protocols to restart to take into account the new
      * changes
-     *
-     * @throws TransformerFactoryConfigurationError
      */
     public void reload(final Document reloadingXML, final String reloadingPath) {
         // 0) avoid silly situations...
@@ -114,7 +125,7 @@ public class Protocols extends PluginActionable {
         for (final ProtocolPanel protocol : mainFrame.getProtocolPanels()) {
             try {
                 final File attachedFile = protocol.getFile();
-                String xmlProtocol;
+                final String xmlProtocol;
 
                 if (attachedFile != null && attachedFile.getAbsolutePath().equals(reloadingPath)) {
                     xmlProtocol = BlocksML.getInstance().toString(reloadingXML);
@@ -160,7 +171,7 @@ public class Protocols extends PluginActionable {
     @Override
     public void run() {
         if (Icy.getMainInterface().isHeadLess()) {
-            // Command line perhaps?
+            // Command-line, perhaps?
             runHeadless();
             return;
         }
@@ -180,7 +191,7 @@ public class Protocols extends PluginActionable {
 
             final String protocolPath = parseCommandLineArgs(false);
 
-            // we have a protocol filename specified ?
+            // we have a protocol filename specified?
             if (protocolPath != null) {
                 final ProtocolPanel panel = new ProtocolPanel(mainFrame);
                 final Document xml = XMLUtil.loadDocument(protocolPath);
@@ -199,7 +210,7 @@ public class Protocols extends PluginActionable {
                         reload(xml, panel.getFile().getAbsolutePath());
                         return;
                     }
-                    catch (BlocksException e2) {
+                    catch (final BlocksException e2) {
                         e2.printStackTrace();
                     }
                 }
@@ -233,7 +244,7 @@ public class Protocols extends PluginActionable {
                             reload(xml, panel.getFile().getAbsolutePath());
                             return;
                         }
-                        catch (BlocksException e2) {
+                        catch (final BlocksException e2) {
                             e2.printStackTrace();
                         }
                     }
@@ -257,7 +268,7 @@ public class Protocols extends PluginActionable {
         boolean ok = false;
 
         for (final String clarg : clargs) {
-            // Sanity check
+            // checking sanity
             if (!clarg.contains("=")) {
                 if (verify)
                     throw new IllegalArgumentException("Invalid command line argument: " + clarg);
@@ -302,7 +313,7 @@ public class Protocols extends PluginActionable {
                 commandLineArguments.put(key, value);
         }
 
-        // we correctly parsed arguments ? --> clear it so no other plugin can re-parse them
+        // we correctly parsed arguments? --> clear it so no other plugin can reparse them
         if (ok)
             Icy.clearCommandLinePluginArgs();
 
@@ -344,7 +355,7 @@ public class Protocols extends PluginActionable {
     }
 
     public String getFriendlyVersion() {
-        Version v = getDescriptor().getVersion();
+        final Version v = getDescriptor().getVersion();
         return "Blocks engine v." + v.getMajor() + "." + v.getMinor();
     }
 

@@ -1,14 +1,28 @@
-package plugins.adufour.protocols.gui.link;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragGestureRecognizer;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.InvalidDnDOperationException;
+package plugins.adufour.protocols.gui.link;
 
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
+
+import java.awt.dnd.*;
 
 /**
  * Button defining an area on a panel from where an output variable can be dragged to another panel
@@ -20,7 +34,7 @@ public class DragZone<T> extends DragDropZone implements DragGestureListener {
     private final DragGestureRecognizer dragGestureRecognizer;
     private final TransferableVar<T> transferable;
 
-    // TODO: 21/03/2023  Check why scope is unused
+    // TODO: 21/03/2023  Why scope is unused ?
     @SuppressWarnings("unused")
     DragZone(final WorkFlow scope, final BlockDescriptor owner, final Var<T> variable) {
         super("Drag this arrow to create a link to another variable", variable);
@@ -32,6 +46,7 @@ public class DragZone<T> extends DragDropZone implements DragGestureListener {
         this.transferable = new TransferableVar<>(owner, variable);
     }
 
+    @Override
     public void dispose() {
         super.dispose();
 

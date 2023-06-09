@@ -1,6 +1,22 @@
-package plugins.adufour.blocks.tools.io;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.io.File;
+package plugins.adufour.blocks.tools.io;
 
 import icy.file.FileUtil;
 import icy.plugin.abstract_.Plugin;
@@ -10,27 +26,29 @@ import plugins.adufour.vars.lang.VarFile;
 import plugins.adufour.vars.lang.VarSequence;
 import plugins.adufour.vars.util.VarException;
 
-public class GetSequenceFolder extends Plugin implements SequenceBlock, IOBlock {
-    VarSequence sequence = new VarSequence("Sequence", null);
+import java.io.File;
 
-    VarFile folder = new VarFile("Folder", null);
+public class GetSequenceFolder extends Plugin implements SequenceBlock, IOBlock {
+    private final VarSequence sequence = new VarSequence("Sequence", null);
+
+    private final VarFile folder = new VarFile("Folder", null);
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("Sequence", sequence);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("Folder", folder);
     }
 
     @Override
     public void run() {
-        String filePath = sequence.getValue(true).getFilename();
+        final String filePath = sequence.getValue(true).getFilename();
         if (filePath == null) throw new VarException(sequence, "[Get sequence folder]: the selected sequence has not been saved on disk");
 
-        String folderPath = FileUtil.getDirectory(filePath);
+        final String folderPath = FileUtil.getDirectory(filePath);
         folder.setValue(new File(folderPath));
     }
 }

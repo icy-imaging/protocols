@@ -1,6 +1,22 @@
-package plugins.adufour.blocks.tools.io;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.io.File;
+package plugins.adufour.blocks.tools.io;
 
 import icy.file.FileUtil;
 import icy.plugin.abstract_.Plugin;
@@ -10,26 +26,28 @@ import plugins.adufour.vars.lang.VarFile;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.lang.VarString;
 
+import java.io.File;
+
 public class AppendFilePath extends Plugin implements IOBlock {
-    VarMutable in = new VarMutable("Current file", null);
+    private final VarMutable in = new VarMutable("Current file", null);
 
-    VarFile out = new VarFile("New file", null);
+    private final VarFile out = new VarFile("New file", null);
 
-    VarBoolean removeExt = new VarBoolean("Remove extension", false);
+    private final VarBoolean removeExt = new VarBoolean("Remove extension", false);
 
-    VarString suffix = new VarString("Add suffix", "");
+    private final VarString suffix = new VarString("Add suffix", "");
 
     @Override
     public void run() {
-        Object input = in.getValue(true);
-        String newPath = "";
+        final Object input = in.getValue(true);
+        String newPath;
 
         if (input instanceof File)
             newPath = ((File) input).getAbsolutePath();
         else newPath = input.toString();
 
         if (removeExt.getValue()) {
-            String fileName = FileUtil.getFileName(newPath, false);
+            final String fileName = FileUtil.getFileName(newPath, false);
             newPath = FileUtil.getDirectory(newPath) + fileName;
         }
 
@@ -39,14 +57,14 @@ public class AppendFilePath extends Plugin implements IOBlock {
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("input file", in);
         inputMap.add("remove ext.", removeExt);
         inputMap.add("suffix", suffix);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("output file", out);
     }
 

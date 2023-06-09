@@ -1,13 +1,31 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.util;
+
+import plugins.adufour.blocks.lang.Block;
+import plugins.adufour.vars.lang.Var;
+import plugins.adufour.vars.lang.VarMutable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
-import plugins.adufour.blocks.lang.Block;
-import plugins.adufour.vars.lang.Var;
-import plugins.adufour.vars.lang.VarMutable;
 
 /**
  * Class defining a map of variables using a {@link java.util.HashMap} dictionary
@@ -26,26 +44,6 @@ public class VarList implements Iterable<Var<?>> {
     private final ArrayList<VarListListener> varListListeners = new ArrayList<>();
 
     /**
-     * Adds the specified variable to this variable list. Each variable is given a unique
-     * identifier, which is here the variable's name. Adding another variable with the same name
-     * using this method will throw a {@link IllegalArgumentException}. Instead, use the
-     * {@link #add(String, Var)} method to specify a unique identifier for each variable.
-     *
-     * @param variable The variable to add
-     * @throws IllegalArgumentException if the variable already exists, or if a variable with same unique ID exists
-     * @deprecated Changing the name of a variable will also change the default UID, and protocols
-     * containing an older version of this block (with the old name) will not reload
-     * properly. Use {@link #add(String, Var)} to specify a unique identifier (and make
-     * sure this identifier never changes across versions!)<br>
-     * NB: for the same reason, when migrating to {@link #add(String, Var)}, use the
-     * current name of the variable as unique identifier
-     */
-    @Deprecated
-    public void add(Var<?> variable) {
-        add(variable.getName(), variable);
-    }
-
-    /**
      * Adds the given variable to this list with the specified unique ID. If a variable with same
      * unique ID already exists, an {@link IllegalArgumentException} is thrown.
      *
@@ -53,7 +51,7 @@ public class VarList implements Iterable<Var<?>> {
      * @param variable The variable to add
      * @throws IllegalArgumentException if the variable already exists, or if a variable with same unique ID exists
      */
-    public void add(String uid, Var<?> variable) {
+    public void add(final String uid, final Var<?> variable) {
         add(uid, variable, false);
     }
 
@@ -66,7 +64,7 @@ public class VarList implements Iterable<Var<?>> {
      * @param uid      the unique ID of the variable (within this list)
      * @param variable The variable to add
      */
-    public void addRuntimeVariable(String uid, VarMutable variable) {
+    public void addRuntimeVariable(final String uid, final VarMutable variable) {
         add(uid, variable, true);
     }
 
@@ -84,20 +82,20 @@ public class VarList implements Iterable<Var<?>> {
      *                          for more details.
      * @throws IllegalArgumentException if the variable already exists, or if a variable with same unique ID exists
      */
-    private void add(String uid, Var<?> variable, boolean isRuntimeVariable) {
+    private void add(final String uid, final Var<?> variable, final boolean isRuntimeVariable) {
         if (varMap.containsKey(uid))
             throw new IllegalArgumentException("A variable with same unique ID (" + uid + ") exists in the map");
 
         varMap.put(uid, variable);
 
-        // By default, all block variables are visible
+        // By default, all block variables are visible.
         // However, variables from embedded blocks should not be visible
         // (and should remain so until they are exposed by the user)
         visibilityMap.put(variable, !uid.contains(":"));
 
         runtimeVariableMap.put(variable, isRuntimeVariable);
 
-        for (VarListListener l : varListListeners)
+        for (final VarListListener l : varListListeners)
             l.variableAdded(this, variable);
     }
 
@@ -106,7 +104,7 @@ public class VarList implements Iterable<Var<?>> {
      *
      * @param listener Variable list listener to be added.
      */
-    public void addVarListListener(VarListListener listener) {
+    public void addVarListListener(final VarListListener listener) {
         varListListeners.add(listener);
     }
 
@@ -115,21 +113,21 @@ public class VarList implements Iterable<Var<?>> {
      *
      * @param listener Variable list listener to be added.
      */
-    public void addVisibilityListener(VarVisibilityListener listener) {
+    public void addVisibilityListener(final VarVisibilityListener listener) {
         visibilityListeners.add(listener);
     }
 
     public void clear() {
         // remove elements one by one to notify listeners properly
-        ArrayList<Var<?>> vars = new ArrayList<>(varMap.values());
+        final ArrayList<Var<?>> vars = new ArrayList<>(varMap.values());
 
-        for (Var<?> var : vars)
+        for (final Var<?> var : vars)
             remove(var);
 
         // FIXME this code does not remove links in the enclosing work flow...
     }
 
-    public boolean contains(Var<?> variable) {
+    public boolean contains(final Var<?> variable) {
         return varMap.containsValue(variable);
     }
 
@@ -137,29 +135,10 @@ public class VarList implements Iterable<Var<?>> {
      * @return first contained variable in the {@link VarList} and <i>null</i> if VarList is empty
      */
     public Var<?> first() {
-        for (Var<?> v : varMap.values())
+        for (final Var<?> v : varMap.values())
             return v;
 
         return null;
-    }
-
-    /**
-     * @param <T>   Type of the variable value.
-     * @param varID Variable identifier.
-     * @return The stored variable.
-     * @throws NoSuchVariableException If no variable is not found with the given identifier
-     * @deprecated Legacy method (used to load old XML work flows).
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public <T> Var<T> get(int varID) throws NoSuchVariableException {
-        int id = 0;
-        for (Var<?> var : this) {
-            if (id == varID)
-                return (Var<T>) var;
-            id++;
-        }
-        throw new NoSuchVariableException("No variable with ID " + varID);
     }
 
     /**
@@ -171,8 +150,8 @@ public class VarList implements Iterable<Var<?>> {
      * @return The stored variable, or null if this name isn't in the map.
      */
     @SuppressWarnings("unchecked")
-    public <T> Var<T> get(String uid) {
-        Var<?> var = varMap.get(uid);
+    public <T> Var<T> get(final String uid) {
+        final Var<?> var = varMap.get(uid);
         return var == null ? null : (Var<T>) var;
     }
 
@@ -181,10 +160,10 @@ public class VarList implements Iterable<Var<?>> {
      *
      * @param var Target variable
      * @return Identifier of the given variable.
-     * @throws NoSuchVariableException If given variable is not present in this variable list.
+     * @throws NoSuchVariableException If the given variable is not present in this variable list.
      */
-    public String getID(Var<?> var) throws NoSuchVariableException {
-        for (String uid : varMap.keySet())
+    public String getID(final Var<?> var) throws NoSuchVariableException {
+        for (final String uid : varMap.keySet())
             if (varMap.get(uid) == var)
                 return uid;
 
@@ -192,27 +171,8 @@ public class VarList implements Iterable<Var<?>> {
     }
 
     /**
-     * @param variable Target variable.
-     * @return The index of the list where the given variable is stored.
-     * @throws NoSuchVariableException If the variable is not found in this variable list.
-     * @deprecated Variable index should not be used to refer to a variable
-     */
-    @Deprecated
-    public int indexOf(Var<?> variable) throws NoSuchVariableException {
-        // throw new UnsupportedOperationException("Cannot retrieve the index of a variable");
-        // return varMap.indexOf(variable);
-        int index = 0;
-        for (Var<?> var : this) {
-            if (variable == var)
-                return index;
-            index++;
-        }
-        throw new NoSuchVariableException(variable.getName());
-    }
-
-    /**
      * Indicates whether the specified variable is dynamic.<br>
-     * A variable is considered dynamic if it has been added to the list at "design-time" (e.g. via
+     * A variable is considered dynamic if it has been added to the list at "design-time" (e.g., via
      * the graphical user interface) rather than at "compile-time" (i.e. via
      * {@link Block#declareInput(VarList)} or {@link Block#declareOutput(VarList)}). <br>
      * A dynamic variable is marked with an additional attribute when stored in XML, such that it
@@ -222,11 +182,11 @@ public class VarList implements Iterable<Var<?>> {
      * @param var Variable to be checked.
      * @return true if the variable is of type runtime.
      */
-    public boolean isRuntimeVariable(Var<?> var) {
+    public boolean isRuntimeVariable(final Var<?> var) {
         return runtimeVariableMap.get(var);
     }
 
-    public boolean isVisible(Var<?> var) {
+    public boolean isVisible(final Var<?> var) {
         return visibilityMap.get(var);
     }
 
@@ -235,7 +195,7 @@ public class VarList implements Iterable<Var<?>> {
         return varMap.values().iterator();
     }
 
-    public void remove(Var<?> var) {
+    public void remove(final Var<?> var) {
         if (var.getReference() != null) {
             var.setReference(null);
             return;
@@ -245,7 +205,7 @@ public class VarList implements Iterable<Var<?>> {
         visibilityMap.remove(var);
         runtimeVariableMap.remove(var);
 
-        for (VarListListener l : varListListeners)
+        for (final VarListListener l : varListListeners)
             l.variableRemoved(this, var);
     }
 
@@ -254,7 +214,7 @@ public class VarList implements Iterable<Var<?>> {
      *
      * @param listener Listener to remove.
      */
-    public void removeVarListListener(VarListListener listener) {
+    public void removeVarListListener(final VarListListener listener) {
         varListListeners.remove(listener);
     }
 
@@ -263,7 +223,7 @@ public class VarList implements Iterable<Var<?>> {
      *
      * @param listener Listener to remove.
      */
-    public void removeVisibilityListener(VarVisibilityListener listener) {
+    public void removeVisibilityListener(final VarVisibilityListener listener) {
         visibilityListeners.remove(listener);
     }
 
@@ -273,14 +233,14 @@ public class VarList implements Iterable<Var<?>> {
      * @param var     Variable to set visibility.
      * @param visible true if the variable is to be visible. false otherwise.
      */
-    public void setVisible(Var<?> var, boolean visible) {
+    public void setVisible(final Var<?> var, final boolean visible) {
         if (!visibilityMap.containsKey(var))
             return;// throw new NoSuchVariableException(var);
 
         if (visibilityMap.get(var) != visible) {
             visibilityMap.put(var, visible);
 
-            for (VarVisibilityListener l : visibilityListeners)
+            for (final VarVisibilityListener l : visibilityListeners)
                 l.visibilityChanged(var, visible);
         }
     }

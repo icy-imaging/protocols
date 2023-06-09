@@ -1,56 +1,51 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
+import com.ochafik.io.JTextAreaOutputStream;
+import icy.file.FileUtil;
+import icy.file.Saver;
+import icy.gui.component.button.IcyToggleButton;
+import icy.image.IcyBufferedImage;
+import icy.image.IcyBufferedImageUtil;
+import icy.system.IcyHandledException;
+import icy.system.thread.ThreadUtil;
+import org.w3c.dom.Document;
+import plugins.adufour.blocks.lang.BlockDescriptor;
+import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
+import plugins.adufour.blocks.lang.Link;
+import plugins.adufour.blocks.lang.WorkFlow;
+import plugins.adufour.blocks.util.*;
+import plugins.adufour.protocols.Protocols;
+import plugins.adufour.protocols.gui.block.WorkFlowContainer;
+import plugins.adufour.vars.lang.Var;
+import plugins.adufour.vars.lang.VarString;
+import plugins.adufour.vars.util.VarListener;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-
-import icy.gui.component.button.IcyToggleButton;
-import org.w3c.dom.Document;
-
-import com.ochafik.io.JTextAreaOutputStream;
-
-import icy.file.FileUtil;
-import icy.file.Saver;
-import icy.gui.component.button.IcyButton;
-import icy.image.IcyBufferedImage;
-import icy.image.IcyBufferedImageUtil;
-import icy.system.IcyHandledException;
-import icy.system.thread.ThreadUtil;
-import plugins.adufour.blocks.lang.BlockDescriptor;
-import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
-import plugins.adufour.blocks.lang.Link;
-import plugins.adufour.blocks.lang.WorkFlow;
-import plugins.adufour.blocks.util.BlockListener;
-import plugins.adufour.blocks.util.BlocksException;
-import plugins.adufour.blocks.util.BlocksFinder;
-import plugins.adufour.blocks.util.BlocksML;
-import plugins.adufour.blocks.util.WorkFlowListener;
-import plugins.adufour.protocols.Protocols;
-import plugins.adufour.protocols.gui.block.WorkFlowContainer;
-import plugins.adufour.vars.lang.Var;
-import plugins.adufour.vars.lang.VarString;
-import plugins.adufour.vars.util.VarListener;
 
 public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyChangeListener {
     private final WorkFlowContainer workFlowContainer;
@@ -77,6 +72,8 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         this(null, new WorkFlow(true), frame);
     }
 
+    // TODO: 09/06/2023 Why frame is unused ?
+    @SuppressWarnings("unused")
     private ProtocolPanel(final File file, final WorkFlow workFlow, final MainFrame frame) {
         // Prepare the log panel
         final JTextArea logArea = new JTextArea();
@@ -111,7 +108,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
 
         add(workFlowStatusLabel, BorderLayout.SOUTH);
 
-        statusListener = new VarListener<String>() {
+        statusListener = new VarListener<>() {
             @Override
             public void valueChanged(final Var<String> source, final String oldValue, final String newValue) {
                 ThreadUtil.invokeLater(() -> workFlowStatusLabel.setText(newValue));
@@ -208,7 +205,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
 
     /**
-     * Saves the protocol to a XML file on disk. If no file was currently known for this protocol, a
+     * Saves the protocol to an XML file on disk. If no file was currently known for this protocol, a
      * dialog appears to ask for one
      *
      * @return true if the saving operation was successful, false if canceled
@@ -352,7 +349,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
 
         final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         final Container c = (Container) focusOwner;
-        WorkFlowContainer wfc;
+        final WorkFlowContainer wfc;
         if (!(c instanceof JLayeredPane)) {
             workFlowContainer.requestFocus();
             wfc = workFlowContainer;
@@ -362,14 +359,6 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         BlocksFinder.createEmbedJMenu(embedPopupMenu, wfc);
 
         embedPopupMenu.show(invoker, 0, invoker.getHeight());
-    }
-
-    /**
-     * @deprecated Use {@link #updateRunButton(IcyToggleButton)} instead.
-     */
-    @Deprecated
-    public void updateRunButton(final IcyButton buttonRun) {
-
     }
 
     public void updateRunButton(final IcyToggleButton button) {
@@ -384,10 +373,6 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
 
     /**
      * Load the specified work flow into the protocol panel, and force its dirty status
-     *
-     * @param xml
-     * @param isDirty
-     * @throws BlocksException
      */
     public void loadWorkFlow(final Document xml, final boolean isDirty) throws BlocksException {
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);

@@ -1,23 +1,46 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui.block;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import icy.file.FileUtil;
+import icy.file.Loader;
+import icy.file.SequenceFileImporter;
+import icy.gui.dialog.ConfirmDialog;
+import icy.system.thread.ThreadUtil;
+import plugins.adufour.blocks.lang.*;
+import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
+import plugins.adufour.blocks.util.BlocksFinder;
+import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
+import plugins.adufour.blocks.util.LinkCutException;
+import plugins.adufour.blocks.util.WorkFlowListener;
+import plugins.adufour.protocols.Protocols;
+import plugins.adufour.protocols.gui.MainFrame;
+import plugins.adufour.protocols.gui.link.Line;
+import plugins.adufour.protocols.gui.link.RoundedSquareLine;
+import plugins.adufour.vars.lang.Var;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -30,32 +53,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JLayeredPane;
-import javax.swing.JPopupMenu;
-import javax.swing.TransferHandler;
-
-import icy.file.FileUtil;
-import icy.file.Loader;
-import icy.file.SequenceFileImporter;
-import icy.gui.dialog.ConfirmDialog;
-import icy.system.thread.ThreadUtil;
-import plugins.adufour.blocks.lang.Block;
-import plugins.adufour.blocks.lang.BlockDescriptor;
-import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
-import plugins.adufour.blocks.lang.Link;
-import plugins.adufour.blocks.lang.Loop;
-import plugins.adufour.blocks.lang.WorkFlow;
-import plugins.adufour.blocks.util.BlocksFinder;
-import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
-import plugins.adufour.blocks.util.LinkCutException;
-import plugins.adufour.blocks.util.WorkFlowListener;
-import plugins.adufour.protocols.Protocols;
-import plugins.adufour.protocols.gui.MainFrame;
-import plugins.adufour.protocols.gui.link.Line;
-import plugins.adufour.protocols.gui.link.RoundedSquareLine;
-import plugins.adufour.vars.lang.Var;
-
 public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener, DropTargetListener, KeyListener {
     protected class BlockSelector extends MouseAdapter {
         int pressedX, pressedY;
@@ -63,18 +60,18 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         ArrayList<BlockDescriptor> currentlySelectedBlocks = new ArrayList<>();
 
         @Override
-        public void mousePressed(MouseEvent e) {
+        public void mousePressed(final MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 if (!((e.getModifiersEx() & Protocols.MENU_SHORTCUT_KEY) == Protocols.MENU_SHORTCUT_KEY)) {
                     workFlow.newSelection();
-                    for (BlockPanel bp : blockPanels.values())
+                    for (final BlockPanel bp : blockPanels.values())
                         bp.setSelected(false);
-                    for (Line l : linkLines.values())
+                    for (final Line l : linkLines.values())
                         l.setSelected(false);
                 }
 
                 if (e.getComponent() instanceof BlockPanel) {
-                    BlockDescriptor bd = ((BlockPanel) e.getComponent()).blockDesc;
+                    final BlockDescriptor bd = ((BlockPanel) e.getComponent()).blockDesc;
 
                     if (!currentlySelectedBlocks.contains(bd) && !workFlow.isBlockSelected(bd)) {
                         currentlySelectedBlocks.add(bd);
@@ -100,9 +97,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseDragged(MouseEvent e) {
+        public void mouseDragged(final MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                Rectangle selection = new Rectangle(Math.min(e.getX(), pressedX), Math.min(e.getY(), pressedY),
+                final Rectangle selection = new Rectangle(Math.min(e.getX(), pressedX), Math.min(e.getY(), pressedY),
                         Math.abs(pressedX - e.getX()), Math.abs(pressedY - e.getY()));
 
                 selectBlocks(selection);
@@ -115,7 +112,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseReleased(MouseEvent e) {
+        public void mouseReleased(final MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 validateSelection();
 
@@ -126,14 +123,14 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mouseClicked(final MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON2 || e.isMetaDown()) {
                 popupMenu.removeAll();
                 new BlocksFinder().createJMenu(popupMenu, WorkFlowContainer.this, e.getPoint());
                 popupMenu.show(WorkFlowContainer.this, e.getX(), e.getY());
             }
             else {
-                for (Link<?> link : linkLines.keySet())
+                for (final Link<?> link : linkLines.keySet())
                     if (linkLines.get(link).isOverCloseButton(e.getPoint())) {
                         workFlow.removeLink(link.dstVar);
                         // prevent concurrent modification
@@ -143,15 +140,15 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseMoved(MouseEvent e) {
-            for (Line l : linkLines.values())
+        public void mouseMoved(final MouseEvent e) {
+            for (final Line l : linkLines.values())
                 l.setCustomColor(l.contains(e.getX(), e.getY()));
         }
 
-        private void selectBlocks(Rectangle rectangle) {
+        private void selectBlocks(final Rectangle rectangle) {
             // block selection
             boolean containsBlock;
-            for (BlockDescriptor bd : blockPanels.keySet()) {
+            for (final BlockDescriptor bd : blockPanels.keySet()) {
                 containsBlock = rectangle.intersects(blockPanels.get(bd).getBounds());
                 // selection
                 if (!currentlySelectedBlocks.contains(bd)) {
@@ -174,7 +171,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
         private void selectLinks() {
             boolean containsLink;
-            for (Link<?> l : linkLines.keySet()) {
+            for (final Link<?> l : linkLines.keySet()) {
                 containsLink = (currentlySelectedBlocks.contains(l.srcBlock) || workFlow.isBlockSelected(l.srcBlock))
                         && (currentlySelectedBlocks.contains(l.dstBlock) || workFlow.isBlockSelected(l.dstBlock));
 
@@ -195,10 +192,10 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         private void validateSelection() {
-            for (BlockDescriptor bd : currentlySelectedBlocks)
+            for (final BlockDescriptor bd : currentlySelectedBlocks)
                 workFlow.selectBlock(bd);
 
-            for (Link<?> l : currentlySelectedLinks)
+            for (final Link<?> l : currentlySelectedLinks)
                 workFlow.selectLink(l);
 
             graphicSelectionHint = new Rectangle();
@@ -226,12 +223,11 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     private Rectangle graphicSelectionHint = new Rectangle();
 
     private final static int TRANSPARENCY = 25;
-    public final static Color TRANSPARENT_BLUE = new Color(Color.BLUE.getRed(), Color.BLUE.getGreen(),
-            Color.BLUE.getBlue(), TRANSPARENCY);
+    public final static Color TRANSPARENT_BLUE = new Color(Color.BLUE.getRed(), Color.BLUE.getGreen(), Color.BLUE.getBlue(), TRANSPARENCY);
 
-    // displays visual hint while selecting blocks
+    // displays a visual hint while selecting blocks
     @Override
-    public void paint(Graphics g) {
+    public void paint(final Graphics g) {
         super.paint(g);
         g.setColor(TRANSPARENT_BLUE);
 
@@ -239,7 +235,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                 graphicSelectionHint.height);
     }
 
-    public WorkFlowContainer(final WorkFlow workFlow, boolean editable) {
+    public WorkFlowContainer(final WorkFlow workFlow, final boolean editable) {
         new DropTarget(this, this);
         setTransferHandler(new MenuItemTransferHandler());
 
@@ -261,10 +257,10 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
         // add graphical components from the new work flow
 
-        for (BlockDescriptor blockInfo : workFlow)
+        for (final BlockDescriptor blockInfo : workFlow)
             blockAdded(workFlow, blockInfo);
 
-        for (Link<?> link : workFlow.getLinksIterator())
+        for (final Link<?> link : workFlow.getLinksIterator())
             linkAdded(workFlow, link);
 
         // register the listener
@@ -276,8 +272,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         ThreadUtil.invokeLater(() -> {
             // the blocks must be retrieved inside the invokeLater method
             // to ensure they are loaded and visible on screen
-            BlockPanel srcBlockPanel = getBlockPanel(link.srcBlock);
-            BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
+            final BlockPanel srcBlockPanel = getBlockPanel(link.srcBlock);
+            final BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
 
             if ((srcBlockPanel == null) || (dstBlockPanel == null)) {
                 System.err.println("Warning: cannot recover link between " + link.srcBlock.getDefinedName()
@@ -288,9 +284,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
                 // refresh the target block
                 if (dstBlockPanel instanceof WorkFlowPanel) {
-                    WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
+                    final WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
 
-                    BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
+                    final BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
 
                     innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
                 }
@@ -303,12 +299,12 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void blockAdded(WorkFlow targetWorkFlow, final BlockDescriptor blockDesc) {
+    public void blockAdded(final WorkFlow targetWorkFlow, final BlockDescriptor blockDesc) {
         if (targetWorkFlow != this.workFlow)
             return;
 
         ThreadUtil.invokeNow(() -> {
-            BlockPanel panel;
+            final BlockPanel panel;
 
             if (blockDesc.isLoop()) {
                 panel = new LoopPanel(WorkFlowContainer.this, blockDesc);
@@ -326,17 +322,17 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             add(panel);
 
             // FIX: get exposed links correctly restored on copy/paste as setVisibility isn't called in that case (Stephane)
-            // this is really an ugly fix but the whole stuff is a complete mess honestly :-/
+            // this is really an ugly fix, but the whole stuff is a complete mess honestly :-/
             if (blockDesc.isWorkFlow()) {
                 synchronized (blockDesc.inputVars) {
                     // update exposed links
-                    for (Var<?> var : blockDesc.inputVars)
+                    for (final Var<?> var : blockDesc.inputVars)
                         ((WorkFlowPanel) panel).updateExposedLink(var, blockDesc.inputVars.isVisible(var));
                 }
 
                 synchronized (blockDesc.outputVars) {
                     // update exposed links
-                    for (Var<?> var : blockDesc.outputVars)
+                    for (final Var<?> var : blockDesc.outputVars)
                         ((WorkFlowPanel) panel).updateExposedLink(var, blockDesc.outputVars.isVisible(var));
                 }
             }
@@ -352,12 +348,12 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void blockCollapsed(WorkFlow source, BlockDescriptor block, boolean collapsed) {
+    public void blockCollapsed(final WorkFlow source, final BlockDescriptor block, final boolean collapsed) {
 
     }
 
     @Override
-    public void blockDimensionChanged(WorkFlow source, BlockDescriptor block, int newWidth, int newHeight) {
+    public void blockDimensionChanged(final WorkFlow source, final BlockDescriptor block, final int newWidth, final int newHeight) {
         if (source != this.workFlow)
             return;
 
@@ -366,7 +362,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void blockLocationChanged(WorkFlow source, BlockDescriptor block, int newX, int newY) {
+    public void blockLocationChanged(final WorkFlow source, final BlockDescriptor block, final int newX, final int newY) {
         if (source != this.workFlow)
             return;
 
@@ -375,14 +371,14 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void blockRemoved(WorkFlow targetWorkFlow, BlockDescriptor blockInfo) {
+    public void blockRemoved(final WorkFlow targetWorkFlow, final BlockDescriptor blockInfo) {
         if (targetWorkFlow != this.workFlow)
             return;
 
         final BlockPanel panel = blockPanels.remove(blockInfo);
 
         targetWorkFlow.unselectBlock(blockInfo);
-        for (Link<?> l : linkLines.keySet())
+        for (final Link<?> l : linkLines.keySet())
             if (l.dstBlock.equals(blockInfo) || l.srcBlock.equals(blockInfo))
                 targetWorkFlow.unselectLink(l);
 
@@ -400,17 +396,17 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void blockStatusChanged(WorkFlow source, BlockDescriptor block, BlockStatus status) {
+    public void blockStatusChanged(final WorkFlow source, final BlockDescriptor block, final BlockStatus status) {
 
     }
 
     @Override
-    public void blockVariableAdded(WorkFlow source, BlockDescriptor block, Var<?> variable) {
+    public void blockVariableAdded(final WorkFlow source, final BlockDescriptor block, final Var<?> variable) {
 
     }
 
     @Override
-    public <T> void blockVariableChanged(WorkFlow source, BlockDescriptor block, Var<T> variable, T newValue) {
+    public <T> void blockVariableChanged(final WorkFlow source, final BlockDescriptor block, final Var<T> variable, final T newValue) {
 
     }
 
@@ -420,11 +416,11 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         removeMouseMotionListener(blockSelector);
         removeKeyListener(this);
 
-        for (BlockPanel panel : blockPanels.values())
+        for (final BlockPanel panel : blockPanels.values())
             panel.dispose();
         blockPanels.clear();
 
-        for (Line line : linkLines.values())
+        for (final Line line : linkLines.values())
             line.dispose();
         linkLines.clear();
 
@@ -435,12 +431,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
      * This method does nothing if the work flow is empty.
      *
      * @param embedType the type of work flow to create
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      * @see Loop
      */
-    public void embedWorkFlow(final Class<? extends WorkFlow> embedType)
-            throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void embedWorkFlow(final Class<? extends WorkFlow> embedType) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         if (workFlow.size() == 0)
             return;
 
@@ -448,7 +441,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             MainFrame.copySelection(workFlow, true);
             doEmbedWorkflow(embedType);
         }
-        catch (LinkCutException | NoSuchMethodException | InvocationTargetException e) {
+        catch (final LinkCutException | NoSuchMethodException | InvocationTargetException e) {
             if (ConfirmDialog.confirm("Warning", e.getMessage(), ConfirmDialog.OK_CANCEL_OPTION)) {
                 doEmbedWorkflow(embedType);
             }
@@ -456,26 +449,26 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
     }
 
-    private void doEmbedWorkflow(Class<? extends WorkFlow> embedType) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        WorkFlow embed = embedType.getDeclaredConstructor().newInstance();
+    private void doEmbedWorkflow(final Class<? extends WorkFlow> embedType) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        final WorkFlow embed = embedType.getDeclaredConstructor().newInstance();
 
         if (!workFlow.getBlockSelection().isEmpty()) {
-            for (Link<?> l : workFlow.getLinkSelection())
+            for (final Link<?> l : workFlow.getLinkSelection())
                 workFlow.removeLink(l.dstVar);
             while (!workFlow.getBlockSelection().isEmpty()) {
-                BlockDescriptor tmp = workFlow.getBlockSelection().get(0);
+                final BlockDescriptor tmp = workFlow.getBlockSelection().get(0);
                 if (tmp.getBlock() instanceof WorkFlow)
                     ((WorkFlow) tmp.getBlock()).newSelection();
                 workFlow.removeBlock(tmp, true);
             }
         }
         else {
-            ArrayList<Link<?>> tmp = new ArrayList<>();
-            for (Link<?> l : workFlow.getLinksIterator())
+            final ArrayList<Link<?>> tmp = new ArrayList<>();
+            for (final Link<?> l : workFlow.getLinksIterator())
                 tmp.add(l); // avoid concurrent modification exception
-            for (Link<?> l : tmp)
+            for (final Link<?> l : tmp)
                 workFlow.removeLink(l.dstVar);
-            for (int i = 0; i < workFlow.size(); )
+            for (int i = 0; i < workFlow.size(); i++) // TODO: 09/06/2023 i++ was not present, check if it was for purpose
                 workFlow.removeBlock(workFlow.getBlock(i), true);
         }
 
@@ -493,12 +486,12 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
         Rectangle bounds = null;
 
-        for (BlockPanel panel : blockPanels.values()) {
+        for (final BlockPanel panel : blockPanels.values()) {
             bounds = (bounds == null) ? new Rectangle(panel.getBounds()) : bounds.union(panel.getBounds());
         }
 
         // add an artificial border to ensure that links are within the bounds
-        int border = 20;
+        final int border = 20;
         bounds.x -= border;
         bounds.y -= border;
         bounds.width += border * 2;
@@ -507,7 +500,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         return bounds;
     }
 
-    public BlockPanel getBlockPanel(BlockDescriptor blockInfo) {
+    public BlockPanel getBlockPanel(final BlockDescriptor blockInfo) {
         if (blockInfo == null)
             return null;
 
@@ -519,8 +512,6 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
     /**
      * Returns the block panel containing this container, or null if this container is top-level
-     *
-     * @return
      */
     WorkFlowPanel getParentPanel() {
         return this.parentPanel;
@@ -535,7 +526,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void linkAdded(WorkFlow targetWorkFlow, final Link<?> link) {
+    public void linkAdded(final WorkFlow targetWorkFlow, final Link<?> link) {
         if (targetWorkFlow != this.workFlow)
             return;
 
@@ -543,7 +534,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void linkRemoved(WorkFlow targetWorkFlow, final Link<?> link) {
+    public void linkRemoved(final WorkFlow targetWorkFlow, final Link<?> link) {
         if (targetWorkFlow != this.workFlow)
             return;
 
@@ -551,20 +542,20 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void paintChildren(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
+    public void paintChildren(final Graphics g) {
+        final Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         if (workFlow.size() == 0) {
-            String s = "Right-click to insert a block...";
+            final String s = "Right-click to insert a block...";
             g2.setColor(Color.gray);
             g2.setFont(g2.getFont().deriveFont(Font.ITALIC));
-            Rectangle2D r = g2.getFontMetrics().getStringBounds(s, g);
+            final Rectangle2D r = g2.getFontMetrics().getStringBounds(s, g);
             g2.drawString(s, (float) (getWidth() / 2 - r.getWidth() / 2),
                     (float) (getHeight() / 2 + r.getHeight() / 2));
         }
 
-        for (Line line : linkLines.values()) {
+        for (final Line line : linkLines.values()) {
             line.update();
             line.paint(g2);
         }
@@ -574,22 +565,22 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         super.paintChildren(g);
     }
 
-    private void removeGraphicalLink(Link<?> link) {
-        Line line = linkLines.remove(link);
+    private void removeGraphicalLink(final Link<?> link) {
+        final Line line = linkLines.remove(link);
 
         if (line == null)
             System.err.println("Warning: missing link, cannot be removed properly");
         else
             line.dispose();
 
-        BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
+        final BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
 
         if (dstBlockPanel != null) {
             // refresh the target block
             if (dstBlockPanel instanceof WorkFlowPanel) {
-                WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
+                final WorkFlowContainer innerFlow = ((WorkFlowPanel) dstBlockPanel).innerFlowPane;
 
-                BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
+                final BlockDescriptor targetInnerlBlock = innerFlow.workFlow.getInputOwner(link.dstVar);
 
                 innerFlow.getBlockPanel(targetInnerlBlock).refreshNow();
             }
@@ -612,12 +603,12 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             parentPanel.repaint();
     }
 
-    void setParentPanel(WorkFlowPanel panel) {
+    void setParentPanel(final WorkFlowPanel panel) {
         this.parentPanel = panel;
     }
 
     @Override
-    public void statusChanged(WorkFlow source, String message) {
+    public void statusChanged(final WorkFlow source, final String message) {
 
     }
 
@@ -627,9 +618,9 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
         // 1) find top-left far-most components
 
-        Rectangle r = new Rectangle();
+        final Rectangle r = new Rectangle();
         int minx = 0, miny = 0;
-        for (Component component : getComponents()) {
+        for (final Component component : getComponents()) {
             component.getBounds(r);
             if (r.x < minx)
                 minx = r.x;
@@ -639,8 +630,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
 
         // 2) compute the new preferred size of this container
 
-        Dimension dim = new Dimension();
-        for (Component component : getComponents()) {
+        final Dimension dim = new Dimension();
+        for (final Component component : getComponents()) {
             component.getBounds(r);
 
             // if the far-most location is negative, shift all components by that amount
@@ -664,17 +655,17 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void workFlowReordered(WorkFlow source) {
+    public void workFlowReordered(final WorkFlow source) {
         // refresh all blocks
-        for (BlockPanel panel : blockPanels.values())
+        for (final BlockPanel panel : blockPanels.values())
             panel.refresh();
     }
 
     @Override
-    public void keyPressed(KeyEvent key) {
+    public void keyPressed(final KeyEvent key) {
         if (key.getKeyCode() == KeyEvent.VK_DELETE || key.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-            ArrayList<BlockDescriptor> tmp = new ArrayList<>(workFlow.getBlockSelection());
-            for (BlockDescriptor bd : tmp)
+            final ArrayList<BlockDescriptor> tmp = new ArrayList<>(workFlow.getBlockSelection());
+            for (final BlockDescriptor bd : tmp)
                 workFlow.removeBlock(bd, true);
         }
         else {
@@ -683,57 +674,56 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void keyTyped(KeyEvent key) {
+    public void keyTyped(final KeyEvent key) {
     }
 
     @Override
-    public void keyReleased(KeyEvent key) {
+    public void keyReleased(final KeyEvent key) {
     }
 
     @Override
-    public void dragEnter(DropTargetDragEvent dtde) {
-
-    }
-
-    @Override
-    public void dragExit(DropTargetEvent dte) {
+    public void dragEnter(final DropTargetDragEvent dtde) {
 
     }
 
     @Override
-    public void dragOver(DropTargetDragEvent dtde) {
+    public void dragExit(final DropTargetEvent dte) {
 
     }
 
     @Override
-    public void drop(DropTargetDropEvent dtde) {
+    public void dragOver(final DropTargetDragEvent dtde) {
+
+    }
+
+    @Override
+    public void drop(final DropTargetDropEvent dtde) {
         try {
-            Transferable t = dtde.getTransferable();
-            DataFlavor[] d = t.getTransferDataFlavors();
-            Point mouseLocation = dtde.getLocation();
+            final Transferable t = dtde.getTransferable();
+            final DataFlavor[] d = t.getTransferDataFlavors();
+            final Point mouseLocation = dtde.getLocation();
 
-            MenuItemTransferHandler menuItemTransferHandler = (MenuItemTransferHandler) getTransferHandler();
+            final MenuItemTransferHandler menuItemTransferHandler = (MenuItemTransferHandler) getTransferHandler();
 
             dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 
             // quick & easy case first
             if (t.getTransferData(d[0]) instanceof DND_MenuItem) {
                 // block coming from the search panel
-                DND_MenuItem menuItem = (DND_MenuItem) t.getTransferData(d[0]);
+                final DND_MenuItem menuItem = (DND_MenuItem) t.getTransferData(d[0]);
                 if (menuItemTransferHandler.canImport(this, d))
                     menuItemTransferHandler.importData(this, menuItem, mouseLocation);
             }
             else if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 // a list of files
 
-                @SuppressWarnings("unchecked")
-                List<File> files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                @SuppressWarnings("unchecked") final List<File> files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
 
-                ArrayList<String> xmlFiles = new ArrayList<>();
-                ArrayList<String> otherFiles = new ArrayList<>();
+                final ArrayList<String> xmlFiles = new ArrayList<>();
+                final ArrayList<String> otherFiles = new ArrayList<>();
 
-                for (File file : files) {
-                    String path = file.getPath();
+                for (final File file : files) {
+                    final String path = file.getPath();
 
                     if (FileUtil.getFileExtension(path, false).equalsIgnoreCase("xml")
                             || FileUtil.getFileExtension(path, false).equalsIgnoreCase("protocol")) {
@@ -744,17 +734,17 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                     }
                 }
 
-                for (String path : xmlFiles) {
+                for (final String path : xmlFiles) {
                     Protocols.loadWorkFlow(new File(path));
                 }
-                for (String path : otherFiles) {
-                    SequenceFileImporter importer = Loader.getSequenceFileImporter(path, true);
+                for (final String path : otherFiles) {
+                    final SequenceFileImporter importer = Loader.getSequenceFileImporter(path, true);
                     if (importer != null)
                         Loader.load(path, true);
                 }
             }
         }
-        catch (UnsupportedFlavorException | IOException e) {
+        catch (final UnsupportedFlavorException | IOException e) {
             e.printStackTrace();
         }
         finally {
@@ -763,46 +753,46 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void dropActionChanged(DropTargetDragEvent dtde) {
+    public void dropActionChanged(final DropTargetDragEvent dtde) {
 
     }
 
     private class MenuItemTransferHandler extends TransferHandler {
 
-        public boolean canImport(JComponent c, DataFlavor[] f) {
-            DataFlavor tmp;
+        @Override
+        public boolean canImport(final JComponent c, final DataFlavor[] f) {
+            final DataFlavor tmp;
             try {
                 tmp = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList");
-                for (DataFlavor d : f)
+                for (final DataFlavor d : f)
                     if (d.equals(tmp))
                         return true;
             }
-            catch (ClassNotFoundException e) {
+            catch (final ClassNotFoundException e) {
                 e.printStackTrace();
             }
             return false;
         }
 
-        public void importData(WorkFlowContainer workFlowContainer, Transferable t, Point p) {
-            Block block;
-            Class<? extends Block> blockClass;
+        public void importData(final WorkFlowContainer workFlowContainer, final Transferable t, final Point p) {
+            final Block block;
+            final Class<? extends Block> blockClass;
             try {
-                DND_MenuItem item = (DND_MenuItem) t.getTransferData(new DataFlavor(DND_MenuItem.class, "MenuItem"));
+                final DND_MenuItem item = (DND_MenuItem) t.getTransferData(new DataFlavor(DND_MenuItem.class, "MenuItem"));
                 blockClass = item.getDescriptor().getPluginClass().asSubclass(Block.class);
                 block = blockClass.getDeclaredConstructor().newInstance();
-                BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor()
-                        : new BlockDescriptor(-1, block));
+                final BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor() : new BlockDescriptor(-1, block));
                 blockDesc.setLocation(p.x, p.y);
                 workFlowContainer.getWorkFlow().addBlock(blockDesc);
                 requestFocus();
             }
             catch (
-                    UnsupportedFlavorException
-                    | IOException
-                    | InstantiationException
-                    | IllegalAccessException
-                    | NoSuchMethodException
-                    | InvocationTargetException e
+                    final UnsupportedFlavorException
+                          | IOException
+                          | InstantiationException
+                          | IllegalAccessException
+                          | NoSuchMethodException
+                          | InvocationTargetException e
             ) {
                 e.printStackTrace();
             }

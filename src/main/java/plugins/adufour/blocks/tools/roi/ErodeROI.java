@@ -1,19 +1,37 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools.roi;
 
-import java.awt.Point;
-import java.util.ArrayList;
-
-import icy.roi.BooleanMask2D;
-import icy.roi.BooleanMask3D;
-import icy.roi.ROI;
-import icy.roi.ROI2D;
-import icy.roi.ROI3D;
+import icy.roi.*;
 import icy.type.point.Point3D;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.util.VarException;
 import plugins.kernel.roi.roi2d.ROI2DArea;
 import plugins.kernel.roi.roi3d.ROI3DArea;
 
+import java.awt.*;
+import java.util.ArrayList;
+
+/**
+ * @author Joel Rogers
+ * @author Alexandre Dufour
+ */
 public class ErodeROI extends MorphROI {
     public ErodeROI() {
         roiOUT = new VarROIArray("Eroded ROI");
@@ -33,7 +51,7 @@ public class ErodeROI extends MorphROI {
                     throw new VarException(unit, "Unsupported unit");
             }
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -46,22 +64,22 @@ public class ErodeROI extends MorphROI {
      * @param xRadius  the radius (in pixels) along X
      * @param yRadius  the radius (in pixels) along Y
      * @param zRadius  the radius (in pixels) along Z (not used if <code>roi</code> is 2D)
-     * @return a new set of eroded ROI of type "area"
-     * @throws InterruptedException
+     * @return a new set of eroded ROI with type "area"
+     * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] erodeROI(ROI[] inputRoi, int xRadius, int yRadius, int zRadius) throws InterruptedException {
-        ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
+    public static ROI[] erodeROI(final ROI[] inputRoi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
+        final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
-        for (ROI roi : inputRoi) {
+        for (final ROI roi : inputRoi) {
             if (Thread.currentThread().isInterrupted())
                 break;
 
-            ROI eroded = erodeROI(roi, xRadius, yRadius, zRadius);
+            final ROI eroded = erodeROI(roi, xRadius, yRadius, zRadius);
             if (eroded != null)
                 out.add(eroded);
         }
 
-        return out.toArray(new ROI[out.size()]);
+        return out.toArray(new ROI[0]);
     }
 
     /**
@@ -72,22 +90,22 @@ public class ErodeROI extends MorphROI {
      * @param xPct     the percentage (from 0 to 100) to erode along X
      * @param yPct     the percentage (from 0 to 100) to erode along Y
      * @param zPct     the percentage (from 0 to 100) to erode along Z (not used in 2D)
-     * @return a new set of eroded ROI of type "area"
-     * @throws InterruptedException
+     * @return a new set of eroded ROI with type "area"
+     * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] erodeROIByPercentage(ROI[] inputRoi, int xPct, int yPct, int zPct) throws InterruptedException {
-        ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
+    public static ROI[] erodeROIByPercentage(final ROI[] inputRoi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
+        final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
-        for (ROI roi : inputRoi) {
+        for (final ROI roi : inputRoi) {
             if (Thread.currentThread().isInterrupted())
                 break;
 
-            ROI eroded = erodeROIByPercentage(roi, xPct, yPct, zPct);
+            final ROI eroded = erodeROIByPercentage(roi, xPct, yPct, zPct);
             if (eroded != null)
                 out.add(eroded);
         }
 
-        return out.toArray(new ROI[out.size()]);
+        return out.toArray(new ROI[0]);
     }
 
     /**
@@ -99,13 +117,12 @@ public class ErodeROI extends MorphROI {
      * @param yPct the percentage (from 0 to 100) to dilate along Y
      * @param zPct the percentage (from 0 to 100) to dilate along Z (not used in 2D)
      * @return a new, dilated ROI of type "area"
-     * @throws InterruptedException
-     * @author Joel Rogers, Alexandre Dufour
+     * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI erodeROIByPercentage(ROI roi, int xPct, int yPct, int zPct) throws InterruptedException {
-        int xRadius = percentageToRadiusX(roi, xPct);
-        int yRadius = percentageToRadiusY(roi, yPct);
-        int zRadius = percentageToRadiusZ(roi, zPct);
+    public static ROI erodeROIByPercentage(final ROI roi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
+        final int xRadius = percentageToRadiusX(roi, xPct);
+        final int yRadius = percentageToRadiusY(roi, yPct);
+        final int zRadius = percentageToRadiusZ(roi, zPct);
 
         return erodeROI(roi, xRadius, yRadius, zRadius);
     }
@@ -118,22 +135,22 @@ public class ErodeROI extends MorphROI {
      * @param yRadius the radius in pixels along X
      * @param zRadius the radius in pixels along Z (not used if <code>roi</code> is 2D)
      * @return a new, eroded ROI of type "area"
-     * @throws InterruptedException
+     * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI erodeROI(ROI roi, int xRadius, int yRadius, int zRadius) throws InterruptedException {
+    public static ROI erodeROI(final ROI roi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
         // The basis of this erosion operator is to remove all pixels within a distance of "radius"
         // from the border. Since we have easy access to the contour points of the ROI, we will
         // start from there and instead use a radius of "radius - 1" when searching for pixels to
-        // erase, so as to be consistent with the dual dilation operator, such that openings
+        // erase, to be consistent with the dual dilation operator, such that openings
         // (erosion + dilation) and closings (dilation + erosion) preserve the global ROI size
 
-        int rx = Math.max(0, xRadius - 1), rrx = rx * rx;
-        int ry = Math.max(0, yRadius - 1), rry = ry * ry;
-        int rz = Math.max(0, zRadius - 1), rrz = rz * rz;
+        final int rx = Math.max(0, xRadius - 1), rrx = rx * rx;
+        final int ry = Math.max(0, yRadius - 1), rry = ry * ry;
+        final int rz = Math.max(0, zRadius - 1), rrz = rz * rz;
 
         if (roi instanceof ROI2D) {
-            BooleanMask2D m2 = ((ROI2D) roi).getBooleanMask(true);
-            ROI2DArea r2 = new ROI2DArea(m2);
+            final BooleanMask2D m2 = ((ROI2D) roi).getBooleanMask(true);
+            final ROI2DArea r2 = new ROI2DArea(m2);
             r2.setC(((ROI2D) roi).getC());
             r2.setZ(((ROI2D) roi).getZ());
             r2.setT(((ROI2D) roi).getT());
@@ -141,12 +158,12 @@ public class ErodeROI extends MorphROI {
 
             r2.beginUpdate();
 
-            for (Point p : m2.getContourPoints()) {
+            for (final Point p : m2.getContourPoints()) {
                 // Brute force
                 for (int y = -ry; y <= ry; y++)
                     for (int x = -rx; x <= rx; x++) {
-                        double xr2 = rrx == 0 ? 0 : x * x / rrx;
-                        double yr2 = rry == 0 ? 0 : y * y / rry;
+                        final double xr2 = rrx == 0 ? 0 : (double) (x * x) / rrx;
+                        final double yr2 = rry == 0 ? 0 : (double) (y * y) / rry;
 
                         // correct the sphere equation to include the outer rim for each pixel
                         if (xr2 + yr2 <= 2.0) {
@@ -160,25 +177,25 @@ public class ErodeROI extends MorphROI {
             return r2.getNumberOfPoints() > 0 ? r2 : null;
         }
         else if (roi instanceof ROI3D) {
-            ROI3D roi3D = (ROI3D) roi;
+            final ROI3D roi3D = (ROI3D) roi;
 
-            BooleanMask3D m3 = roi3D.getBooleanMask(true);
+            final BooleanMask3D m3 = roi3D.getBooleanMask(true);
 
-            ROI3DArea r3 = new ROI3DArea(m3);
+            final ROI3DArea r3 = new ROI3DArea(m3);
             r3.setC(((ROI3D) roi).getC());
             r3.setT(((ROI3D) roi).getT());
             r3.setName(roi.getName() + " eroded[" + xRadius + "," + yRadius + "," + zRadius + "]");
 
             r3.beginUpdate();
 
-            for (Point3D.Integer p : m3.getContourPoints()) { // Brute force
+            for (final Point3D.Integer p : m3.getContourPoints()) { // Brute force
 
                 if (rrz == 0) {
-                    int z = 0;
+                    final int z = 0;
                     for (int y = -ry; y <= ry; y++)
                         for (int x = -rx; x <= rx; x++) {
-                            double xr2 = rrx == 0 ? 0 : x * x / rrx;
-                            double yr2 = rry == 0 ? 0 : y * y / rry;
+                            final double xr2 = rrx == 0 ? 0 : (double) (x * x) / rrx;
+                            final double yr2 = rry == 0 ? 0 : (double) (y * y) / rry;
 
                             // correct the sphere equation to include the outer rim for each pixel
                             if (xr2 + yr2 <= 2.0) {
@@ -186,7 +203,7 @@ public class ErodeROI extends MorphROI {
                                     try {
                                         r3.removePoint(p.x + x, p.y + y, p.z + z);
                                     }
-                                    catch (ArrayIndexOutOfBoundsException aioobe) {
+                                    catch (final ArrayIndexOutOfBoundsException aioobe) {
                                         // FIXME @Stephane, what's wrong here?!
                                     }
                             }
@@ -196,9 +213,9 @@ public class ErodeROI extends MorphROI {
                     for (int z = -rz; z <= rz; z++)
                         for (int y = -ry; y <= ry; y++)
                             for (int x = -rx; x <= rx; x++) {
-                                double xr2 = rrx == 0 ? 0 : x * x / rrx;
-                                double yr2 = rry == 0 ? 0 : y * y / rry;
-                                double zr2 = rrz == 0 ? 0 : z * z / rrz;
+                                final double xr2 = rrx == 0 ? 0 : (double) (x * x) / rrx;
+                                final double yr2 = rry == 0 ? 0 : (double) (y * y) / rry;
+                                final double zr2 = rrz == 0 ? 0 : (double) (z * z) / rrz;
 
                                 // correct the sphere equation to include the outer rim for each
                                 // pixel
@@ -207,7 +224,7 @@ public class ErodeROI extends MorphROI {
                                         try {
                                             r3.removePoint(p.x + x, p.y + y, p.z + z);
                                         }
-                                        catch (ArrayIndexOutOfBoundsException aioobe) {
+                                        catch (final ArrayIndexOutOfBoundsException aioobe) {
                                             // FIXME @Stephane, what's wrong here?!
                                         }
                                 }

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools.input;
 
 import icy.plugin.abstract_.Plugin;
@@ -17,14 +35,14 @@ public class Folders extends Plugin implements InputBlock {
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
-        VarFileArray vf = new VarFileArray("folders", new java.io.File[0]);
+    public void declareInput(final VarList inputMap) {
+        final VarFileArray vf = new VarFileArray("folders", new java.io.File[0]);
         vf.setDefaultEditorModel(new FileTypeListModel("", FileMode.FOLDERS, null, false));
         inputMap.add("folders", vf);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
     }
 
 }

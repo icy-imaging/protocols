@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools.roi;
 
 import icy.image.IcyBufferedImage;
@@ -8,37 +26,36 @@ import icy.sequence.Sequence;
 import icy.type.rectangle.Rectangle5D;
 import icy.util.OMEUtil;
 import icy.util.StringUtil;
-
-import java.awt.Rectangle;
-import java.util.ArrayList;
-
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarGenericArray;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.lang.VarSequence;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class CropSequenceToROI extends Plugin implements ROIBlock {
-    VarSequence input = new VarSequence("Sequence to crop", null);
+    private final VarSequence input = new VarSequence("Sequence to crop", null);
 
-    VarROIArray rois = new VarROIArray("List of ROI");
+    private final VarROIArray rois = new VarROIArray("List of ROI");
 
-    VarGenericArray<Sequence[]> output = new VarGenericArray<Sequence[]>("List of crops", Sequence[].class, new Sequence[]{});
+    private final VarGenericArray<Sequence[]> output = new VarGenericArray<>("List of crops", Sequence[].class, new Sequence[]{});
 
     @Override
     public void run() {
-        Sequence seq = input.getValue(true);
+        final Sequence seq = input.getValue(true);
 
-        int nbROIs = rois.getValue(true).length;
+        final int nbROIs = rois.getValue(true).length;
 
-        ArrayList<Sequence> crops = new ArrayList<>(nbROIs);
+        final ArrayList<Sequence> crops = new ArrayList<>(nbROIs);
 
         int cpt = 1;
-        int digitSize = 1 + (int) Math.log10(nbROIs);
+        final int digitSize = 1 + (int) Math.log10(nbROIs);
 
-        for (ROI roi : rois.getValue()) {
+        for (final ROI roi : rois.getValue()) {
             final Sequence result = new Sequence(OMEUtil.createOMEXMLMetadata(seq.getOMEXMLMetadata()));
 
-            Rectangle5D.Integer region = roi.getBounds5D().toInteger();
+            final Rectangle5D.Integer region = roi.getBounds5D().toInteger();
 
             final Rectangle region2d = region.toRectangle2D().getBounds();
             final int startZ;
@@ -84,18 +101,17 @@ public class CropSequenceToROI extends Plugin implements ROIBlock {
             cpt++;
         }
 
-        output.setValue(crops.toArray(new Sequence[crops.size()]));
+        output.setValue(crops.toArray(new Sequence[0]));
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("sequence to crop", input);
         inputMap.add("list of ROI", rois);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("list of crops", output);
     }
-
 }

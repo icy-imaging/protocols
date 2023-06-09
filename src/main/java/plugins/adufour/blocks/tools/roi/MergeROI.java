@@ -1,7 +1,22 @@
-package plugins.adufour.blocks.tools.roi;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.util.Arrays;
-import java.util.List;
+package plugins.adufour.blocks.tools.roi;
 
 import icy.plugin.abstract_.Plugin;
 import icy.roi.ROI;
@@ -11,37 +26,39 @@ import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarEnum;
 import plugins.adufour.vars.lang.VarROIArray;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class MergeROI extends Plugin implements ROIBlock {
-    VarEnum<BooleanOperator> operation = new VarEnum<>("Merge operation", BooleanOperator.AND);
+    private final VarEnum<BooleanOperator> operation = new VarEnum<>("Merge operation", BooleanOperator.AND);
 
-    VarROIArray roiIn = new VarROIArray("List of ROI");
+    private final VarROIArray roiIn = new VarROIArray("List of ROI");
 
-    VarROIArray roiOut = new VarROIArray("Merged ROI");
+    private final VarROIArray roiOut = new VarROIArray("Merged ROI");
 
     @Override
     public void run() {
         roiOut.setValue(new ROI[0]);
 
         try {
-            List<ROI> rois = Arrays.asList(roiIn.getValue());
-            ROI merge = ROIUtil.merge(rois, operation.getValue());
+            final List<ROI> rois = Arrays.asList(roiIn.getValue());
+            final ROI merge = ROIUtil.merge(rois, operation.getValue());
             if (merge != null)
                 roiOut.add(merge);
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("List of ROI", roiIn);
         inputMap.add("Merge operation", operation);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("Merged ROI", roiOut);
     }
-
 }

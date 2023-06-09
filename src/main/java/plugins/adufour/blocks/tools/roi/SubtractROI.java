@@ -1,37 +1,55 @@
-package plugins.adufour.blocks.tools.roi;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.util.ArrayList;
+package plugins.adufour.blocks.tools.roi;
 
 import icy.plugin.abstract_.Plugin;
 import icy.roi.ROI;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarROIArray;
 
+import java.util.ArrayList;
+
 public class SubtractROI extends Plugin implements ROIBlock {
-    VarROIArray roiA = new VarROIArray("List of ROI #1");
+    private final VarROIArray roiA = new VarROIArray("List of ROI #1");
 
-    VarROIArray roiB = new VarROIArray("List of ROI #2");
+    private final VarROIArray roiB = new VarROIArray("List of ROI #2");
 
-    VarROIArray roiOut = new VarROIArray("Subtracted ROI");
+    private final VarROIArray roiOut = new VarROIArray("Subtracted ROI");
 
     @Override
     public void run() {
         try {
             roiOut.setValue(subtractROI(roiA.getValue(true), roiB.getValue(true)));
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("List of ROI #1", roiA);
         inputMap.add("List of ROI #2", roiB);
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("subtraction output ROI", roiOut);
     }
 
@@ -40,17 +58,17 @@ public class SubtractROI extends Plugin implements ROIBlock {
      *
      * @param roiA ROIs to be subtracted from.
      * @param roiB ROIs subtracted from the first group of ROIs.
-     * @return A - B. The group of ROIs resulting from the subtraction from the each element of the group A and each element of the group B.
-     * @throws InterruptedException
-     * @throws UnsupportedOperationException
+     * @return A - B. The group of ROIs resulting from the subtraction from each element of the group A and each element of the group B.
+     * @throws InterruptedException          if the user interrupts the process
+     * @throws UnsupportedOperationException if the operation cannot be done
      */
-    public static ROI[] subtractROI(ROI[] roiA, ROI[] roiB) throws UnsupportedOperationException, InterruptedException {
-        ArrayList<ROI> out = new ArrayList<>(roiA.length);
+    public static ROI[] subtractROI(final ROI[] roiA, final ROI[] roiB) throws UnsupportedOperationException, InterruptedException {
+        final ArrayList<ROI> out = new ArrayList<>(roiA.length);
 
-        for (ROI a : roiA) {
+        for (final ROI a : roiA) {
             ROI subtraction = a.getCopy();
 
-            for (ROI b : roiB)
+            for (final ROI b : roiB)
                 subtraction = subtraction.getSubtraction(b);
 
             if (subtraction == null || subtraction.isEmpty())
@@ -60,6 +78,6 @@ public class SubtractROI extends Plugin implements ROIBlock {
                 out.add(subtraction);
         }
 
-        return out.toArray(new ROI[out.size()]);
+        return out.toArray(new ROI[0]);
     }
 }

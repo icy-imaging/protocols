@@ -1,11 +1,29 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui.link;
+
+import plugins.adufour.blocks.lang.BlockDescriptor;
+import plugins.adufour.vars.lang.Var;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-
-import plugins.adufour.blocks.lang.BlockDescriptor;
-import plugins.adufour.vars.lang.Var;
 
 public class TransferableVar<T> implements Transferable {
     public static final DataFlavor varFlavor = new DataFlavor(Var.class, "Var");
@@ -14,7 +32,7 @@ public class TransferableVar<T> implements Transferable {
 
     private Var<T> srcVar;
 
-    public TransferableVar(BlockDescriptor owner, Var<T> variable) {
+    public TransferableVar(final BlockDescriptor owner, final Var<T> variable) {
         this.srcBlock = owner;
         this.srcVar = variable;
     }
@@ -25,12 +43,12 @@ public class TransferableVar<T> implements Transferable {
     }
 
     @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
+    public boolean isDataFlavorSupported(final DataFlavor flavor) {
         return flavor.equals(varFlavor);
     }
 
     @Override
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+    public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
         if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
 
         return this;
@@ -45,8 +63,8 @@ public class TransferableVar<T> implements Transferable {
     }
 
     /**
-     * This method is necessary since this instance of Transferable is never garbage collected (a
-     * global JNI reference is kept by the OS due to previous drag'n'drop operations.
+     * This method is necessary since this instance of Transferable is never garbage collected
+     * (the OS keeps a global JNI reference due to previous drag n drop operations).
      */
     public void dispose() {
         srcBlock = null;

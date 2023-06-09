@@ -1,22 +1,32 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui.link;
 
-import java.awt.Point;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
-import icy.system.SystemUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Button defining an area on a panel to where an variable can be dropped from another panel
@@ -53,18 +63,22 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
         setDefaultLinkIcon();
     }
 
+    @Override
     public void dragEnter(final DropTargetDragEvent e) {
         checkDrag(e);
     }
 
+    @Override
     public void dragOver(final DropTargetDragEvent e) {
         checkDrag(e);
     }
 
+    @Override
     public void dropActionChanged(final DropTargetDragEvent e) {
         checkDrag(e);
     }
 
+    @Override
     public void dragExit(final DropTargetEvent e) {
         errorPopup.setVisible(false);
         errorPopup.removeAll();
@@ -74,7 +88,7 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
     @SuppressWarnings("unchecked")
     private void checkDrag(final DropTargetDragEvent e) {
         try {
-            TransferableVar<T> transfer = (TransferableVar<T>) e.getTransferable().getTransferData(TransferableVar.varFlavor);
+            final TransferableVar<T> transfer = (TransferableVar<T>) e.getTransferable().getTransferData(TransferableVar.varFlavor);
 
             // create the link without actually storing it (to check for errors)
             workFlow.checkLink(transfer.getSrcBlock(), transfer.getSrcVar(), dstBlock, dstVar);
@@ -107,6 +121,7 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void drop(final DropTargetDropEvent e) {
         try {
@@ -125,16 +140,12 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
         }
     }
 
+    @Override
     public void dispose() {
         super.dispose();
 
         removeActionListener(this);
         dropTarget.removeDropTargetListener(this);
         dropTarget.setComponent(null);
-
-        // only available on java < 10
-        // TODO: 21/03/2023 Remove this when Java 11 become minimum Icy requirement
-        if (SystemUtil.getJavaVersionAsNumber() < 10d)
-            dropTarget.getDropTargetContext().dropComplete(true);
     }
 }

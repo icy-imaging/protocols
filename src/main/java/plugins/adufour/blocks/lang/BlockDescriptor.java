@@ -1,18 +1,22 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.lang;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import icy.file.xml.XMLPersistent;
 import icy.gui.plugin.PluginErrorReport;
@@ -24,22 +28,24 @@ import icy.plugin.abstract_.Plugin;
 import icy.util.ClassUtil;
 import icy.util.StringUtil;
 import icy.util.XMLUtil;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import plugins.adufour.blocks.tools.Display;
 import plugins.adufour.blocks.tools.input.InputBlock;
 import plugins.adufour.blocks.tools.output.OutputBlock;
-import plugins.adufour.blocks.util.BlockListener;
-import plugins.adufour.blocks.util.BlocksException;
-import plugins.adufour.blocks.util.BlocksFinder;
-import plugins.adufour.blocks.util.BlocksML;
-import plugins.adufour.blocks.util.BlocksReloadedException;
-import plugins.adufour.blocks.util.NoSuchVariableException;
-import plugins.adufour.blocks.util.VarList;
-import plugins.adufour.blocks.util.VarListListener;
+import plugins.adufour.blocks.util.*;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.lang.VarMutableArray;
 import plugins.adufour.vars.util.MutableType;
 import plugins.adufour.vars.util.VarListener;
+
+import java.awt.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.*;
 
 /**
  * Class defining all the metadata associated to a {@link Block}.
@@ -71,7 +77,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
         private String optionalUserMessage = "";
 
-        BlockStatus(String message) {
+        BlockStatus(final String message) {
             defaultErrorMessage = message;
         }
 
@@ -79,7 +85,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             return optionalUserMessage;
         }
 
-        public void setUserMessage(String message) {
+        public void setUserMessage(final String message) {
             optionalUserMessage = (message != null ? message : "");
         }
 
@@ -133,7 +139,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         this.outputVars.addVarListListener(this);
     }
 
-    public BlockDescriptor(int ID, Block block) {
+    /**
+     * @param ID    Identifier
+     * @param block Block template instance
+     */
+    public BlockDescriptor(final int ID, final Block block) {
         this();
 
         this.block = block;
@@ -143,14 +153,14 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
             block.declareOutput(outputVars);
         }
-        catch (RuntimeException e) {
-            String blockName = block.getClass().getName();
+        catch (final RuntimeException e) {
+            final String blockName = block.getClass().getName();
 
             String devId = blockName.substring("plugins.".length());
             devId = devId.substring(0, devId.indexOf('.'));
 
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
             pw.write("Unable to insert block: " + block.getClass().getName() + "\n");
             pw.write("Reason: " + e.getClass().getName() + ": " + e.getMessage() + "\n");
             pw.write("Stack trace:\n");
@@ -161,21 +171,6 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
         if (ID != -1)
             id = ID;
-    }
-
-    /**
-     * @param ID       Identifier
-     * @param block    Block template instance.
-     * @param owner    Workflow containing the new block.
-     * @param location Position of the new block.
-     * @deprecated use {@link #BlockDescriptor(int, Block)} instead
-     */
-    @Deprecated
-    public BlockDescriptor(int ID, Block block, WorkFlow owner, Point location) {
-        this(ID, block);
-
-        this.container = owner;
-        setLocation(location.x, location.y);
     }
 
     /**
@@ -191,7 +186,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param variable the variable to add
      * @throws IllegalArgumentException if a variable with same unique ID exists
      */
-    public void addInput(String uid, Var<?> variable) throws IllegalArgumentException {
+    public void addInput(final String uid, final Var<?> variable) throws IllegalArgumentException {
         inputVars.add(uid, variable);
     }
 
@@ -208,23 +203,23 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param variable the variable to add
      * @throws IllegalArgumentException if a variable with same unique ID exists
      */
-    public void addOutput(String uid, Var<?> variable) throws IllegalArgumentException {
+    public void addOutput(final String uid, final Var<?> variable) throws IllegalArgumentException {
         outputVars.add(uid, variable);
     }
 
-    public void addBlockListener(BlockListener listener) {
+    public void addBlockListener(final BlockListener listener) {
         listeners.add(listener);
     }
 
-    public void addBlockPanelListener(BlockListener listener) {
+    public void addBlockPanelListener(final BlockListener listener) {
         listeners.add(listener);
     }
 
-    public void removeBlockListener(BlockListener listener) {
+    public void removeBlockListener(final BlockListener listener) {
         listeners.remove(listener);
     }
 
-    public void removeBlockPanelListener(BlockListener listener) {
+    public void removeBlockPanelListener(final BlockListener listener) {
         listeners.remove(listener);
     }
 
@@ -258,7 +253,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         String blockName = block.getClass().getSimpleName();
 
         if (block instanceof Plugin && ((Plugin) block).getDescriptor() != null) {
-            String pluginName = ((Plugin) block).getDescriptor().getName();
+            final String pluginName = ((Plugin) block).getDescriptor().getName();
 
             if (!pluginName.equalsIgnoreCase(blockName))
                 return pluginName;
@@ -286,9 +281,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @return Identifier of the given variable.
      * @throws NoSuchVariableException If the variable cannot be found in this block's input or output.
      */
-    public String getVarID(Var<?> variable) throws NoSuchVariableException {
+    public String getVarID(final Var<?> variable) throws NoSuchVariableException {
         if (inputVars.contains(variable)) {
-            String varID = inputVars.getID(variable);
+            final String varID = inputVars.getID(variable);
 
             if (!isWorkFlow() || varID.contains(":"))
                 return varID;
@@ -296,7 +291,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             return ((WorkFlow) block).getInputVarID(variable);
         }
 
-        String varID = outputVars.getID(variable);
+        final String varID = outputVars.getID(variable);
 
         if (!isWorkFlow() || varID.contains(":"))
             return varID;
@@ -342,17 +337,17 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         // return isWorkFlow() && container == null;
     }
 
-    public void setCollapsed(boolean collapsed) {
+    public void setCollapsed(final boolean collapsed) {
         if (this.collapsed == collapsed)
             return;
 
         this.collapsed = collapsed;
 
-        for (BlockListener l : listeners)
+        for (final BlockListener l : listeners)
             l.blockCollapsed(this, collapsed);
     }
 
-    public void setContainer(WorkFlow container) {
+    public void setContainer(final WorkFlow container) {
         this.container = container;
     }
 
@@ -364,7 +359,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      *
      * @param finalBlock true to stop the work flow after running this block, false otherwise.
      */
-    public void setFinalBlock(boolean finalBlock) {
+    public void setFinalBlock(final boolean finalBlock) {
         this.finalBlock = finalBlock;
     }
 
@@ -374,35 +369,35 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param width  Width of the block in pixels.
      * @param height Height of the block in pixels.
      */
-    public void setDimension(int width, int height) {
+    public void setDimension(final int width, final int height) {
         if (dimension.width == width && dimension.height == height)
             return;
 
         dimension.setSize(width, height);
 
-        for (BlockListener l : listeners)
+        for (final BlockListener l : listeners)
             l.blockDimensionChanged(this, width, height);
     }
 
     /**
      * Sets the ID of this block.
      *
-     * @param id Block unique identifier.
+     * @param id Unique block identifier.
      */
-    public void setID(int id) {
+    public void setID(final int id) {
         this.id = id;
     }
 
     /**
      * Sets the value of the specified input variable
      *
-     * @param <T>   Type of the value of the variable being set.
+     * @param <T>   Value type of the variable being set.
      * @param varID The unique ID of the input variable to set.
      * @param value The new variable value.
      * @throws NoSuchVariableException If the variable is not in this block.
      */
-    public <T> void setInput(String varID, T value) throws NoSuchVariableException {
-        Var<T> input = inputVars.get(varID);
+    public <T> void setInput(final String varID, final T value) throws NoSuchVariableException {
+        final Var<T> input = inputVars.get(varID);
         if (input == null)
             throw new NoSuchVariableException(this, varID);
 
@@ -415,42 +410,42 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param x X-axis position in pixels.
      * @param y Y-axis position in pixels.
      */
-    public void setLocation(int x, int y) {
+    public void setLocation(final int x, final int y) {
         if (location.x == x && location.y == y)
             return;
 
         location.move(x, y);
-        for (BlockListener l : listeners)
+        for (final BlockListener l : listeners)
             l.blockLocationChanged(this, x, y);
     }
 
     /**
      * Sets the value of the specified output variable
      *
-     * @param <T>   Type of the value in the variable being set.
+     * @param <T>   Value type of the variable being set.
      * @param varID the unique ID of the output variable to set
      * @param value the new variable value
      * @throws NoSuchVariableException if the variable is not in this block
      */
-    public <T> void setOutput(String varID, T value) throws NoSuchVariableException {
-        Var<T> output = outputVars.get(varID);
+    public <T> void setOutput(final String varID, final T value) throws NoSuchVariableException {
+        final Var<T> output = outputVars.get(varID);
         if (output == null)
             throw new NoSuchVariableException(this, varID);
 
         output.setValue(value);
     }
 
-    public void setStatus(BlockStatus newStatus) {
+    public void setStatus(final BlockStatus newStatus) {
         if (this.status == newStatus)
             return;
 
         this.status = newStatus;
-        for (BlockListener listener : listeners)
+        for (final BlockListener listener : listeners)
             listener.blockStatusChanged(this, status);
 
         if (status == BlockStatus.DIRTY && container != null) {
             // propagate dirty status to the container (if it is not running)
-            BlockDescriptor wfDescriptor = container.getBlockDescriptor();
+            final BlockDescriptor wfDescriptor = container.getBlockDescriptor();
 
             if (wfDescriptor.getStatus() != BlockStatus.RUNNING) {
                 wfDescriptor.setStatus(BlockStatus.DIRTY);
@@ -463,7 +458,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      *
      * @param inputVar Variable to be removed from the input variable list.
      */
-    public void removeInput(Var<?> inputVar) {
+    public void removeInput(final Var<?> inputVar) {
         if (!inputVars.contains(inputVar))
             return;
 
@@ -476,7 +471,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      *
      * @param outputVar Variable to be removed from the output variable list.
      */
-    public void removeOutput(Var<?> outputVar) {
+    public void removeOutput(final Var<?> outputVar) {
         if (!outputVars.contains(outputVar))
             return;
 
@@ -487,17 +482,18 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     /**
      * Resets all output variables in this block to their default value
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void reset() {
         setStatus(BlockStatus.DIRTY);
 
-        for (Var var : outputVars)
+        for (final Var var : outputVars)
             var.setValue(var.getDefaultValue());
 
         if (isWorkFlow())
             ((WorkFlow) block).reset();
     }
 
+    @Override
     public void run() {
         if (keepResults && status == BlockStatus.READY)
             return;
@@ -508,8 +504,8 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             block.run();
             setStatus(keepResults ? BlockStatus.READY : BlockStatus.DIRTY);
         }
-        catch (RuntimeException e) {
-            BlockStatus error = BlockStatus.ERROR;
+        catch (final RuntimeException e) {
+            final BlockStatus error = BlockStatus.ERROR;
 
             error.setUserMessage(e.getMessage());
 
@@ -520,16 +516,16 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @SuppressWarnings("unchecked")
     @Override
-    public void valueChanged(Var source, Object oldValue, Object newValue) {
+    public void valueChanged(final Var source, final Object oldValue, final Object newValue) {
         if (inputVars.contains(source))
             setStatus(BlockStatus.DIRTY);
 
-        for (BlockListener listener : listeners)
+        for (final BlockListener listener : listeners)
             listener.blockVariableChanged(this, source, newValue);
     }
 
     @Override
-    public void referenceChanged(Var source, Var oldReference, Var newReference) {
+    public void referenceChanged(final Var source, final Var oldReference, final Var newReference) {
         setStatus(BlockStatus.DIRTY);
     }
 
@@ -540,44 +536,41 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @SuppressWarnings("unchecked")
     @Override
-    public void variableAdded(VarList list, Var<?> variable) {
+    public void variableAdded(final VarList list, final Var<?> variable) {
         variable.addListener(this);
 
-        for (BlockListener listener : listeners)
+        for (final BlockListener listener : listeners)
             listener.blockVariableAdded(this, variable);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void variableRemoved(VarList list, Var<?> variable) {
+    public void variableRemoved(final VarList list, final Var<?> variable) {
         variable.removeListener(this);
 
-        // although we removed a variable, there is no "removed" notifier
-        // use the "added" notifier just for the sake of refreshing the GUI
-        for (BlockListener listener : listeners)
+        // although we removed a variable, there is no "removed" notifier.
+        // use the "added" notifier just for the sake of refreshing the GUI.
+        for (final BlockListener listener : listeners)
             listener.blockVariableAdded(this, variable);
     }
 
     /**
      * Goes online, downloads and installs the plug-in containing the specified block
-     *
-     * @param blockType
-     * @return
-     * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
-    private Class<? extends Block> installRequiredBlock(String pluginClassName, String blockType)
-            throws ClassNotFoundException {
-        Class<?> clazz;
+    private Class<? extends Block> installRequiredBlock(final String pluginClassName, final String blockType) throws ClassNotFoundException {
+        final Class<?> clazz;
 
         // check if the class exists, otherwise try downloading it (if online)
         try {
             clazz = ClassUtil.findClass(blockType);
         }
-        catch (ClassNotFoundException e) {
+        catch (final ClassNotFoundException e) {
             if (!NetworkUtil.hasInternetAccess() || getClass().getClassLoader() == ClassLoader.getSystemClassLoader()) {
-                throw new BlocksException("Plugin " + blockType
-                        + " is missing, but no internet connection is available.\nTry again later", true);
+                throw new BlocksException(String.format(
+                        "Plugin %s is missing, but no internet connection is available.\nTry again later",
+                        blockType
+                ), true);
             }
 
             // String simpleName =
@@ -585,7 +578,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
             // status.setValue("Downloading " + simpleName + "...");
 
-            PluginDescriptor pd = PluginRepositoryLoader.getPlugin(pluginClassName);
+            final PluginDescriptor pd = PluginRepositoryLoader.getPlugin(pluginClassName);
 
             if (pd == null) {
                 // status.setValue("Couldn't find plugin online !");
@@ -603,15 +596,15 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     }
 
     @Override
-    public boolean loadFromXML(Node node) {
+    public boolean loadFromXML(final Node node) {
         boolean noWarnings = true;
 
-        Element blockNode = (Element) node;
+        final Element blockNode = (Element) node;
 
-        String blockType = XMLUtil.getAttributeValue(blockNode, "blockType", null);
+        final String blockType = XMLUtil.getAttributeValue(blockNode, "blockType", null);
 
         try {
-            Class<? extends Block> blockClass = installRequiredBlock(
+            final Class<? extends Block> blockClass = installRequiredBlock(
                     XMLUtil.getAttributeValue(blockNode, "className", null), blockType);
 
             block = blockClass.getDeclaredConstructor().newInstance();
@@ -624,19 +617,19 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
             setID(XMLUtil.getAttributeIntValue(blockNode, "ID", -1));
 
-            int width = XMLUtil.getAttributeIntValue(blockNode, "width", 500);
-            int height = XMLUtil.getAttributeIntValue(blockNode, "height", 500);
+            final int width = XMLUtil.getAttributeIntValue(blockNode, "width", 500);
+            final int height = XMLUtil.getAttributeIntValue(blockNode, "height", 500);
             setDimension(width, height);
 
-            int xPos = XMLUtil.getAttributeIntValue(blockNode, "xLocation", -1);
-            int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
+            final int xPos = XMLUtil.getAttributeIntValue(blockNode, "xLocation", -1);
+            final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
             setLocation(xPos, yPos);
 
-            Element varRoot = XMLUtil.getElement(blockNode, "variables");
-            Element inVarRoot = XMLUtil.getElement(varRoot, "input");
-            for (Element varNode : XMLUtil.getElements(inVarRoot)) {
-                String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
-                Var<?> var = inputVars.get(uid);
+            final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+            final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+            for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                final Var<?> var = inputVars.get(uid);
 
                 if (var == null) {
                     if (noWarnings) {
@@ -648,7 +641,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 }
 
                 if (var instanceof MutableType) {
-                    String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                    final String type = XMLUtil.getAttributeValue(varNode, "type", null);
 
                     if (type != null) {
                         if (var instanceof VarMutable) {
@@ -670,10 +663,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 inputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
             }
 
-            Element outVarRoot = XMLUtil.getElement(varRoot, "output");
-            for (Element varNode : XMLUtil.getElements(outVarRoot)) {
-                String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
-                Var<?> var = outputVars.get(uid);
+            final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+            for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                final Var<?> var = outputVars.get(uid);
 
                 if (var == null) {
                     if (noWarnings) {
@@ -687,10 +680,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 outputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
 
                 if (var instanceof MutableType) {
-                    String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                    final String type = XMLUtil.getAttributeValue(varNode, "type", null);
                     if (type != null) {
                         if (var instanceof VarMutable) {
-                            Class<?> mutableType = BlocksML.getPrimitiveType(type);
+                            final Class<?> mutableType = BlocksML.getPrimitiveType(type);
                             ((MutableType) var).setType(mutableType != null ? mutableType : Class.forName(type));
                         }
                         else if (var instanceof VarMutableArray) {
@@ -701,10 +694,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             }
 
         }
-        catch (ClassNotFoundException e1) {
+        catch (final ClassNotFoundException e1) {
             throw new BlocksException("Cannot create block (" + e1.getMessage() + ") => class not found", true);
         }
-        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
@@ -712,12 +705,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     }
 
     @Override
-    public boolean saveToXML(Node node) {
-        // TODO Auto-generated method stub
+    public boolean saveToXML(final Node node) {
         return false;
     }
 
-    public void setDefinedName(String s) {
+    public void setDefinedName(final String s) {
         definedName = s;
     }
 
@@ -728,9 +720,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return definedName;
     }
 
-    public static BlockDescriptor findBlockDescriptor(int blockId, List<BlockDescriptor> blocks) {
-        for (BlockDescriptor bd : blocks)
-            if (bd.getID().intValue() == blockId)
+    public static BlockDescriptor findBlockDescriptor(final int blockId, final List<BlockDescriptor> blocks) {
+        for (final BlockDescriptor bd : blocks)
+            if (bd.getID().equals(blockId))
                 return bd;
 
         return null;
@@ -741,8 +733,8 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param blocks        list of {@link BlockDescriptor}
      * @return Input block {@link InputBlock} with given commandLineId or <i>null</i> if it doesn't exist
      */
-    public static BlockDescriptor findInputBlockDescriptor(String commandLineId, List<BlockDescriptor> blocks) {
-        for (BlockDescriptor block : blocks)
+    public static BlockDescriptor findInputBlockDescriptor(final String commandLineId, final List<BlockDescriptor> blocks) {
+        for (final BlockDescriptor block : blocks)
             if (block.isInput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
                 return block;
 
@@ -754,23 +746,23 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param blocks        list of {@link BlockDescriptor}
      * @return Output block {@link OutputBlock} with given commandLineId or <i>null</i> if it doesn't exist
      */
-    public static BlockDescriptor findOutputBlockDescriptor(String commandLineId, List<BlockDescriptor> blocks) {
-        for (BlockDescriptor block : blocks)
+    public static BlockDescriptor findOutputBlockDescriptor(final String commandLineId, final List<BlockDescriptor> blocks) {
+        for (final BlockDescriptor block : blocks)
             if (block.isOutput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
                 return block;
 
         return null;
     }
 
-    private static BlockDescriptor getBlockDescriptor(int blockId, Set<BlockDescriptor> bds) {
-        for (BlockDescriptor bd : bds)
-            if (bd.getID().intValue() == blockId)
+    private static BlockDescriptor getBlockDescriptor(final int blockId, final Set<BlockDescriptor> bds) {
+        for (final BlockDescriptor bd : bds)
+            if (bd.getID().equals(blockId))
                 return bd;
 
         return null;
     }
 
-    private String getNewVarId(String oldVarId, Map<BlockDescriptor, BlockDescriptor> copies) {
+    private String getNewVarId(final String oldVarId, final Map<BlockDescriptor, BlockDescriptor> copies) {
         // search for workflow shadow exposed variable
         final int index = oldVarId.indexOf(":");
 
@@ -780,11 +772,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
         String result = "";
 
-        // get block Id
+        // get block ID
         final int blockId = StringUtil.parseInt(oldVarId.substring(0, index), 0);
         // get block descriptor from id
         final BlockDescriptor bd = getBlockDescriptor(blockId, copies.keySet());
-        // get corresponding new block
+        // get the corresponding new block
         final BlockDescriptor nbd = copies.get(bd);
 
         if (nbd != null)
@@ -794,26 +786,22 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return result + ":" + getNewVarId(oldVarId.substring(index + 1), copies);
     }
 
-    public BlockDescriptor clone(boolean embedding) {
+    public BlockDescriptor clone(final boolean embedding) {
         return clone(embedding, new HashMap<>());
     }
 
-    @SuppressWarnings("unchecked")
-    public BlockDescriptor clone(boolean embedding, Map<BlockDescriptor, BlockDescriptor> copies) {
-        // TODO: Why we were using the PluginLoader to retrieve the plugin class ?? (Stephane)
-        // could give issue when for some reasons a Block class isn't present in the PluginLoader plugin list
-//        Class<? extends Block> blockClass = PluginLoader.getPlugin(getBlock().getClass().getName()).getPluginClass()
-//                .asSubclass(Block.class);
-        Class<? extends Block> blockClass = getBlock().getClass().asSubclass(Block.class);
-        WorkFlow wf;
-        WorkFlow wfCpy;
-        BlockDescriptor cpy;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public BlockDescriptor clone(final boolean embedding, final Map<BlockDescriptor, BlockDescriptor> copies) {
+        final Class<? extends Block> blockClass = getBlock().getClass().asSubclass(Block.class);
+        final WorkFlow wf;
+        final WorkFlow wfCpy;
+        final BlockDescriptor cpy;
         Block newBlock = null;
 
         try {
             newBlock = blockClass.getDeclaredConstructor().newInstance();
         }
-        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+        catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
             e1.printStackTrace();
         }
 
@@ -826,10 +814,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         cpy.setCollapsed(isCollapsed());
 
         // Clone input variables
-        for (Var oldVar : inputVars) {
+        for (final Var oldVar : inputVars) {
             final String oldID = inputVars.getID(oldVar);
 
-            // FIX: shadow exposed variable from workflow ? --> don't copy it for now (Stephane)
+            // FIX: shadow exposed variable from workflow? --> don't copy it for now (Stephane)
             if (oldID.contains(":") && (getBlock() instanceof WorkFlow))
                 continue;
 
@@ -850,10 +838,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         }
 
         // Clone output variables
-        for (Var oldVar : outputVars) {
+        for (final Var oldVar : outputVars) {
             final String oldID = outputVars.getID(oldVar);
 
-            // FIX: shadow exposed variable from workflow ? --> don't copy it for now (Stephane)
+            // FIX: shadow exposed variable from workflow? --> don't copy it for now (Stephane)
             if (oldID.contains(":") && (getBlock() instanceof WorkFlow))
                 continue;
 
@@ -879,7 +867,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
             BlockDescriptor tmp;
             if (wf.getBlockSelection().isEmpty() || embedding) {
-                for (BlockDescriptor bd : wf) {
+                for (final BlockDescriptor bd : wf) {
                     tmp = bd.clone(true, copies);
                     copies.put(bd, tmp);
                     wfCpy.addBlock(tmp);
@@ -888,7 +876,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 cloneLinks(wf.getLinksIterator(), copies, wfCpy);
             }
             else {
-                for (BlockDescriptor bd : wf.getBlockSelection()) {
+                for (final BlockDescriptor bd : wf.getBlockSelection()) {
                     tmp = bd.clone(true, copies);
                     copies.put(bd, tmp);
                     wfCpy.addBlock(tmp);
@@ -897,11 +885,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 cloneLinks(wf.getLinkSelection(), copies, wfCpy);
             }
 
-            for (Var oldVar : inputVars) {
+            for (final Var oldVar : inputVars) {
                 final String oldID = inputVars.getID(oldVar);
                 final int index = oldID.indexOf(":");
 
-                // shadow exposed variable ? --> try to recover it
+                // shadow exposed variable? --> try to recover it
                 if (index != -1) {
                     // get block ID
                     final int blockID = StringUtil.parseInt(oldID.substring(0, index), 0);
@@ -911,12 +899,12 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                     final String newVarID = getNewVarId(varID, copies);
                     // get block descriptor from ID
                     final BlockDescriptor bd = wf.getBlockByID(blockID);
-                    // get corresponding new block
+                    // get the corresponding new block
                     final BlockDescriptor nbd = copies.get(bd);
-                    // get corresponding var for this block
+                    // get the corresponding var for this block
                     final Var<Object> inputVar = nbd.inputVars.get(newVarID);
 
-                    // finally add the shadow exposed variable if not already done (can be done in WorkFlow.addBlock(..) method) !
+                    // finally, add the shadow exposed variable if not already done (can be done in WorkFlow.addBlock(..) method) !
                     if (inputVar != null) {
                         if (!cpy.inputVars.contains(inputVar))
                             cpy.addInput(wfCpy.getInputVarID(inputVar), inputVar);
@@ -926,11 +914,11 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 }
             }
 
-            for (Var oldVar : outputVars) {
+            for (final Var oldVar : outputVars) {
                 final String oldID = outputVars.getID(oldVar);
                 final int index = oldID.indexOf(":");
 
-                // shadow exposed variable ? --> try to recover it
+                // shadow exposed variable? --> try to recover it
                 if (index != -1) {
                     // get block ID
                     final int blockID = StringUtil.parseInt(oldID.substring(0, index), 0);
@@ -940,12 +928,12 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                     final String newVarID = getNewVarId(varID, copies);
                     // get block descriptor from ID
                     final BlockDescriptor bd = wf.getBlockByID(blockID);
-                    // get corresponding new block
+                    // get the corresponding new block
                     final BlockDescriptor nbd = copies.get(bd);
-                    // get corresponding var for this block
+                    // get the corresponding var for this block
                     final Var<Object> outputVar = nbd.outputVars.get(newVarID);
 
-                    // finally add the shadow exposed variable if not already done (can be done in WorkFlow.addBlock(..) method) !
+                    // finally, add the shadow exposed variable if not already done (can be done in WorkFlow.addBlock(..) method) !
                     if (outputVar != null) {
                         if (!cpy.outputVars.contains(outputVar))
                             cpy.addOutput(wfCpy.getInputVarID(outputVar), outputVar);
@@ -959,9 +947,8 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return cpy;
     }
 
-    private static void cloneLinks(Iterable<Link<?>> iterable, Map<BlockDescriptor, BlockDescriptor> copies,
-                                   WorkFlow dest) {
-        for (Link<?> l : iterable) {
+    private static void cloneLinks(final Iterable<Link<?>> iterable, final Map<BlockDescriptor, BlockDescriptor> copies, final WorkFlow dest) {
+        for (final Link<?> l : iterable) {
             if (l.srcBlock.getBlock() instanceof Loop || l.dstBlock.getBlock() instanceof Loop) {
                 System.err.println("Warning : cannot copy a link to a loop variable");
                 continue;
@@ -976,7 +963,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                         copies.get(l.dstBlock),
                         copies.get(l.dstBlock).inputVars.get(l.dstBlock.inputVars.getID(l.dstVar)));
             }
-            catch (NoSuchVariableException nsve) {
+            catch (final NoSuchVariableException nsve) {
                 dest.addLink(copies.get(l.srcBlock),
                         copies.get(l.srcBlock).outputVars.get(l.srcBlock.outputVars.getID(l.srcVar)),
                         copies.get(l.dstBlock),
@@ -998,14 +985,14 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      *
      * @param keep Flag to keep results in memory.
      */
-    public void keepResults(boolean keep) {
+    public void keepResults(final boolean keep) {
         this.keepResults = keep;
     }
 
     /**
      * (This method is used only if the block implements {@link InputBlock} or {@link OutputBlock})
      *
-     * @return the command-line identifier for the input/ouput block's variable
+     * @return the command-line identifier for the input/output block's variable
      */
     public String getCommandLineID() {
         return commandLineID;
@@ -1017,7 +1004,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      *
      * @param id Block identifier when using the command line.
      */
-    public void setCommandLineID(String id) {
+    public void setCommandLineID(final String id) {
         commandLineID = id;
     }
 

@@ -1,12 +1,22 @@
-package plugins.adufour.blocks.lang;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.awt.Point;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+package plugins.adufour.blocks.lang;
 
 import icy.gui.dialog.ConfirmDialog;
 import icy.main.Icy;
@@ -18,23 +28,20 @@ import icy.util.StringUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.input.InputBlock;
 import plugins.adufour.blocks.tools.output.OutputBlock;
-import plugins.adufour.blocks.util.BlockListener;
-import plugins.adufour.blocks.util.BlocksException;
-import plugins.adufour.blocks.util.LinkCutException;
-import plugins.adufour.blocks.util.LoopException;
-import plugins.adufour.blocks.util.NoSuchBlockException;
-import plugins.adufour.blocks.util.NoSuchLinkException;
-import plugins.adufour.blocks.util.NoSuchVariableException;
-import plugins.adufour.blocks.util.ScopeException;
-import plugins.adufour.blocks.util.StopException;
-import plugins.adufour.blocks.util.VarList;
-import plugins.adufour.blocks.util.VarListListener;
-import plugins.adufour.blocks.util.WorkFlowListener;
+import plugins.adufour.blocks.util.*;
 import plugins.adufour.protocols.gui.MainFrame;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.lang.VarObject;
 import plugins.adufour.vars.util.VarException;
+
+import java.awt.*;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>, BlockListener, WorkFlowListener {
     private final BlockDescriptor descriptor = new BlockDescriptor(-1, this);
@@ -49,24 +56,24 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
     private final VarListListener inputVarListener = new VarListListener() {
         @Override
-        public void variableAdded(VarList list, Var<?> variable) {
+        public void variableAdded(final VarList list, final Var<?> variable) {
             descriptor.addInput(getInputVarID(variable), variable);
         }
 
         @Override
-        public void variableRemoved(VarList list, Var<?> variable) {
+        public void variableRemoved(final VarList list, final Var<?> variable) {
             descriptor.removeInput(variable);
         }
     };
 
     private final VarListListener outputVarListener = new VarListListener() {
         @Override
-        public void variableAdded(VarList list, Var<?> variable) {
+        public void variableAdded(final VarList list, final Var<?> variable) {
             descriptor.addOutput(getOutputVarID(variable), variable);
         }
 
         @Override
-        public void variableRemoved(VarList list, Var<?> variable) {
+        public void variableRemoved(final VarList list, final Var<?> variable) {
             descriptor.removeOutput(variable);
         }
     };
@@ -80,7 +87,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
     private static final OutputStream nullStream = new OutputStream() {
         @Override
-        public void write(int b) {
+        public void write(final int b) {
         }
     };
 
@@ -89,7 +96,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      */
     private PrintStream logStream = new PrintStream(nullStream);
 
-    public void setLogStream(PrintStream logStream) {
+    public void setLogStream(final PrintStream logStream) {
         this.logStream = logStream;
     }
 
@@ -106,13 +113,13 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         this(false);
     }
 
-    public WorkFlow(boolean topLevel) {
+    public WorkFlow(final boolean topLevel) {
         super();
 
         this.topLevel = topLevel;
     }
 
-    public void addBlock(BlockDescriptor blockInfo) {
+    public void addBlock(final BlockDescriptor blockInfo) {
         blockInfo.setContainer(this);
 
         orderedBlocks.add(blockInfo);
@@ -128,13 +135,13 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
             // this is to allow variable exposing
 
             // Retrieve input variables
-            for (Var<?> inputVar : blockInfo.inputVars) {
+            for (final Var<?> inputVar : blockInfo.inputVars) {
                 // FIX: avoid to duplicate variable (Stephane)
                 if (!descriptor.inputVars.contains(inputVar))
                     descriptor.addInput(getInputVarID(inputVar), inputVar);
             }
             // Retrieve output variables
-            for (Var<?> outputVar : blockInfo.outputVars) {
+            for (final Var<?> outputVar : blockInfo.outputVars) {
                 // FIX: avoid to duplicate variable (Stephane)
                 if (!descriptor.outputVars.contains(outputVar))
                     descriptor.addOutput(getOutputVarID(outputVar), outputVar);
@@ -145,41 +152,6 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         }
 
         blockAdded(this, blockInfo);
-    }
-
-    /**
-     * @param block Block to add.
-     * @return Descriptor relative to this workflow of the added block.
-     * @deprecated Use {@link #addBlock(BlockDescriptor)} instead.
-     */
-    @Deprecated
-    public BlockDescriptor addBlock(Block block) {
-        return addBlock(-1, block, new Point());
-    }
-
-    /**
-     * @param ID       Block identifier.
-     * @param block    Block to be added.
-     * @param location Position to put the block at.
-     * @return Descriptor relative to this workflow of the added block.
-     * @deprecated Use {@link #addBlock(BlockDescriptor)} instead.
-     */
-    @Deprecated
-    public BlockDescriptor addBlock(int ID, Block block, Point location) {
-        BlockDescriptor blockDescriptor;
-
-        if (block instanceof WorkFlow) {
-            blockDescriptor = ((WorkFlow) block).descriptor;
-            blockDescriptor.setContainer(this);
-            blockDescriptor.setLocation(location.x, location.y);
-        }
-        else {
-            blockDescriptor = new BlockDescriptor(ID, block, this, location);
-        }
-
-        addBlock(blockDescriptor);
-
-        return blockDescriptor;
     }
 
     /**
@@ -194,18 +166,17 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @throws NoSuchBlockException    if either the source or destination block is not in this work flow
      * @throws NoSuchVariableException if either the source or destination variable is not in the corresponding block
      */
-    public <T> Link<T> addLink(BlockDescriptor srcBlock, String srcArgID, BlockDescriptor dstBlock, String dstArgID)
-            throws NoSuchBlockException, NoSuchVariableException, ClassCastException {
+    public <T> Link<T> addLink(final BlockDescriptor srcBlock, final String srcArgID, final BlockDescriptor dstBlock, final String dstArgID) throws NoSuchBlockException, NoSuchVariableException, ClassCastException {
         if (!orderedBlocks.contains(srcBlock))
             throw new NoSuchBlockException(srcBlock);
         if (!orderedBlocks.contains(dstBlock))
             throw new NoSuchBlockException(dstBlock);
 
-        Var<T> srcVar = srcBlock.outputVars.get(srcArgID);
+        final Var<T> srcVar = srcBlock.outputVars.get(srcArgID);
         if (srcVar == null)
             throw new NoSuchVariableException(srcBlock, srcArgID);
 
-        Var<T> dstVar = dstBlock.inputVars.get(dstArgID);
+        final Var<T> dstVar = dstBlock.inputVars.get(dstArgID);
         if (dstVar == null)
             throw new NoSuchVariableException(dstBlock, dstArgID);
 
@@ -215,7 +186,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
     /**
      * Creates a link between the given variables and re-schedules the blocks accordingly
      *
-     * @param <T>      Type of the value of the link that is generated.
+     * @param <T>      Value type of the link that is generated.
      * @param srcBlock Start-point block descriptor of the link.
      * @param srcVar   Start-point variable instance of the link.
      * @param dstBlock End-point block descriptor of the link.
@@ -226,9 +197,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @throws ClassCastException      If the link is not valid, meaning that the two specified variables are of
      *                                 incompatible types.
      */
-    public <T> Link<T> addLink(BlockDescriptor srcBlock, Var<T> srcVar, BlockDescriptor dstBlock, Var<T> dstVar)
-            throws LoopException, ClassCastException {
-        Link<T> link = checkLink(srcBlock, srcVar, dstBlock, dstVar);
+    public <T> Link<T> addLink(final BlockDescriptor srcBlock, final Var<T> srcVar, final BlockDescriptor dstBlock, final Var<T> dstVar) throws LoopException, ClassCastException {
+        final Link<T> link = checkLink(srcBlock, srcVar, dstBlock, dstVar);
 
         dstVar.setReference(srcVar);
 
@@ -238,14 +208,14 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
         links.add(link);
 
-        for (WorkFlowListener listener : listeners) {
+        for (final WorkFlowListener listener : listeners) {
             listener.linkAdded(this, link);
         }
 
         return link;
     }
 
-    public void addListener(WorkFlowListener listener) {
+    public void addListener(final WorkFlowListener listener) {
         listeners.add(listener);
     }
 
@@ -253,7 +223,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         return topLevel;
     }
 
-    public boolean contains(BlockDescriptor dstBlock) {
+    public boolean contains(final BlockDescriptor dstBlock) {
         return orderedBlocks.contains(dstBlock);
     }
 
@@ -270,8 +240,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @throws ClassCastException if the link is not valid, meaning that the two specified variables are of
      *                            incompatible types
      */
-    public <T> Link<T> checkLink(final BlockDescriptor srcBlock, Var<T> srcVar, final BlockDescriptor dstBlock, Var<T> dstVar) throws ClassCastException {
-        Link<T> link = new Link<>(this, srcBlock, srcVar, dstBlock, dstVar);
+    public <T> Link<T> checkLink(final BlockDescriptor srcBlock, final Var<T> srcVar, final BlockDescriptor dstBlock, final Var<T> dstVar) throws ClassCastException {
+        final Link<T> link = new Link<>(this, srcBlock, srcVar, dstBlock, dstVar);
 
         checkScope(link);
 
@@ -282,7 +252,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         return link;
     }
 
-    protected <T> void checkScope(Link<T> link) throws ScopeException {
+    protected <T> void checkScope(final Link<T> link) throws ScopeException {
         if (contains(link.srcBlock) != contains(link.dstBlock))
             throw new ScopeException();
 
@@ -291,12 +261,12 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
             throw new ScopeException();
     }
 
-    protected <T> void checkLoop(Link<T> link) throws LoopException {
+    protected <T> void checkLoop(final Link<T> link) throws LoopException {
         if (link.srcBlock.equals(link.dstBlock) || depends(link.srcBlock, link.dstBlock))
             throw new LoopException();
     }
 
-    protected <T> void checkType(Link<T> link) throws ClassCastException {
+    protected <T> void checkType(final Link<T> link) throws ClassCastException {
         // filter all valid cases
 
         if (link.dstVar.isAssignableFrom(link.srcVar))
@@ -318,17 +288,17 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
     }
 
-    private boolean depends(BlockDescriptor srcBlock, BlockDescriptor dstBlock) {
+    private boolean depends(final BlockDescriptor srcBlock, final BlockDescriptor dstBlock) {
         boolean srcDependsOnDst = false;
 
-        for (Link<?> link : links) {
+        for (final Link<?> link : links) {
             if (link.dstBlock == srcBlock) {
                 // link points to srcBlock.
                 if (link.srcBlock == dstBlock)
@@ -348,13 +318,13 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
     /**
      * @param recursive if we also want blocks from sub workflow
-     * @return all blocks contained in current workflow
+     * @return all blocks contained in the current workflow
      */
-    public List<BlockDescriptor> getBlockDescriptors(boolean recursive) {
+    public List<BlockDescriptor> getBlockDescriptors(final boolean recursive) {
         final List<BlockDescriptor> result = new ArrayList<>();
 
         synchronized (orderedBlocks) {
-            for (BlockDescriptor block : orderedBlocks) {
+            for (final BlockDescriptor block : orderedBlocks) {
                 if (recursive && block.isWorkFlow())
                     result.addAll(((WorkFlow) block.getBlock()).getBlockDescriptors(true));
 
@@ -369,10 +339,10 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @param recursive if we also want blocks from sub workflow
      * @return all Input type blocks ({@link InputBlock} contained in current workflow
      */
-    public List<BlockDescriptor> getInputBlockDescriptors(boolean recursive) {
+    public List<BlockDescriptor> getInputBlockDescriptors(final boolean recursive) {
         final List<BlockDescriptor> result = new ArrayList<>();
 
-        for (BlockDescriptor block : getBlockDescriptors(recursive))
+        for (final BlockDescriptor block : getBlockDescriptors(recursive))
             if (block.isInput())
                 result.add(block);
 
@@ -383,25 +353,25 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @param recursive if we also want blocks from sub workflow
      * @return all Output type blocks ({@link OutputBlock} contained in current workflow
      */
-    public List<BlockDescriptor> getOutputBlockDescriptors(boolean recursive) {
+    public List<BlockDescriptor> getOutputBlockDescriptors(final boolean recursive) {
         final List<BlockDescriptor> result = new ArrayList<>();
 
-        for (BlockDescriptor block : getBlockDescriptors(recursive))
+        for (final BlockDescriptor block : getBlockDescriptors(recursive))
             if (block.isOutput())
                 result.add(block);
 
         return result;
     }
 
-    public BlockDescriptor getBlock(int index) {
+    public BlockDescriptor getBlock(final int index) {
         return orderedBlocks.get(index);
     }
 
-    public BlockDescriptor getBlockByID(int blockID) throws NoSuchBlockException {
+    public BlockDescriptor getBlockByID(final int blockID) throws NoSuchBlockException {
         if (blockID == descriptor.getID())
             return descriptor;
 
-        for (BlockDescriptor bd : orderedBlocks)
+        for (final BlockDescriptor bd : orderedBlocks)
             if (bd.getID() == blockID)
                 return bd;
 
@@ -412,8 +382,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @param variable The input variable to retrieve.
      * @return A unique ID for the variable within this work flow (used for XML loading/saving).
      */
-    public String getInputVarID(Var<?> variable) {
-        BlockDescriptor owner = getInputOwner(variable);
+    public String getInputVarID(final Var<?> variable) {
+        final BlockDescriptor owner = getInputOwner(variable);
 
         return owner.getID() + ":" + owner.getVarID(variable);
     }
@@ -422,8 +392,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @param variable The input variable to retrieve.
      * @return A unique ID for the variable within this work flow (used for XML loading/saving).
      */
-    public String getOutputVarID(Var<?> variable) {
-        BlockDescriptor owner = getOutputOwner(variable);
+    public String getOutputVarID(final Var<?> variable) {
+        final BlockDescriptor owner = getOutputOwner(variable);
 
         return owner.getID() + ":" + owner.getVarID(variable);
     }
@@ -432,18 +402,18 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         return descriptor;
     }
 
-    public BlockDescriptor getInputOwner(Var<?> var) {
-        for (BlockDescriptor blockInfo : orderedBlocks)
-            for (Var<?> inputVar : blockInfo.inputVars)
+    public BlockDescriptor getInputOwner(final Var<?> var) {
+        for (final BlockDescriptor blockInfo : orderedBlocks)
+            for (final Var<?> inputVar : blockInfo.inputVars)
                 if (inputVar.equals(var))
                     return blockInfo;
 
         return null;
     }
 
-    public BlockDescriptor getOutputOwner(Var<?> var) {
-        for (BlockDescriptor blockInfo : orderedBlocks)
-            for (Var<?> outputVar : blockInfo.outputVars)
+    public BlockDescriptor getOutputOwner(final Var<?> var) {
+        for (final BlockDescriptor blockInfo : orderedBlocks)
+            for (final Var<?> outputVar : blockInfo.outputVars)
                 if (outputVar.equals(var))
                     return blockInfo;
 
@@ -454,7 +424,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         return links;
     }
 
-    public int indexOf(BlockDescriptor blockInfo) {
+    public int indexOf(final BlockDescriptor blockInfo) {
         if (blockInfo == null)
             return -1;
 
@@ -464,7 +434,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
     @Override
     public Iterator<BlockDescriptor> iterator() {
         // return orderedBlocks.iterator();
-        return new Iterator<BlockDescriptor>() {
+        return new Iterator<>() {
             private final Iterator<BlockDescriptor> orderedBlocksIt = orderedBlocks.iterator();
 
             @Override
@@ -487,30 +457,31 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
     /**
      * Give the highest priority to the specified block, by placing giving it the smallest possible
-     * index in the list (i.e. after its direct dependencies). This method reorganizes the block execution order.
+     * index in the list (i.e., after its direct dependencies).
+     * This method reorganizes the block execution order.
      *
      * @param blockDesc Descriptor of the block to be prioritized.
      */
-    public void prioritize(BlockDescriptor blockDesc) {
+    public void prioritize(final BlockDescriptor blockDesc) {
         // retrieve the current order
-        int currentOrder = indexOf(blockDesc);
+        final int currentOrder = indexOf(blockDesc);
         // assume we can give the block maximum priority
         int targetOrder = 0;
 
         // find its dependencies
-        HashSet<BlockDescriptor> dependencies = new HashSet<>();
+        final HashSet<BlockDescriptor> dependencies = new HashSet<>();
 
-        for (Link<?> link : links)
+        for (final Link<?> link : links)
             if (link.dstBlock == blockDesc && contains(link.srcBlock))
                 dependencies.add(link.srcBlock);
 
-        // give piority to the dependencies first
-        for (BlockDescriptor dependency : dependencies)
+        // give priority to the dependencies first
+        for (final BlockDescriptor dependency : dependencies)
             prioritize(dependency);
 
         // calculate the final order
-        for (BlockDescriptor dependency : dependencies) {
-            int order = indexOf(dependency) + 1;
+        for (final BlockDescriptor dependency : dependencies) {
+            final int order = indexOf(dependency) + 1;
             if (order > targetOrder)
                 targetOrder = order;
         }
@@ -519,50 +490,49 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
         if (targetOrder != currentOrder) {
             orderedBlocks.add(targetOrder, orderedBlocks.remove(currentOrder));
-            for (WorkFlowListener listener : listeners)
+            for (final WorkFlowListener listener : listeners)
                 listener.workFlowReordered(this);
         }
     }
 
     /**
      * Re-orders the specified blocks to ensure that prevBlock will execute before nextBlock.<br>
-     * NOTE: this method assumes that the specified blocks belong to the current work flow. If this
-     * is not the case, see the {@link #reOrder(Link)} method instead.
+     * NOTE: this method assumes that the specified blocks belong to the current workflow.
      *
      * @param prevBlock The block that should be executed right before this instance.
      * @param nextBlock The block that should be executed right after this instance.
      */
-    private void reOrder(BlockDescriptor prevBlock, BlockDescriptor nextBlock) {
+    private void reOrder(final BlockDescriptor prevBlock, final BlockDescriptor nextBlock) {
         orderedBlocks.remove(prevBlock);
         orderedBlocks.add(orderedBlocks.indexOf(nextBlock), prevBlock);
 
-        for (Link<?> link : links)
+        for (final Link<?> link : links)
             if (link.dstBlock == prevBlock && orderedBlocks.indexOf(link.srcBlock) > orderedBlocks.indexOf(prevBlock)) {
                 reOrder(link.srcBlock, prevBlock);
                 break; // only do it once, even if multiple links exist
             }
 
-        for (WorkFlowListener listener : listeners)
+        for (final WorkFlowListener listener : listeners)
             listener.workFlowReordered(this);
     }
 
-    public void removeBlock(BlockDescriptor blockInfo, boolean checkSelection) {
+    public void removeBlock(final BlockDescriptor blockInfo, boolean checkSelection) {
         // pops out workflows' selections
         if (blockInfo.getBlock() instanceof WorkFlow) {
-            WorkFlow wf = ((WorkFlow) blockInfo.getBlock());
+            final WorkFlow wf = ((WorkFlow) blockInfo.getBlock());
             if (checkSelection && !wf.getBlockSelection().isEmpty())
                 try {
-                    // use location in main container instead of in the inner workflow
+                    // use location in the main container instead of in the inner workflow
                     // avoids jumping toward the top left
-                    for (BlockDescriptor bd : wf) {
-                        Point contLoc = bd.getContainer().getBlockDescriptor().getLocation();
-                        Point loc = bd.getLocation();
+                    for (final BlockDescriptor bd : wf) {
+                        final Point contLoc = bd.getContainer().getBlockDescriptor().getLocation();
+                        final Point loc = bd.getLocation();
                         bd.setLocation(contLoc.x + loc.x, contLoc.y + loc.y);
                     }
                     MainFrame.copySelection(wf, true);
                     MainFrame.pasteSelection(this, true);
                 }
-                catch (LinkCutException e) {
+                catch (final LinkCutException e) {
                     if (ConfirmDialog.confirm("Warning", e.getMessage(), ConfirmDialog.OK_CANCEL_OPTION)) {
                         MainFrame.pasteSelection(this, true);
                     }
@@ -580,26 +550,26 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
         // 1.a) links from this block elsewhere
         for (int i = 0; i < links.size(); i++) {
-            Link<?> link = links.get(i);
+            final Link<?> link = links.get(i);
 
             if (blockInfo == link.srcBlock) {
                 link.dstVar.setReference(null);
                 links.remove(i--);
 
-                for (WorkFlowListener listener : listeners)
+                for (final WorkFlowListener listener : listeners)
                     listener.linkRemoved(this, link);
             }
         }
 
         // 1.b) links from elsewhere to this block
         for (int i = 0; i < links.size(); i++) {
-            Link<?> link = links.get(i);
+            final Link<?> link = links.get(i);
 
             if (blockInfo == link.dstBlock) {
                 link.dstVar.setReference(null);
                 links.remove(i--);
 
-                for (WorkFlowListener listener : listeners)
+                for (final WorkFlowListener listener : listeners)
                     listener.linkRemoved(this, link);
             }
         }
@@ -609,11 +579,11 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         // a work flow does not have variables of its own => nothing to remove
         if (!blockInfo.isWorkFlow()) {
             // Remove input variables
-            for (Var<?> inputVar : blockInfo.inputVars)
+            for (final Var<?> inputVar : blockInfo.inputVars)
                 this.descriptor.removeInput(inputVar);
 
             // Remove output variables
-            for (Var<?> outputVar : blockInfo.outputVars)
+            for (final Var<?> outputVar : blockInfo.outputVars)
                 this.descriptor.removeOutput(outputVar);
         }
 
@@ -634,7 +604,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
         // 5) Notify listeners...
 
-        for (WorkFlowListener listener : listeners) {
+        for (final WorkFlowListener listener : listeners) {
             listener.blockRemoved(this, blockInfo);
             listener.workFlowReordered(this);
         }
@@ -649,8 +619,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * @param var the variable (input or output) to look for
      * @return true if the specified variable is linked to another block, false otherwise
      */
-    public boolean isLinked(Var<?> var) {
-        for (Link<?> link : links)
+    public boolean isLinked(final Var<?> var) {
+        for (final Link<?> link : links)
             if (link.dstVar == var || link.srcVar == var)
                 return true;
         return false;
@@ -661,12 +631,12 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      *
      * @param dstVar the destination variable of the link to remove
      */
-    public void removeLink(Var<?> dstVar) {
-        for (Link<?> link : links)
+    public void removeLink(final Var<?> dstVar) {
+        for (final Link<?> link : links)
             if (link.dstVar == dstVar && links.remove(link)) {
                 link.dstVar.setReference(null);
 
-                for (WorkFlowListener listener : listeners)
+                for (final WorkFlowListener listener : listeners)
                     listener.linkRemoved(this, link);
 
                 return;
@@ -684,7 +654,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         }
     }
 
-    public void removeListener(WorkFlowListener listener) {
+    public void removeListener(final WorkFlowListener listener) {
         listeners.remove(listener);
     }
 
@@ -692,7 +662,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * Resets all output variables of each block in this work flow to their default value
      */
     public void reset() {
-        for (BlockDescriptor block : orderedBlocks)
+        for (final BlockDescriptor block : orderedBlocks)
             block.reset();
     }
 
@@ -711,7 +681,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      *                          case, the status of the work flow can be accessed via {@link #getDescriptor()}
      *                          {@link BlockDescriptor#getStatus() .getStatus()})
      */
-    public void runWorkFlow(boolean waitForCompletion) {
+    public void runWorkFlow(final boolean waitForCompletion) {
         // this is the top-level work flow
         // force it "dirty" to run it
         this.descriptor.setStatus(BlockStatus.DIRTY);
@@ -750,6 +720,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      * DO NOT CALL DIRECTLY FROM CLIENT CODE: this method assumes running in its own thread, and may
      * behave inconsistently if interrupted. Use the {@link #runWorkFlow()} method instead
      */
+    @Override
     public void run() {
         if (orderedBlocks.size() == 0)
             return;
@@ -765,47 +736,47 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         try {
             startTime = System.nanoTime();
 
-            String statusPrefix = getBlockDescriptor().getContainer() == null ? ""
+            final String statusPrefix = getBlockDescriptor().getContainer() == null ? ""
                     : "\"" + getBlockDescriptor().getContainer().descriptor.getName() + "\"" + " => ";
 
             // get the log stream recursively to ensure it is always the top-level one
-            PrintStream log = getLogStream();
+            final PrintStream log = getLogStream();
 
             for (int blockIndex = 0; blockIndex < orderedBlocks.size(); blockIndex++) {
                 if (isInterrupted())
                     throw new StopException();
 
-                BlockDescriptor blockDescriptor = orderedBlocks.get(blockIndex);
+                final BlockDescriptor blockDescriptor = orderedBlocks.get(blockIndex);
 
                 if (blockDescriptor.getStatus() != BlockStatus.READY) {
                     runningBlock = blockDescriptor;
 
-                    String blockLog = "block #" + (blockIndex + 1) + " [" + blockDescriptor.getDefinedName() + "]";
+                    final String blockLog = "block #" + (blockIndex + 1) + " [" + blockDescriptor.getDefinedName() + "]";
 
                     // Adjust status
                     statusChanged(this, "Running block " + statusPrefix + "\"" + blockDescriptor.getDefinedName()
                             + "\" (#" + (blockIndex + 1) + ")...");
 
                     // Log should be indented
-                    String indentation = "";
+                    final StringBuilder indentation = new StringBuilder();
                     // indent as many times as we go deep in the tree
                     WorkFlow container = this.descriptor.getContainer();
                     while (container != null) {
-                        indentation += "   ";
+                        indentation.append("   ");
                         container = container.descriptor.getContainer();
                     }
                     log.print(indentation + "Running " + blockLog);
 
                     if (blockDescriptor.inputVars.size() > 0) {
                         log.println(" with the following parameters:");
-                        for (Var<?> var : blockDescriptor.inputVars) {
+                        for (final Var<?> var : blockDescriptor.inputVars) {
                             if (!blockDescriptor.inputVars.isVisible(var))
                                 continue;
 
                             log.print(indentation + "- " + var.getName() + ": " + var.getValueAsString(true));
 
                             // If this variable points to another one, say so
-                            Var<?> reference = var.getReference();
+                            final Var<?> reference = var.getReference();
                             if (reference != null) {
                                 // The owner of the reference is either...
 
@@ -833,11 +804,11 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
                     }
 
                     // THIS IS WHERE IT HAPPENS
-                    long tic = System.nanoTime();
+                    final long tic = System.nanoTime();
                     blockDescriptor.run();
-                    long tac = System.nanoTime();
+                    final long tac = System.nanoTime();
 
-                    String time = UnitUtil.displayTimeAsStringWithUnits((tac - tic) / 1000000f, false);
+                    final String time = UnitUtil.displayTimeAsStringWithUnits((tac - tic) / 1000000f, false);
                     log.println(indentation + "Finished " + blockLog + " in " + (time.isEmpty() ? "0 ms" : time));
 
                     runningBlock = null;
@@ -854,14 +825,14 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
             finalStatus = "The workflow executed successfully";
         }
-        catch (StopException e) {
+        catch (final StopException e) {
             // push the exception upstairs
             if (descriptor.getContainer() != null)
                 throw e;
 
             finalStatus = "The workflow was interrupted";
         }
-        catch (RuntimeException e) {
+        catch (final RuntimeException e) {
             finalStatus = "The workflow did not execute properly";
 
             boolean catchException = false;
@@ -874,8 +845,8 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
             }
 
             if (catchException && runningBlock != null) {
-                String blockName = runningBlock.getDefinedName();
-                int blockID = indexOf(runningBlock) + 1;
+                final String blockName = runningBlock.getDefinedName();
+                final int blockID = indexOf(runningBlock) + 1;
                 throw new IcyHandledException(
                         "While running block \"" + blockName + "\" (" + blockID + "):\n" + e.getMessage());
             }
@@ -886,13 +857,13 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         finally {
             descriptor.setStatus(BlockStatus.READY);
             endTime = System.nanoTime();
-            double time = endTime - startTime;
+            final double time = endTime - startTime;
             finalStatus += " (total running time: " + StringUtil.toString(time / 1e9, 2) + " seconds)";
             statusChanged(this, finalStatus);
         }
     }
 
-    public void setLocation(BlockDescriptor blockInfo, Point point) {
+    public void setLocation(final BlockDescriptor blockInfo, final Point point) {
         blockInfo.setLocation(point.x, point.y);
     }
 
@@ -904,108 +875,108 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
     }
 
     @Override
-    public void blockStatusChanged(BlockDescriptor blockInfo, BlockStatus status) {
+    public void blockStatusChanged(final BlockDescriptor blockInfo, final BlockStatus status) {
         if (status == BlockStatus.DIRTY) {
             // "dirty-fy" following blocks
-            for (Link<?> link : links)
+            for (final Link<?> link : links)
                 if (link.srcBlock == blockInfo)
                     link.dstBlock.setStatus(BlockStatus.DIRTY);
         }
     }
 
     @Override
-    public void blockVariableAdded(BlockDescriptor block, Var<?> variable) {
+    public void blockVariableAdded(final BlockDescriptor block, final Var<?> variable) {
 
     }
 
     @Override
-    public <T> void blockVariableChanged(BlockDescriptor block, Var<T> variable, T newValue) {
+    public <T> void blockVariableChanged(final BlockDescriptor block, final Var<T> variable, final T newValue) {
         blockVariableChanged(this, block, variable, newValue);
     }
 
     @Override
-    public void blockCollapsed(BlockDescriptor block, boolean collapsed) {
+    public void blockCollapsed(final BlockDescriptor block, final boolean collapsed) {
 
     }
 
     @Override
-    public void blockDimensionChanged(BlockDescriptor block, int newWidth, int newHeight) {
+    public void blockDimensionChanged(final BlockDescriptor block, final int newWidth, final int newHeight) {
         blockDimensionChanged(this, block, newWidth, newHeight);
     }
 
     @Override
-    public void blockLocationChanged(BlockDescriptor block, int newX, int newY) {
+    public void blockLocationChanged(final BlockDescriptor block, final int newX, final int newY) {
         blockLocationChanged(this, block, newX, newY);
     }
 
     @Override
-    public void blockAdded(WorkFlow source, BlockDescriptor addedBlock) {
-        for (WorkFlowListener listener : listeners)
+    public void blockAdded(final WorkFlow source, final BlockDescriptor addedBlock) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockAdded(source, addedBlock);
     }
 
     @Override
-    public void blockRemoved(WorkFlow source, BlockDescriptor removedBlock) {
-        for (WorkFlowListener listener : listeners)
+    public void blockRemoved(final WorkFlow source, final BlockDescriptor removedBlock) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockRemoved(source, removedBlock);
     }
 
     @Override
-    public void linkAdded(WorkFlow source, Link<?> addedLink) {
-        for (WorkFlowListener listener : listeners)
+    public void linkAdded(final WorkFlow source, final Link<?> addedLink) {
+        for (final WorkFlowListener listener : listeners)
             listener.linkAdded(source, addedLink);
     }
 
     @Override
-    public void linkRemoved(WorkFlow source, Link<?> removedLink) {
-        for (WorkFlowListener listener : listeners)
+    public void linkRemoved(final WorkFlow source, final Link<?> removedLink) {
+        for (final WorkFlowListener listener : listeners)
             listener.linkRemoved(source, removedLink);
     }
 
     @Override
-    public void workFlowReordered(WorkFlow source) {
-        for (WorkFlowListener listener : listeners)
+    public void workFlowReordered(final WorkFlow source) {
+        for (final WorkFlowListener listener : listeners)
             listener.workFlowReordered(source);
     }
 
     @Override
-    public void blockCollapsed(WorkFlow source, BlockDescriptor block, boolean collapsed) {
-        for (WorkFlowListener listener : listeners)
+    public void blockCollapsed(final WorkFlow source, final BlockDescriptor block, final boolean collapsed) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockCollapsed(source, block, collapsed);
     }
 
     @Override
-    public void blockDimensionChanged(WorkFlow source, BlockDescriptor block, int newWidth, int newHeight) {
-        for (WorkFlowListener listener : listeners)
+    public void blockDimensionChanged(final WorkFlow source, final BlockDescriptor block, final int newWidth, final int newHeight) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockDimensionChanged(this, block, newWidth, newHeight);
     }
 
     @Override
-    public void blockLocationChanged(WorkFlow source, BlockDescriptor block, int newX, int newY) {
-        for (WorkFlowListener listener : listeners)
+    public void blockLocationChanged(final WorkFlow source, final BlockDescriptor block, final int newX, final int newY) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockLocationChanged(this, block, newX, newY);
     }
 
     @Override
-    public void blockStatusChanged(WorkFlow source, BlockDescriptor block, BlockStatus status) {
+    public void blockStatusChanged(final WorkFlow source, final BlockDescriptor block, final BlockStatus status) {
         // no need to propagate this event
     }
 
     @Override
-    public void blockVariableAdded(WorkFlow source, BlockDescriptor block, Var<?> variable) {
-        for (WorkFlowListener listener : listeners)
+    public void blockVariableAdded(final WorkFlow source, final BlockDescriptor block, final Var<?> variable) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockVariableAdded(this, block, variable);
     }
 
     @Override
-    public <T> void blockVariableChanged(WorkFlow source, BlockDescriptor block, Var<T> variable, T newValue) {
-        for (WorkFlowListener listener : listeners)
+    public <T> void blockVariableChanged(final WorkFlow source, final BlockDescriptor block, final Var<T> variable, final T newValue) {
+        for (final WorkFlowListener listener : listeners)
             listener.blockVariableChanged(this, block, variable, newValue);
     }
 
     @Override
-    public void statusChanged(WorkFlow source, String message) {
-        for (WorkFlowListener listener : listeners)
+    public void statusChanged(final WorkFlow source, final String message) {
+        for (final WorkFlowListener listener : listeners)
             listener.statusChanged(source, message);
     }
 
@@ -1014,30 +985,30 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         linkSelection = new ArrayList<>();
     }
 
-    public boolean isBlockSelected(BlockDescriptor bd) {
+    public boolean isBlockSelected(final BlockDescriptor bd) {
         return blockSelection.contains(bd);
     }
 
-    public boolean isLinkSelected(Link<?> l) {
+    public boolean isLinkSelected(final Link<?> l) {
         return linkSelection.contains(l);
     }
 
-    public void selectBlock(BlockDescriptor bd) {
+    public void selectBlock(final BlockDescriptor bd) {
         if (!isBlockSelected(bd))
             blockSelection.add(bd);
     }
 
-    public void selectLink(Link<?> l) {
+    public void selectLink(final Link<?> l) {
         if (!isLinkSelected(l))
             linkSelection.add(l);
     }
 
-    public void unselectBlock(BlockDescriptor bd) {
+    public void unselectBlock(final BlockDescriptor bd) {
         if (isBlockSelected(bd))
             blockSelection.remove(bd);
     }
 
-    public void unselectLink(Link<?> l) {
+    public void unselectLink(final Link<?> l) {
         if (isLinkSelected(l))
             linkSelection.remove(l);
     }

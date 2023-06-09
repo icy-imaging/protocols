@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools.roi;
 
 import icy.plugin.abstract_.Plugin;
@@ -14,7 +32,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
 
         private final String displayText;
 
-        MorphUnit(String displayText) {
+        MorphUnit(final String displayText) {
             this.displayText = displayText;
         }
 
@@ -24,17 +42,17 @@ abstract class MorphROI extends Plugin implements ROIBlock {
         }
     }
 
-    VarROIArray roiIN = new VarROIArray("List of ROI");
-    VarInteger x = new VarInteger("Along X", 1);
-    VarInteger y = new VarInteger("Along Y", 1);
-    VarInteger z = new VarInteger("Along Z", 1);
+    protected final VarROIArray roiIN = new VarROIArray("List of ROI");
+    protected final VarInteger x = new VarInteger("Along X", 1);
+    protected final VarInteger y = new VarInteger("Along Y", 1);
+    protected final VarInteger z = new VarInteger("Along Z", 1);
 
-    VarEnum<MorphUnit> unit = new VarEnum<>("Unit", MorphUnit.PIXELS);
+    protected final VarEnum<MorphUnit> unit = new VarEnum<>("Unit", MorphUnit.PIXELS);
 
-    VarROIArray roiOUT;
+    protected VarROIArray roiOUT;
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         x.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
         y.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
         z.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
@@ -46,7 +64,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("output ROI", roiOUT);
     }
 
@@ -60,9 +78,9 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusX(ROI roi, int pct) {
-        double size = roi.getBounds5D().getSizeX();
-        double diff = (size * pct / 100);
+    static int percentageToRadiusX(final ROI roi, final int pct) {
+        final double size = roi.getBounds5D().getSizeX();
+        final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);
     }
 
@@ -76,9 +94,9 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusY(ROI roi, int pct) {
-        double size = roi.getBounds5D().getSizeY();
-        double diff = (size * pct / 100);
+    static int percentageToRadiusY(final ROI roi, final int pct) {
+        final double size = roi.getBounds5D().getSizeY();
+        final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);
     }
 
@@ -92,9 +110,9 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusZ(ROI roi, int pct) {
-        double size = roi.getBounds5D().getSizeZ();
-        double diff = (size * pct / 100);
+    static int percentageToRadiusZ(final ROI roi, final int pct) {
+        final double size = roi.getBounds5D().getSizeZ();
+        final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);
     }
 }

@@ -1,28 +1,22 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui.block;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 
 import icy.gui.component.menu.IcyMenuItem;
 import icy.system.thread.ThreadUtil;
@@ -38,6 +32,15 @@ import plugins.adufour.protocols.gui.link.Line;
 import plugins.adufour.protocols.gui.link.RoundedSquareLine;
 import plugins.adufour.vars.lang.Var;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
     private final WorkFlow innerWorkFlow;
 
@@ -49,7 +52,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
 
     private final MouseAdapter mouseAdapter;
 
-    protected Box varBox;
+    final protected Box varBox;
 
     protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", GoogleMaterialDesignIcons.CLOSE);
 
@@ -153,11 +156,10 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
     }
 
     /**
-     * Draws the drag'n'drop zones representing the exposed variables of the
+     * Draws the drag n drop zones representing the exposed variables of the
      * inner work flow
      *
-     * @param row the row where to start drawing within the
-     *            {@link GridBagLayout}
+     * @param row the row where to start drawing within the {@link GridBagLayout}
      * @return the last row used in the {@link GridBagLayout}
      */
     protected int drawExposedLinks(final int row) {

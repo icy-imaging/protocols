@@ -1,12 +1,22 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui.block;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.HashMap;
-
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.MouseInputListener;
 
 import icy.gui.component.button.IcyButton;
 import icy.gui.component.menu.IcyMenuItem;
@@ -29,6 +39,13 @@ import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.util.VarReferencingPolicy;
 
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+
 public class BlockPanel extends JPanel implements ActionListener, BlockListener {
     private final class BlockMotionManager implements MouseInputListener {
         private int pressedX, pressedY;
@@ -44,18 +61,18 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             int dx = e.getX();
             int dy = e.getY();
 
-            int minWidth = jPanelTitle.getPreferredSize().width;
+            final int minWidth = jPanelTitle.getPreferredSize().width;
             int w = resizing_EAST ? Math.max(minWidth, dx) : getWidth();
 
-            int minHeight = MIN_HEIGHT + 5;
+            final int minHeight = MIN_HEIGHT + 5;
             int h = resizing_SOUTH ? Math.max(minHeight, dy) : getHeight();
 
             if (dragging) {
-                WorkFlow wf = workFlowPane.getWorkFlow();
+                final WorkFlow wf = workFlowPane.getWorkFlow();
 
                 if (wf.isBlockSelected(blockDesc)) {
-                    for (BlockDescriptor bd : wf.getBlockSelection()) {
-                        BlockPanel bp = workFlowPane.getBlockPanel(bd);
+                    for (final BlockDescriptor bd : wf.getBlockSelection()) {
+                        final BlockPanel bp = workFlowPane.getBlockPanel(bd);
 
                         if (bp != null) {
                             bp.setBounds(
@@ -134,15 +151,15 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
         @Override
         public void mouseClicked(final MouseEvent e) {
-            Component c = getComponentAt(e.getX(), e.getY());
+            final Component c = getComponentAt(e.getX(), e.getY());
             if (e.getClickCount() == 2 && !e.isConsumed() && c != null && c.equals(jPanelTitle)) {
                 e.consume();
 
                 final JPanel renamePanel = new JPanel();
                 final JTextField newName = new JTextField(blockDesc.getDefinedName());
-                JPanel buttonPanel = new JPanel();
-                JButton ok = new JButton("OK");
-                JButton cancel = new JButton("Cancel");
+                final JPanel buttonPanel = new JPanel();
+                final JButton ok = new JButton("OK");
+                final JButton cancel = new JButton("Cancel");
 
                 ok.addActionListener(okEvent -> {
                     blockDesc.setDefinedName(newName.getText());
@@ -190,8 +207,8 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
         @Override
         public void mouseMoved(final MouseEvent e) {
-            int x = e.getX();
-            int y = e.getY();
+            final int x = e.getX();
+            final int y = e.getY();
 
             if (resizeable && !e.getSource().equals(name)) {
                 if (x < BORDER_SIZE_X) {
@@ -264,7 +281,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     protected static final int BORDER_SIZE_Y = 8;
 
-    protected int ARC_SIZE = 10;
+    protected static final int ARC_SIZE = 10;
 
     //@Deprecated
     //protected static final int ICON_SIZE = 16;
@@ -276,7 +293,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     private static final float ICON_SIZE_F = LookAndFeelUtil.getDefaultIconSizeAsFloat();
 
     /**
-     * Indicates that the block is dirty (results isn't ready)
+     * Indicates that the block is dirty (results aren't ready)
      */
     private static final ImageIcon ICON_DIRTY = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.WARNING, ICON_SIZE_F, Color.ORANGE.darker()));
 
@@ -347,7 +364,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
      * @param wfPane    The work flow pane containing this panel
      * @param blockDesc The block controlled by this panel
      */
-    public BlockPanel(WorkFlowContainer wfPane, BlockDescriptor blockDesc) {
+    public BlockPanel(final WorkFlowContainer wfPane, final BlockDescriptor blockDesc) {
         this.blockDesc = blockDesc;
         this.workFlowPane = wfPane;
 
@@ -364,7 +381,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         toolBar.setFloatable(false);
         toolBar.add(bMenu);
         toolBar.add(bRunUntilHere);
-        int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
+        final int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
         bID.setText(String.valueOf(id));
         bID.setMargin(new Insets(0, 0, 0, 0));
         toolBar.add(bID);
@@ -375,16 +392,16 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         toolBar.add(bStatus);
 
         // Need to remove all the mouse listeners to dispatch the event
-        for (MouseListener ml : toolBar.getMouseListeners())
+        for (final MouseListener ml : toolBar.getMouseListeners())
             toolBar.removeMouseListener(ml);
-        for (MouseMotionListener mml : toolBar.getMouseMotionListeners())
+        for (final MouseMotionListener mml : toolBar.getMouseMotionListeners())
             toolBar.removeMouseMotionListener(mml);
 
         add(toolBar, BorderLayout.NORTH);
 
         // Menu
         bMenu.setComponentPopupMenu(menu);
-        for (AbstractButton button : new AbstractButton[]{bMenu, menuCollapse, bRunUntilHere, menuKeepResults, menuRemove, bID}) {
+        for (final AbstractButton button : new AbstractButton[]{bMenu, menuCollapse, bRunUntilHere, menuKeepResults, menuRemove, bID}) {
             button.addActionListener(this);
         }
 
@@ -414,7 +431,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         refresher = () -> {
             ThreadUtil.invokeNow(this::refreshNow);
 
-            // we don't want to spent too much time with refresh so we force sleep here
+            // we don't want to spend too much time with refresh, so we force sleep here
             ThreadUtil.sleep(100);
         };
     }
@@ -453,7 +470,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getSource() == bMenu) {
             bMenu.getComponentPopupMenu().show(bMenu, 0, bMenu.getHeight());
         }
@@ -503,9 +520,9 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     @Override
-    public void blockCollapsed(BlockDescriptor block, final boolean collapsed) {
+    public void blockCollapsed(final BlockDescriptor block, final boolean collapsed) {
         ThreadUtil.invokeLater(() -> {
-            // redraw the panel in minimised mode
+            // redraw the panel in minimized mode
             refreshNow();
             // change the status icon
             menuCollapse.setText(blockDesc.isCollapsed() ? "Expand" : "Collapse");
@@ -518,32 +535,32 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     @Override
-    public void blockDimensionChanged(BlockDescriptor block, int newWidth, int newHeight) {
+    public void blockDimensionChanged(final BlockDescriptor block, final int newWidth, final int newHeight) {
 
     }
 
     @Override
-    public void blockLocationChanged(BlockDescriptor block, int newX, int newY) {
+    public void blockLocationChanged(final BlockDescriptor block, final int newX, final int newY) {
 
     }
 
     @Override
-    public void blockStatusChanged(BlockDescriptor blockInfo, BlockStatus status) {
+    public void blockStatusChanged(final BlockDescriptor blockInfo, final BlockStatus status) {
         updateStatusIcon(status);
     }
 
     @Override
-    public void blockVariableAdded(BlockDescriptor block, Var<?> variable) {
+    public void blockVariableAdded(final BlockDescriptor block, final Var<?> variable) {
         ThreadUtil.invokeNow(this::refreshNow);
         // refresh();
     }
 
     @Override
-    public <T> void blockVariableChanged(BlockDescriptor block, Var<T> variable, T newValue) {
+    public <T> void blockVariableChanged(final BlockDescriptor block, final Var<T> variable, final T newValue) {
 
     }
 
-    protected DragDropZone createVarDragZone(final Var<?> variable, boolean allowExposure) {
+    protected DragDropZone createVarDragZone(final Var<?> variable, final boolean allowExposure) {
         final DragDropZone dragZone = DragDropZone.createDragZone(workFlowPane.getWorkFlow(), blockDesc, variable);
 
         if (allowExposure) {
@@ -553,15 +570,15 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
             dragZone.addMouseListener(new MouseInputAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(final MouseEvent e) {
                     // don't show if the owner is the top-level work flow
-                    WorkFlow parent = blockDesc.getContainer();
+                    final WorkFlow parent = blockDesc.getContainer();
 
                     if (parent.getBlockDescriptor().isTopLevelWorkFlow())
                         return;
 
                     if (e.getButton() == MouseEvent.BUTTON2 || e.isMetaDown()) {
-                        VarList parentOutputs = parent.getBlockDescriptor().outputVars;
+                        final VarList parentOutputs = parent.getBlockDescriptor().outputVars;
                         itemExposeVar.setText(parentOutputs.isVisible(variable) ? "Hide variable" : "Expose variable");
                         popup.show(dragZone, 5, 10);
                     }
@@ -569,7 +586,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             });
 
             itemExposeVar.addActionListener(arg0 -> ThreadUtil.bgRun(() -> {
-                VarList outputWorkFlowVars = blockDesc.getContainer().getBlockDescriptor().outputVars;
+                final VarList outputWorkFlowVars = blockDesc.getContainer().getBlockDescriptor().outputVars;
                 outputWorkFlowVars.setVisible(variable, !outputWorkFlowVars.isVisible(variable));
             }));
         }
@@ -594,7 +611,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
             dropZone.addMouseListener(new MouseInputAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(final MouseEvent e) {
                     // don't show if:
                     // 1) the owner is the top-level work flow
                     if (parent.getBlockDescriptor().isTopLevelWorkFlow())
@@ -604,7 +621,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                         return;
 
                     if (e.getButton() == MouseEvent.BUTTON2 || e.isMetaDown()) {
-                        VarList parentInputs = parent.getBlockDescriptor().inputVars;
+                        final VarList parentInputs = parent.getBlockDescriptor().inputVars;
                         itemExposeVar.setText(parentInputs.isVisible(variable) ? "Hide variable" : "Expose variable");
                         popup.show(dropZone, 5, 10);
                     }
@@ -612,7 +629,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             });
 
             itemExposeVar.addActionListener(arg0 -> ThreadUtil.bgRun(() -> {
-                VarList inputWorkFlowVars = blockDesc.getContainer().getBlockDescriptor().inputVars;
+                final VarList inputWorkFlowVars = blockDesc.getContainer().getBlockDescriptor().inputVars;
                 inputWorkFlowVars.setVisible(variable, !inputWorkFlowVars.isVisible(variable));
             }));
         }
@@ -620,8 +637,8 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         return dropZone;
     }
 
-    protected <T> VarEditor<T> createVarEditor(Var<T> variable) {
-        VarEditor<T> editor = variable.isEnabled() ? variable.createVarEditor() : variable.createVarViewer();
+    protected <T> VarEditor<T> createVarEditor(final Var<T> variable) {
+        final VarEditor<T> editor = variable.isEnabled() ? variable.createVarEditor() : variable.createVarViewer();
         editor.setEnabled(true); // activates listeners
         return editor;
     }
@@ -634,22 +651,22 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         getUI().uninstallUI(this);
 
         // clean resources
-        for (AbstractButton button : new AbstractButton[]{bMenu, menuCollapse, bRunUntilHere, menuKeepResults, menuRemove, bID}) {
+        for (final AbstractButton button : new AbstractButton[]{bMenu, menuCollapse, bRunUntilHere, menuKeepResults, menuRemove, bID}) {
             button.removeActionListener(this);
         }
         removeMouseListener(mouseAdapter);
         removeMouseMotionListener(mouseAdapter);
         blockDesc.removeBlockListener(this);
 
-        for (VarEditor<?> editor : varEditors.values())
+        for (final VarEditor<?> editor : varEditors.values())
             editor.dispose();
         varEditors.clear();
 
-        for (DragDropZone dp : varDropZones.values())
+        for (final DragDropZone dp : varDropZones.values())
             dp.dispose();
         varDropZones.clear();
 
-        for (DragDropZone dg : varDragZones.values())
+        for (final DragDropZone dg : varDragZones.values())
             dg.dispose();
         varDragZones.clear();
     }
@@ -705,9 +722,9 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
         if ((blockDesc.getBlock() instanceof InputBlock) || (blockDesc.getBlock() instanceof OutputBlock)) {
             // option to retrieve parameter from command line
-            String tooltip = "Identifier used to set the value from the command line";
+            final String tooltip = "Identifier used to set the value from the command line";
 
-            JPanel menuCLID = new JPanel(new FlowLayout(FlowLayout.LEADING));
+            final JPanel menuCLID = new JPanel(new FlowLayout(FlowLayout.LEADING));
             //menuCLID.setOpaque(false);
             menuCLID.setToolTipText(tooltip);
 
@@ -718,7 +735,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             fieldID.setToolTipText(tooltip);
             menuCLID.add(fieldID);
 
-            IcyButton bStoreFieldID = new IcyButton(GoogleMaterialDesignIcons.CHECK);
+            final IcyButton bStoreFieldID = new IcyButton(GoogleMaterialDesignIcons.CHECK);
             bStoreFieldID.setFlat(true);
             //bStoreFieldID.setFocusable(false);
             //bStoreFieldID.setBorderPainted(false);
@@ -752,19 +769,19 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             if (!varDragZones.containsKey(input))
                 varDragZones.put(input, createVarDragZone(input, false));
 
-            JLabel inputName = new JLabel(input.getName());
-            Dimension inputNameDim = inputName.getPreferredSize();
+            final JLabel inputName = new JLabel(input.getName());
+            final Dimension inputNameDim = inputName.getPreferredSize();
             inputNameDim.height = 20;
             inputName.setPreferredSize(inputNameDim);
 
-            VarEditor<?> varEditor = varEditors.get(input);
+            final VarEditor<?> varEditor = varEditors.get(input);
 
-            JComponent inputComponent = (JComponent) varEditor.getEditorComponent();
+            final JComponent inputComponent = (JComponent) varEditor.getEditorComponent();
 
-            VarReferencingPolicy policy = input.getReferencingPolicy();
+            final VarReferencingPolicy policy = input.getReferencingPolicy();
 
             if (policy == VarReferencingPolicy.IN || policy == VarReferencingPolicy.BOTH) {
-                GridBagConstraints gbc_dropZone = new GridBagConstraints();
+                final GridBagConstraints gbc_dropZone = new GridBagConstraints();
                 gbc_dropZone.anchor = GridBagConstraints.WEST;
                 gbc_dropZone.fill = GridBagConstraints.NONE;
                 gbc_dropZone.insets = new Insets(2, 0, 0, 0);
@@ -774,7 +791,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             }
 
             if (!blockDesc.isSingleBlock() && varEditor.isNameVisible()) {
-                GridBagConstraints gbc_inputName = new GridBagConstraints();
+                final GridBagConstraints gbc_inputName = new GridBagConstraints();
                 gbc_inputName.anchor = GridBagConstraints.CENTER;
                 gbc_inputName.fill = GridBagConstraints.HORIZONTAL;
                 gbc_inputName.insets = new Insets(2, 5, 0, 0);
@@ -785,7 +802,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             }
 
             if (inputComponent != null) {
-                GridBagConstraints gbc_inputComponent = new GridBagConstraints();
+                final GridBagConstraints gbc_inputComponent = new GridBagConstraints();
                 gbc_inputComponent.anchor = GridBagConstraints.CENTER;
                 gbc_inputComponent.fill = GridBagConstraints.BOTH;
                 gbc_inputComponent.insets = new Insets(2, 5, 0, 0);
@@ -811,7 +828,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             }
 
             if (policy == VarReferencingPolicy.OUT || policy == VarReferencingPolicy.BOTH) {
-                GridBagConstraints gbc_dragZone = new GridBagConstraints();
+                final GridBagConstraints gbc_dragZone = new GridBagConstraints();
                 gbc_dragZone.anchor = GridBagConstraints.EAST;
                 gbc_dragZone.fill = GridBagConstraints.NONE;
                 gbc_dragZone.insets = new Insets(2, 5, 0, 0);
@@ -822,8 +839,8 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             row++;
         }
 
-        for (Var<?> output : blockDesc.outputVars) {
-            GridBagConstraints gbc_outputName = new GridBagConstraints();
+        for (final Var<?> output : blockDesc.outputVars) {
+            final GridBagConstraints gbc_outputName = new GridBagConstraints();
             gbc_outputName.fill = GridBagConstraints.NONE;
             gbc_outputName.anchor = GridBagConstraints.EAST;
             gbc_outputName.insets = new Insets(2, 0, 0, 0);
@@ -834,8 +851,8 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                 gbc_outputName.insets.right = 5;
             }
 
-            JLabel label = new JLabel(output.getName());
-            Dimension dim = label.getPreferredSize();
+            final JLabel label = new JLabel(output.getName());
+            final Dimension dim = label.getPreferredSize();
             dim.height = 20;
             label.setPreferredSize(dim);
 
@@ -843,7 +860,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                 if (!varEditors.containsKey(output))
                     varEditors.put(output, createVarEditor(output));
 
-                JPanel panel = new JPanel(new FlowLayout());
+                final JPanel panel = new JPanel(new FlowLayout());
                 panel.add(label);
                 panel.add((JComponent) varEditors.get(output).getEditorComponent());
                 //panel.setOpaque(false);
@@ -855,7 +872,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
             if (!varDragZones.containsKey(output))
                 varDragZones.put(output, createVarDragZone(output, true));
-            GridBagConstraints gbc_dragZone = new GridBagConstraints();
+            final GridBagConstraints gbc_dragZone = new GridBagConstraints();
             gbc_dragZone.anchor = GridBagConstraints.EAST;
             gbc_dragZone.fill = GridBagConstraints.NONE;
             gbc_dragZone.insets = new Insets(2, 0, 0, 0);
@@ -868,66 +885,12 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     protected void drawTitle() {
-        int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
+        final int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
         bID.setText(String.valueOf(id));
         updateStatusIcon(blockDesc.getStatus());
     }
 
-    @Deprecated
-    protected void drawTitleOld() {
-        GridBagConstraints gbc_icon = new GridBagConstraints();
-        gbc_icon.insets = new Insets(0, BORDER_SIZE_X, 4, 2);
-        gbc_icon.gridx = 0;
-        gbc_icon.gridy = 0;
-        gbc_icon.anchor = GridBagConstraints.WEST;
-        gbc_icon.fill = GridBagConstraints.NONE;
-        jPanelTitle.add(bMenu, gbc_icon);
-
-        gbc_icon.insets = new Insets(0, -1, 4, 2);
-        gbc_icon.gridx = 1;
-        jPanelTitle.add(bRunUntilHere, gbc_icon);
-
-        bRunUntilHere.setToolTipText("<html><h4>Run the work-flow until this block (inclusive)</h4></html>");
-
-        GridBagConstraints gbc_name = new GridBagConstraints();
-        gbc_name.insets = new Insets(0, 3, 4, 3);
-        gbc_name.anchor = GridBagConstraints.CENTER;
-        gbc_name.fill = GridBagConstraints.HORIZONTAL;
-        gbc_name.gridx = 2;
-        gbc_name.gridy = 0;
-        gbc_name.weightx = 1;
-        name.setFont(name.getFont().deriveFont(Font.BOLD + Font.ITALIC, 12));
-        jPanelTitle.add(name, gbc_name);
-
-        int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
-        GridBagConstraints gbc_id = new GridBagConstraints();
-        gbc_id.insets = new Insets(0, 0, 4, 0);
-        gbc_id.gridx = 3;
-        gbc_id.gridy = 0;
-        gbc_id.anchor = GridBagConstraints.EAST;
-        gbc_id.fill = GridBagConstraints.HORIZONTAL;
-        //BufferedImage idImage = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB);
-        //Graphics2D g = idImage.createGraphics();
-        //g.setColor(Color.black);
-        //g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        //g.setFont(new Font(id > 99 ? "Arial Narrow" : "Arial", Font.BOLD, id > 99 ? 12 : 13));
-        //GraphicsUtil.drawCenteredString(g, "" + id, ICON_SIZE / 2, 1 + ICON_SIZE / 2, false);
-        //bID.setIcon(new ImageIcon(idImage));
-        bID.setText(String.valueOf(id));
-        jPanelTitle.add(bID, gbc_id);
-
-        GridBagConstraints gbc_right = new GridBagConstraints();
-        gbc_right.insets = new Insets(0, 0, 4, 6);
-        gbc_right.gridx = 4;
-        gbc_right.gridy = 0;
-        gbc_right.anchor = GridBagConstraints.EAST;
-        gbc_right.fill = GridBagConstraints.HORIZONTAL;
-        jPanelTitle.add(bStatus, gbc_right);
-
-        updateStatusIcon(blockDesc.getStatus());
-    }
-
-    private void updateStatusIcon(BlockStatus status) {
+    private void updateStatusIcon(final BlockStatus status) {
         switch (status) {
             case READY:
                 bStatus.setIcon(ICON_READY);
@@ -952,44 +915,44 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         return workFlowPane;
     }
 
-    public DragDropZone getDragZone(Var<?> input) {
+    public DragDropZone getDragZone(final Var<?> input) {
         return varDragZones.get(input);
     }
 
-    public DragDropZone getDropZone(Var<?> output) {
+    public DragDropZone getDropZone(final Var<?> output) {
         return varDropZones.get(output);
     }
 
     /**
      * @param output the output variable to retrieve
-     * @return The right-hand border of the drag zone for the specifed output variable (or the edge
+     * @return The right-hand border of the drag zone for the specified output variable (or the edge
      * of the panel if minimized). Coordinates are given relatively to this panel's top
      * left-hand corner
      */
-    public Point getDragZoneLocation(Var<?> output) {
+    public Point getDragZoneLocation(final Var<?> output) {
         if (blockDesc.isCollapsed() && !(this instanceof WorkFlowPanel))
             return new Point(getX() + getWidth() - SHADOW_SIZE, getY() + getHeight() / 2);
 
-        DragDropZone dz = getDragZone(output);
+        final DragDropZone dz = getDragZone(output);
         if (!dz.isVisible())
             return new Point(getX() + getWidth() - SHADOW_SIZE, getY() + getHeight() / 2);
 
-        int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
-        int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
+        final int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
+        final int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
 
         return new Point(x + dz.getWidth(), y + dz.getHeight() / 2);
     }
 
-    public Point getDropZoneLocation(Var<?> input) {
+    public Point getDropZoneLocation(final Var<?> input) {
         if (blockDesc.isCollapsed() && !(this instanceof WorkFlowPanel))
             return new Point(getX() + SHADOW_SIZE, getY() + getHeight() / 2);
 
-        DragDropZone dz = getDropZone(input);
+        final DragDropZone dz = getDropZone(input);
         if (!dz.isVisible())
             return new Point(getX() + SHADOW_SIZE, getY() + getHeight() / 2);
 
-        int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
-        int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
+        final int x = dz.getLocationOnScreen().x - getParent().getLocationOnScreen().x;
+        final int y = dz.getLocationOnScreen().y - getParent().getLocationOnScreen().y;
         return new Point(x, y + dz.getHeight() / 2);
     }
 
@@ -1019,7 +982,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         return super.getPreferredSize();
     }
 
-    public VarEditor<?> getVarEditor(Var<?> variable) {
+    public VarEditor<?> getVarEditor(final Var<?> variable) {
         return varEditors.get(variable);
     }
 
@@ -1035,7 +998,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     @Override
-    public void setBounds(int x, int y, int width, int height) {
+    public void setBounds(final int x, final int y, final int width, final int height) {
         if (width == getWidth() && height == getHeight() && x == getX() && y == getY())
             return;
 
@@ -1053,7 +1016,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         super.setBounds(x, y, width, height);
     }
 
-    protected void setResizeable(boolean resizeable) {
+    protected void setResizeable(final boolean resizeable) {
         mouseAdapter.setResizeable(resizeable);
     }
 
@@ -1065,7 +1028,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
     }
 
-    public void setSelected(boolean selected) {
+    public void setSelected(final boolean selected) {
         this.selected = selected;
     }
 

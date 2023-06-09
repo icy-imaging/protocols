@@ -1,9 +1,27 @@
-package plugins.adufour.blocks.lang;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.io.File;
+package plugins.adufour.blocks.lang;
 
 import icy.file.Loader;
 import plugins.adufour.vars.lang.VarSequence;
+
+import java.io.File;
 
 /**
  * Similar to the {@link FileBatch File batch}, a Sequence file batch will read
@@ -32,7 +50,7 @@ public class SequenceFileBatch extends FileBatch {
     }
 
     @Override
-    public boolean accept(File f) {
+    public boolean accept(final File f) {
         return f.isDirectory() || super.accept(f) && Loader.isSupportedImageFile(f.getPath());
     }
 
@@ -42,7 +60,7 @@ public class SequenceFileBatch extends FileBatch {
             element.setValue(Loader.loadSequence(files[getIterationCounter().getValue()].getPath(), 0, false));
             Thread.yield();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Thread.currentThread().interrupt();
         }
     }

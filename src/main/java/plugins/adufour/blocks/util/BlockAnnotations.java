@@ -1,29 +1,35 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.util;
 
 import icy.plugin.abstract_.Plugin;
 import icy.sequence.Sequence;
+import plugins.adufour.blocks.lang.Block;
+import plugins.adufour.vars.lang.*;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import plugins.adufour.blocks.lang.Block;
-import plugins.adufour.vars.lang.Var;
-import plugins.adufour.vars.lang.VarBoolean;
-import plugins.adufour.vars.lang.VarDouble;
-import plugins.adufour.vars.lang.VarFile;
-import plugins.adufour.vars.lang.VarFloat;
-import plugins.adufour.vars.lang.VarInteger;
-import plugins.adufour.vars.lang.VarSequence;
-import plugins.adufour.vars.lang.VarString;
 
 /**
  * Utility class that parses block annotations and generates blocks from valid methods
@@ -60,7 +66,7 @@ public class BlockAnnotations {
         String value();
     }
 
-    public static Class<?> getInnerType(Class<? extends Var<?>> variableClass) {
+    public static Class<?> getInnerType(final Class<? extends Var<?>> variableClass) {
         if (variableClass == VarInteger.class) return Integer.class;
 
         if (variableClass == VarDouble.class) return Double.class;
@@ -78,7 +84,7 @@ public class BlockAnnotations {
         throw new UnsupportedOperationException("Unsupported type: " + variableClass.getSimpleName());
     }
 
-    public static Class<? extends Var<?>> getVariableType(Class<?> clazz) {
+    public static Class<? extends Var<?>> getVariableType(final Class<?> clazz) {
         if (clazz == Integer.class) return VarInteger.class;
 
         if (clazz == Double.class) return VarDouble.class;
@@ -96,17 +102,17 @@ public class BlockAnnotations {
         throw new UnsupportedOperationException("Unsupported type: " + clazz.getSimpleName());
     }
 
-    public static ArrayList<BlockAnnotations> findBlockMethods(Class<? extends Plugin> clazz) {
+    public static ArrayList<BlockAnnotations> findBlockMethods(final Class<? extends Plugin> clazz) {
         final ArrayList<BlockAnnotations> blockDescriptors = new ArrayList<>();
 
-        Method[] methods = clazz.getDeclaredMethods();
+        final Method[] methods = clazz.getDeclaredMethods();
 
         for (final Method method : methods) {
             // make sure the method is static and annotated
 
             if (!Modifier.isStatic(method.getModifiers())) continue;
 
-            BlockMethod blockFunction = method.getAnnotation(BlockMethod.class);
+            final BlockMethod blockFunction = method.getAnnotation(BlockMethod.class);
             if (blockFunction == null) continue;
 
             blockDescriptors.add(new BlockAnnotations(method));
@@ -117,7 +123,7 @@ public class BlockAnnotations {
 
     private final Method method;
 
-    public BlockAnnotations(Method method) {
+    public BlockAnnotations(final Method method) {
         this.method = method;
     }
 
@@ -136,35 +142,35 @@ public class BlockAnnotations {
             @Override
             public void run() {
                 try {
-                    Object[] arguments = new Object[inputMap.size()];
-                    Iterator<Var<?>> inputIterator = inputMap.iterator();
+                    final Object[] arguments = new Object[inputMap.size()];
+                    final Iterator<Var<?>> inputIterator = inputMap.iterator();
 
                     for (int i = 0; i < arguments.length; i++)
                         arguments[i] = inputIterator.next().getValue();
 
-                    Object result = method.invoke(null, arguments);
+                    final Object result = method.invoke(null, arguments);
 
                     if (outputVariable != null) outputVariable.setValue(result);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     e.printStackTrace();
                 }
             }
 
             @Override
-            public void declareOutput(VarList outputMap) {
+            public void declareOutput(final VarList outputMap) {
                 try {
-                    Class<?> returnType = method.getReturnType();
+                    final Class<?> returnType = method.getReturnType();
                     if (returnType == Void.TYPE) {
                         outputVariable = null;
                     }
                     else {
-                        Class<? extends Var<?>> outputVarClass = getVariableType(returnType);
-                        Constructor<? extends Var<?>> outputConstructor = outputVarClass.getDeclaredConstructor(String.class, returnType);
+                        final Class<? extends Var<?>> outputVarClass = getVariableType(returnType);
+                        final Constructor<? extends Var<?>> outputConstructor = outputVarClass.getDeclaredConstructor(String.class, returnType);
                         outputVariable = outputConstructor.newInstance("output (" + returnType.getSimpleName() + ")", null);
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     e.printStackTrace();
                 }
 
@@ -172,29 +178,29 @@ public class BlockAnnotations {
             }
 
             @Override
-            public void declareInput(VarList theInputMap) {
+            public void declareInput(final VarList theInputMap) {
                 this.inputMap = theInputMap;
 
                 try {
-                    Class<?>[] types = method.getParameterTypes();
-                    Annotation[][] annotations = method.getParameterAnnotations();
+                    final Class<?>[] types = method.getParameterTypes();
+                    final Annotation[][] annotations = method.getParameterAnnotations();
 
                     for (int i = 0; i < types.length; i++) {
-                        Class<?> parameterClass = types[i];
+                        final Class<?> parameterClass = types[i];
                         String parameterName = parameterClass.getSimpleName();
 
-                        for (Annotation annotation : annotations[i])
+                        for (final Annotation annotation : annotations[i])
                             if (annotation.annotationType() == BlockInput.class) {
                                 parameterName = ((BlockInput) annotation).value();
                             }
 
-                        Class<? extends Var<?>> inputVarClass = getVariableType(parameterClass);
-                        Constructor<? extends Var<?>> inputConstructor = inputVarClass.getDeclaredConstructor(String.class, parameterClass);
-                        Var<?> instance = inputConstructor.newInstance(parameterName, null);
+                        final Class<? extends Var<?>> inputVarClass = getVariableType(parameterClass);
+                        final Constructor<? extends Var<?>> inputConstructor = inputVarClass.getDeclaredConstructor(String.class, parameterClass);
+                        final Var<?> instance = inputConstructor.newInstance(parameterName, null);
                         theInputMap.add(instance.getName(), instance);
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     e.printStackTrace();
                 }
             }

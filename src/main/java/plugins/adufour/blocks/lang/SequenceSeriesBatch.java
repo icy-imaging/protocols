@@ -1,7 +1,22 @@
-package plugins.adufour.blocks.lang;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.io.File;
-import java.io.IOException;
+package plugins.adufour.blocks.lang;
 
 import icy.common.exception.UnsupportedFormatException;
 import icy.file.Loader;
@@ -14,11 +29,14 @@ import plugins.adufour.vars.lang.VarSequence;
 import plugins.adufour.vars.util.VarException;
 import plugins.kernel.importer.LociImporterPlugin;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
- * A Sequence series batch will iteratively load all series contained in a multi-series (e.g. Leica
- * .lif) file, allowing to process all the series with a single work-flow. It can be used in
- * combination with the {@link FileBatch File batch} to batch process entire folders of multi-series
- * files.
+ * A Sequence series batch will iteratively load all series contained in a multi-series
+ * (e.g. Leica.lif) file, allowing to process all the series with a single work-flow.
+ * It can be used in combination with the {@link FileBatch File batch} to batch process
+ * entire folders of multi-series files.
  *
  * @author Alexandre Dufour
  */
@@ -57,11 +75,11 @@ public class SequenceSeriesBatch extends Batch {
         if (multiSeriesFile.getValue() == null)
             throw new VarException(multiSeriesFile, "No file indicated");
 
-        File f = multiSeriesFile.getValue();
+        final File f = multiSeriesFile.getValue();
         if (f.isDirectory())
             throw new VarException(multiSeriesFile, f.getAbsolutePath() + " is not a file");
 
-        String path = f.getPath();
+        final String path = f.getPath();
 
         try {
             final SequenceFileImporter importer = Loader.getSequenceFileImporter(path, true);
@@ -72,13 +90,13 @@ public class SequenceSeriesBatch extends Batch {
 
             nbSeries = MetaDataUtil.getNumSeries(Loader.getOMEXMLMetaData(importer, path));
         }
-        catch (UnsupportedFormatException e) {
+        catch (final UnsupportedFormatException e) {
             throw new VarException(multiSeriesFile, path + " is not an imaging file");
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new VarException(multiSeriesFile, "Unable to read " + path);
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             throw new VarException(multiSeriesFile, "Process interrupted !");
         }
     }

@@ -1,28 +1,45 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools.roi;
 
 import icy.plugin.abstract_.Plugin;
 import icy.roi.ROI;
 import icy.type.point.Point5D;
-
-import java.awt.geom.Point2D;
-
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarInteger;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.kernel.roi.roi2d.ROI2DArea;
 import plugins.kernel.roi.roi3d.ROI3DArea;
 
+import java.awt.geom.Point2D;
+
 public class TranslateROI extends Plugin implements ROIBlock {
-    VarROIArray inputROI = new VarROIArray("Input ROI");
+    private final VarROIArray inputROI = new VarROIArray("Input ROI");
 
-    VarInteger xShift = new VarInteger("X shift", 0);
-    VarInteger yShift = new VarInteger("Y shift", 0);
-    VarInteger zShift = new VarInteger("Z shift", 0);
+    private final VarInteger xShift = new VarInteger("X shift", 0);
+    private final VarInteger yShift = new VarInteger("Y shift", 0);
+    private final VarInteger zShift = new VarInteger("Z shift", 0);
 
-    VarROIArray outputROI = new VarROIArray("Translated ROI");
+    private final VarROIArray outputROI = new VarROIArray("Translated ROI");
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("input ROI", inputROI);
         inputMap.add("X shift", xShift);
         inputMap.add("Y shift", yShift);
@@ -30,7 +47,7 @@ public class TranslateROI extends Plugin implements ROIBlock {
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("output ROI", outputROI);
     }
 
@@ -38,12 +55,12 @@ public class TranslateROI extends Plugin implements ROIBlock {
     public void run() {
         outputROI.setValue(new ROI[0]);
 
-        for (ROI roi : inputROI) {
+        for (final ROI roi : inputROI) {
             if (Thread.currentThread().isInterrupted()) break;
 
             if (roi.canSetPosition()) {
-                ROI shiftedROI = roi.getCopy();
-                Point5D pos = shiftedROI.getPosition5D();
+                final ROI shiftedROI = roi.getCopy();
+                final Point5D pos = shiftedROI.getPosition5D();
                 pos.setX(pos.getX() + xShift.getValue());
                 pos.setY(pos.getY() + yShift.getValue());
                 pos.setZ(pos.getZ() + zShift.getValue());
@@ -52,12 +69,12 @@ public class TranslateROI extends Plugin implements ROIBlock {
             }
             else {
                 if (roi instanceof ROI3DArea) {
-                    ROI3DArea shiftedROI = new ROI3DArea();
+                    final ROI3DArea shiftedROI = new ROI3DArea();
 
-                    for (ROI2DArea slice : (ROI3DArea) roi) {
-                        ROI2DArea sliceCopy = (ROI2DArea) slice.getCopy();
+                    for (final ROI2DArea slice : (ROI3DArea) roi) {
+                        final ROI2DArea sliceCopy = (ROI2DArea) slice.getCopy();
 
-                        Point2D p2 = slice.getPosition2D();
+                        final Point2D p2 = slice.getPosition2D();
                         p2.setLocation(p2.getX() + xShift.getValue(), p2.getY() + yShift.getValue());
                         sliceCopy.setPosition2D(p2);
 
@@ -67,8 +84,6 @@ public class TranslateROI extends Plugin implements ROIBlock {
                     outputROI.add(shiftedROI);
                 }
             }
-
         }
     }
-
 }

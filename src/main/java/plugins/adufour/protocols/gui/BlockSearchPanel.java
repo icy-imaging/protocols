@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.protocols.gui;
 
 import icy.gui.component.IcyTextFieldHint;
@@ -10,21 +28,12 @@ import japa.parser.JavaParser;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.JavadocComment;
 import japa.parser.ast.body.TypeDeclaration;
+import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import plugins.adufour.blocks.util.BlocksFinder;
+import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
+import plugins.adufour.blocks.util.MenuItemListener;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.io.InputStream;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -33,11 +42,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
-import plugins.adufour.blocks.util.BlocksFinder;
-import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
-import plugins.adufour.blocks.util.MenuItemListener;
+import java.awt.*;
+import java.io.InputStream;
 
 /**
  * A search panel for the Protocols interface, where blocks can be found by keyword search
@@ -87,14 +93,14 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
         // calls the search function when typing in the search bar
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void removeUpdate(DocumentEvent arg0) {
+            public void removeUpdate(final DocumentEvent arg0) {
                 blockList.removeAll();
                 if (searchField.getText().length() >= MIN_CHARACTERS_FOR_SEARCH) updateBlockList();
                 else blockList.setVisible(false);
             }
 
             @Override
-            public void insertUpdate(DocumentEvent arg0) {
+            public void insertUpdate(final DocumentEvent arg0) {
                 blockList.removeAll();
                 if (searchField.getText().length() >= MIN_CHARACTERS_FOR_SEARCH) {
                     updateBlockList();
@@ -103,7 +109,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
             }
 
             @Override
-            public void changedUpdate(DocumentEvent arg0) {
+            public void changedUpdate(final DocumentEvent arg0) {
             }
         });
         searchBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -141,7 +147,8 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
         add(results, BorderLayout.CENTER);
     }
 
-    public Component add(Component c) {
+    @Override
+    public Component add(final Component c) {
         return blockList.add(c);
     }
 
@@ -153,13 +160,14 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
     }
 
     /**
-     * updates the block documentation with it's annotations
+     * updates the block documentation with its annotations
      *
      * @param d the plugin descriptor
      */
-    public void displayDoc(PluginDescriptor d) {
+    @Override
+    public void displayDoc(final PluginDescriptor d) {
         // highlight the selected block
-        for (Component c : blockList.getComponents()) {
+        for (final Component c : blockList.getComponents()) {
             if (d == ((DND_MenuItem) c).getDescriptor()) {
                 c.setBackground(c.getBackground());
             }
@@ -168,7 +176,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
             }
         }
 
-        Class<? extends Plugin> _class = d.getPluginClass();
+        final Class<? extends Plugin> _class = d.getPluginClass();
 
         String name = d.getName();
         final StringBuilder description = new StringBuilder("<h3>Public description:</h3>");
@@ -199,15 +207,15 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
 
         // add JavaDoc (if available) to the description
         try {
-            InputStream stream = d.getPluginClass().getResourceAsStream(d.getSimpleClassName() + ".java");
-            CompilationUnit unit = JavaParser.parse(stream); // retrieve the block's source file
+            final InputStream stream = d.getPluginClass().getResourceAsStream(d.getSimpleClassName() + ".java");
+            final CompilationUnit unit = JavaParser.parse(stream); // retrieve the block's source file
             if (stream != null)
                 stream.close();
 
             if (unit.getComments() != null) {
                 // get the first declared type (should be the main class per Java convention)
-                TypeDeclaration declaration = unit.getTypes().get(0);
-                JavadocComment doc = declaration.getJavaDoc();
+                final TypeDeclaration declaration = unit.getTypes().get(0);
+                final JavadocComment doc = declaration.getJavaDoc();
 
                 // the "real" new line markers are "<br/>\n" or "* \n"
                 // to split them all at once, replace one by the other
@@ -215,7 +223,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
                 String docString = doc.getContent().trim().replace("* \n", "<br/>\n");
                 // now remove "fake" new line markers
                 docString = docString.replace("* ", "").replace("\n", "");
-                String[] lines = docString.split("<br/> ");
+                final String[] lines = docString.split("<br/> ");
 
                 if (lines.length > 0) {
                     description.append("<h3>Developer documentation:</h3>");
@@ -230,11 +238,11 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
                         else {
                             while (line.contains("@link")) {
                                 // hide links (for now)
-                                int start = line.indexOf("{@link");
-                                int end = line.indexOf("}", start);
-                                String link = line.substring(start, end + 1);
+                                final int start = line.indexOf("{@link");
+                                final int end = line.indexOf("}", start);
+                                final String link = line.substring(start, end + 1);
                                 // if the link has a name after the target, use it
-                                String[] linkWords = link.substring(7, link.length() - 1).split(" ");
+                                final String[] linkWords = link.substring(7, link.length() - 1).split(" ");
                                 final StringBuilder linkReplacement = new StringBuilder("<b>");
                                 if (linkWords.length == 1) {
                                     linkReplacement.append(linkWords[0]);
@@ -255,8 +263,8 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
                 }
             }
         }
-        catch (Exception e) {
-            // the source file probably wasn't found. Don't bother then...
+        catch (final Exception e) {
+            // The source file probably wasn't found. Don't bother then...
         }
 
         String doc = "<html><body style=\"font-family: Tahoma\">";
@@ -276,23 +284,26 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
 
         private static class MySplitPaneDivider extends BasicSplitPaneDivider {
 
-            public MySplitPaneDivider(BasicSplitPaneUI ui) {
+            public MySplitPaneDivider(final BasicSplitPaneUI ui) {
                 super(ui);
             }
 
+            @Override
             protected JButton createLeftOneTouchButton() {
-                JButton button = super.createLeftOneTouchButton();
+                final JButton button = super.createLeftOneTouchButton();
                 button.setPreferredSize(new Dimension(40, 40));
                 return button;
             }
 
+            @Override
             protected JButton createRightOneTouchButton() {
-                JButton button = super.createRightOneTouchButton();
+                final JButton button = super.createRightOneTouchButton();
                 button.setPreferredSize(new Dimension(40, 40));
                 return button;
             }
         }
 
+        @Override
         public BasicSplitPaneDivider createDefaultDivider() {
             return new MySplitPaneDivider(this);
         }

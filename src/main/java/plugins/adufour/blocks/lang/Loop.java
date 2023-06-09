@@ -1,10 +1,24 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.lang;
 
 import icy.system.IcyHandledException;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.ReLoop;
 import plugins.adufour.blocks.util.BlocksException;
@@ -14,6 +28,9 @@ import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarBoolean;
 import plugins.adufour.vars.lang.VarInteger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Special work flow that will repeat its contents forever until is it manually stopped by the user.
@@ -42,7 +59,7 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    public BlockDescriptor getBlock(int blockID) {
+    public BlockDescriptor getBlock(final int blockID) {
         if (blockID == -1)
             return getBlockDescriptor();
 
@@ -50,17 +67,18 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    public BlockDescriptor getInputOwner(Var<?> var) {
+    public BlockDescriptor getInputOwner(final Var<?> var) {
         return loopVariables.contains(var) ? getBlockDescriptor() : super.getInputOwner(var);
     }
 
     @Override
-    public BlockDescriptor getOutputOwner(Var<?> var) {
+    public BlockDescriptor getOutputOwner(final Var<?> var) {
         return loopVariables.contains(var) ? getBlockDescriptor() : super.getOutputOwner(var);
     }
 
-    public String getInputVarID(Var<?> variable) {
-        for (Var<?> innerVar : loopVariables)
+    @Override
+    public String getInputVarID(final Var<?> variable) {
+        for (final Var<?> innerVar : loopVariables)
             if (variable == innerVar) {
                 return getBlockDescriptor().inputVars.getID(variable);
             }
@@ -68,8 +86,9 @@ public class Loop extends WorkFlow {
         return super.getInputVarID(variable);
     }
 
-    public String getOutputVarID(Var<?> variable) {
-        for (Var<?> innerVar : loopVariables)
+    @Override
+    public String getOutputVarID(final Var<?> variable) {
+        for (final Var<?> innerVar : loopVariables)
             if (variable == innerVar) {
                 return getBlockDescriptor().outputVars.getID(variable);
             }
@@ -82,23 +101,10 @@ public class Loop extends WorkFlow {
     }
 
     /**
-     * Adds the specified variable to the list of inner loop variables, i.e., variables describing
-     * the parameters of the loop, which can be referenced from inside the loop by other blocks.
-     *
-     * @param loopVar the variable to register
-     * @deprecated The process of declaring loop variables has changed. Override
-     * {@link #declareLoopVariables(List)} instead.
-     */
-    @Deprecated
-    protected void addLoopVariable(Var<?> loopVar) {
-        loopVariables.add(loopVar);
-    }
-
-    /**
      * @param var the variable to look for
      * @return true if <code>var</code> is a loop variable, false otherwise
      */
-    public boolean isLoopVariable(Var<?> var) {
+    public boolean isLoopVariable(final Var<?> var) {
         return loopVariables.contains(var);
     }
 
@@ -111,14 +117,14 @@ public class Loop extends WorkFlow {
         iterationCounter.setValue(0);
         initializeLoop();
 
-        List<IcyHandledException> exceptions = new ArrayList<>();
+        final List<IcyHandledException> exceptions = new ArrayList<>();
 
         while (!Thread.currentThread().isInterrupted() && !isStopConditionReached()) {
             // FIXED (Stephane)
             // we need to reset to dirty state for all contained blocks before the iteration
             // as we never expect any contained block to keep value from previous iteration
 
-            for (BlockDescriptor block : this) {
+            for (final BlockDescriptor block : this) {
                 // put block back in dirty state
                 if (block.getStatus() == BlockStatus.READY)
                     block.setStatus(BlockStatus.DIRTY);
@@ -129,7 +135,7 @@ public class Loop extends WorkFlow {
             try {
                 super.run();
             }
-            catch (IcyHandledException e) {
+            catch (final IcyHandledException e) {
                 exceptions.add(e);
                 if (stopOnFirstError.getValue())
                     break;
@@ -140,10 +146,10 @@ public class Loop extends WorkFlow {
         }
 
         if (exceptions.size() > 0) {
-            String message = "The following errors occurred during the loop:\n\n";
-            for (Exception e : exceptions)
-                message += " - " + e.getMessage() + "\n";
-            throw new BlocksException(message, true);
+            final StringBuilder message = new StringBuilder("The following errors occurred during the loop:\n\n");
+            for (final Exception e : exceptions)
+                message.append(" - ").append(e.getMessage()).append("\n");
+            throw new BlocksException(message.toString(), true);
         }
     }
 
@@ -171,7 +177,7 @@ public class Loop extends WorkFlow {
      * iteration counter is automatically increased before calling this method.
      */
     public void afterIteration() {
-        // release other threads for a very short time
+        // release other threads for a brief time
         // (especially the AWT, to receive user interruption and display stuff)
         Thread.yield();
 
@@ -189,11 +195,11 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    protected <T> void checkScope(Link<T> link) throws ScopeException {
+    protected <T> void checkScope(final Link<T> link) throws ScopeException {
         try {
             super.checkScope(link);
         }
-        catch (ScopeException e) {
+        catch (final ScopeException e) {
             // authorize links coming from variable loops
             if (!loopVariables.contains(link.srcVar))
                 throw e;
@@ -201,14 +207,14 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    protected <T> void checkLoop(Link<T> link) throws LoopException {
+    protected <T> void checkLoop(final Link<T> link) throws LoopException {
         try {
             super.checkLoop(link);
         }
-        catch (LoopException e) {
+        catch (final LoopException e) {
             // authorize loops only if the destination is a "ReLoop" block
             if (link.dstBlock.getBlock() instanceof ReLoop) {
-                ReLoop reLoop = (ReLoop) link.dstBlock.getBlock();
+                final ReLoop reLoop = (ReLoop) link.dstBlock.getBlock();
 
                 if (link.dstVar == reLoop.reloopValue)
                     return;
@@ -219,7 +225,7 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         super.declareOutput(outputMap);
 
         iterationCounter = new VarInteger("iteration", 0);
@@ -234,7 +240,7 @@ public class Loop extends WorkFlow {
      *
      * @param loopVars the variable to register
      */
-    public void declareLoopVariables(List<Var<?>> loopVars) {
+    public void declareLoopVariables(final List<Var<?>> loopVars) {
         // a loop has no inner variable
     }
 }

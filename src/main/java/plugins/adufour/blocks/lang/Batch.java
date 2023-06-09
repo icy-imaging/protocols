@@ -1,7 +1,22 @@
-package plugins.adufour.blocks.lang;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.lang.reflect.Array;
-import java.util.List;
+package plugins.adufour.blocks.lang;
 
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
@@ -11,10 +26,14 @@ import plugins.adufour.vars.lang.VarMutableArray;
 import plugins.adufour.vars.util.VarException;
 import plugins.adufour.vars.util.VarListener;
 
+import java.lang.reflect.Array;
+import java.util.List;
+
 /**
- * A batch is a particular type of work-flow that will execute repeatedly for every element of a
- * list of items, allowing to process all list items with a same work-flow. This is the most generic
- * type of batch available, however there are more user-friendly versions available, such as for
+ * A batch is a particular type of work-flow that will execute repeatedly for every element of an
+ * item list, allowing to process all list items with the same work-flow.<br>
+ * This is the most generic type of batch available.<br>
+ * However, there are more user-friendly versions available, such as for
  * instance a {@link FileBatch File batch} or a {@link SequenceFileBatch Sequence file batch}.
  *
  * @author Alexandre Dufour
@@ -25,7 +44,7 @@ public class Batch extends Loop {
     private VarMutable element;
 
     /**
-     * Defines the variable used to determine the list of objects to batch process.<br>
+     * Defines the variable used to determine the list of objects to the batch process.<br>
      * By default, this variable is simply a {@link VarArray} containing the elements to process,
      * but overriding classes may provide special functionalities.
      *
@@ -34,17 +53,17 @@ public class Batch extends Loop {
      * @see SequenceFileBatch#getBatchSource()
      * @see SequenceSeriesBatch#getBatchSource()
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked"})
     public Var<?> getBatchSource() {
         if (array == null) {
             array = new VarMutableArray("array", null);
-            array.addListener(new VarListener() {
+            array.addListener(new VarListener<>() {
                 @Override
-                public void valueChanged(Var source, Object oldValue, Object newValue) {
+                public void valueChanged(final Var source, final Object oldValue, final Object newValue) {
                 }
 
                 @Override
-                public void referenceChanged(Var source, Var oldReference, Var newReference) {
+                public void referenceChanged(final Var source, final Var oldReference, final Var newReference) {
                     if (oldReference == null) {
                         if (newReference != null) {
                             element.setType(newReference.getType().getComponentType());
@@ -104,19 +123,19 @@ public class Batch extends Loop {
     }
 
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         super.declareInput(inputMap);
 
-        Var<?> batchSource = getBatchSource();
+        final Var<?> batchSource = getBatchSource();
 
         inputMap.add(batchSource.getName(), getBatchSource());
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         super.declareOutput(outputMap);
 
-        Var<?> batchElement = getBatchElement();
+        final Var<?> batchElement = getBatchElement();
 
         outputMap.add(batchElement.getName(), batchElement);
     }
@@ -128,7 +147,7 @@ public class Batch extends Loop {
      * the batch as loop variables, therefore they don't need to be declared by overriding classes
      */
     @Override
-    public void declareLoopVariables(List<Var<?>> loopVariables) {
+    public void declareLoopVariables(final List<Var<?>> loopVariables) {
         loopVariables.add(getBatchSource());
         loopVariables.add(getBatchElement());
     }

@@ -1,6 +1,22 @@
-package plugins.adufour.blocks.tools;
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.lang.reflect.Array;
+package plugins.adufour.blocks.tools;
 
 import icy.plugin.abstract_.Plugin;
 import plugins.adufour.blocks.util.VarList;
@@ -11,18 +27,20 @@ import plugins.adufour.vars.lang.VarTrigger;
 import plugins.adufour.vars.util.TypeChangeListener;
 import plugins.adufour.vars.util.VarReferencingPolicy;
 
+import java.lang.reflect.Array;
+
 public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListener {
-    Class<?> type = null;
+    private Class<?> type = null;
 
-    VarList inputMap;
+    private VarList inputMap;
 
-    VarMutable output = new VarMutable("output", null);
+    private final VarMutable output = new VarMutable("output", null);
 
     @Override
     public void run() {
         int arrayLength = 0;
 
-        for (Var<?> var : inputMap) {
+        for (final Var<?> var : inputMap) {
             if (var.getValue() == null || var instanceof VarTrigger) continue;
 
             if (var.getValue().getClass().isArray()) {
@@ -31,14 +49,14 @@ public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListene
             else arrayLength++;
         }
 
-        Object array = Array.newInstance(type.getComponentType(), arrayLength);
+        final Object array = Array.newInstance(type.getComponentType(), arrayLength);
 
         int i = 0;
-        for (Var<?> var : inputMap) {
+        for (final Var<?> var : inputMap) {
             if (var.getValue() == null || var instanceof VarTrigger) continue;
 
             if (var.getValue().getClass().isArray()) {
-                int length = Array.getLength(var.getValue());
+                final int length = Array.getLength(var.getValue());
                 System.arraycopy(var.getValue(), 0, array, i, length);
                 i += length;
             }
@@ -48,37 +66,36 @@ public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListene
         output.setValue(array);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked"})
     @Override
     public void declareInput(final VarList theInputMap) {
         if (this.inputMap == null) {
             this.inputMap = theInputMap;
-            VarTrigger trigger = new VarTrigger("Add variable", new VarTrigger.TriggerListener() {
+            final VarTrigger trigger = new VarTrigger("Add variable", new VarTrigger.TriggerListener() {
                 @Override
-                public void valueChanged(Var<Integer> source, Integer oldValue, Integer newValue) {
+                public void valueChanged(final Var<Integer> source, final Integer oldValue, final Integer newValue) {
 
                 }
 
                 @Override
-                public void referenceChanged(Var<Integer> source, Var<? extends Integer> oldReference, Var<? extends Integer> newReference) {
+                public void referenceChanged(final Var<Integer> source, final Var<? extends Integer> oldReference, final Var<? extends Integer> newReference) {
 
                 }
 
                 @Override
-                public void triggered(VarTrigger source) {
+                public void triggered(final VarTrigger source) {
                     final VarMutable var = new VarMutable("input", type) {
-                        public boolean isAssignableFrom(Var aVariable) {
+                        @Override
+                        public boolean isAssignableFrom(final Var aVariable) {
                             if (this.type == null) return true;
 
                             if (super.isAssignableFrom(aVariable)) return true;
 
                             return type.getComponentType().isAssignableFrom(aVariable.getType());
                         }
-
-                        ;
                     };
                     var.addTypeChangeListener(Accumulator.this);
-                    theInputMap.addRuntimeVariable("" + var.hashCode(), var);
+                    theInputMap.addRuntimeVariable(String.valueOf(var.hashCode()), var);
                 }
             });
 
@@ -88,11 +105,11 @@ public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListene
 
             theInputMap.addVarListListener(new VarListListener() {
                 @Override
-                public void variableRemoved(VarList list, Var variable) {
+                public void variableRemoved(final VarList list, final Var<?> variable) {
                 }
 
                 @Override
-                public void variableAdded(VarList list, Var variable) {
+                public void variableAdded(final VarList list, final Var<?> variable) {
                     if (variable instanceof VarMutable) {
                         ((VarMutable) variable).addTypeChangeListener(Accumulator.this);
                     }
@@ -102,18 +119,18 @@ public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListene
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
         outputMap.add("output", output);
     }
 
     @Override
-    public void typeChanged(Object source, Class<?> oldType, Class<?> newType) {
+    public void typeChanged(final Object source, final Class<?> oldType, final Class<?> newType) {
         if (type == null) {
             this.type = (newType.isArray() ? newType : Array.newInstance(newType, 0).getClass());
 
             output.setType(type);
 
-            for (Var<?> var : inputMap) {
+            for (final Var<?> var : inputMap) {
                 if (var instanceof VarMutable) ((VarMutable) var).setType(type);
             }
         }

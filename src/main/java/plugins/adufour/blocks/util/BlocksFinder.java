@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.util;
 
 import icy.gui.component.menu.IcyMenu;
@@ -7,35 +25,6 @@ import icy.plugin.PluginDescriptor;
 import icy.plugin.PluginLoader;
 import icy.plugin.abstract_.Plugin;
 import icy.util.ClassUtil;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.TransferHandler;
-
 import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
@@ -53,6 +42,18 @@ import plugins.adufour.blocks.tools.sequence.SequenceBlock;
 import plugins.adufour.protocols.gui.BlockSearchPanel;
 import plugins.adufour.protocols.gui.block.WorkFlowContainer;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class BlocksFinder {
     /**
      * Indicates whether annotated methods should be parsed and made available as
@@ -65,6 +66,7 @@ public class BlocksFinder {
      *
      * @author Ludovic Laborde, Alexandre Dufour
      */
+    // FIXME: 08/06/2023 Replace PluginMenuItem dependency
     public static class DND_MenuItem extends PluginMenuItem implements MouseListener, Transferable, DragSourceListener, DragGestureListener {
         private final DragSource source;
         private final TransferHandler handler;
@@ -76,14 +78,15 @@ public class BlocksFinder {
             super(d);
             setOpaque(false);
 
-            for (MouseListener listener : getMouseListeners())
+            for (final MouseListener listener : getMouseListeners())
                 removeMouseListener(listener);
 
             descriptor = d;
             menuItemListeners = new ArrayList<>();
 
             handler = new TransferHandler() {
-                public Transferable createTransferable(JComponent c) {
+                @Override
+                public Transferable createTransferable(final JComponent c) {
                     return new DND_MenuItem(descriptor);
                 }
             };
@@ -100,12 +103,12 @@ public class BlocksFinder {
         }
 
         @Override
-        public void dragGestureRecognized(DragGestureEvent dge) {
+        public void dragGestureRecognized(final DragGestureEvent dge) {
             source.startDrag(dge, DragSource.DefaultMoveDrop, new DND_MenuItem(descriptor), this);
         }
 
         @Override
-        public Object getTransferData(DataFlavor flavor) {
+        public Object getTransferData(final DataFlavor flavor) {
             return this;
         }
 
@@ -115,69 +118,69 @@ public class BlocksFinder {
                 return new DataFlavor[]{
                         new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList")};
             }
-            catch (ClassNotFoundException e) {
+            catch (final ClassNotFoundException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
         @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
+        public boolean isDataFlavorSupported(final DataFlavor flavor) {
             return true;
         }
 
         @Override
-        public void mouseClicked(MouseEvent arg0) {
+        public void mouseClicked(final MouseEvent arg0) {
             setBackground(Color.GRAY);
             notifyListeners();
         }
 
-        public void addMenuItemListener(MenuItemListener l) {
+        public void addMenuItemListener(final MenuItemListener l) {
             menuItemListeners.add(l);
         }
 
         // updates the search panel
         private void notifyListeners() {
-            for (MenuItemListener l : menuItemListeners)
+            for (final MenuItemListener l : menuItemListeners)
                 l.displayDoc(descriptor);
         }
 
         @Override
-        public void dragDropEnd(DragSourceDropEvent dsde) {
+        public void dragDropEnd(final DragSourceDropEvent dsde) {
             setBackground(Color.GRAY);
             notifyListeners();
         }
 
         @Override
-        public void dragEnter(DragSourceDragEvent dsde) {
+        public void dragEnter(final DragSourceDragEvent dsde) {
         }
 
         @Override
-        public void dragExit(DragSourceEvent dse) {
+        public void dragExit(final DragSourceEvent dse) {
         }
 
         @Override
-        public void dragOver(DragSourceDragEvent dsde) {
+        public void dragOver(final DragSourceDragEvent dsde) {
         }
 
         @Override
-        public void dropActionChanged(DragSourceDragEvent dsde) {
+        public void dropActionChanged(final DragSourceDragEvent dsde) {
         }
 
         @Override
-        public void mouseEntered(MouseEvent arg0) {
+        public void mouseEntered(final MouseEvent arg0) {
         }
 
         @Override
-        public void mouseExited(MouseEvent arg0) {
+        public void mouseExited(final MouseEvent arg0) {
         }
 
         @Override
-        public void mousePressed(MouseEvent arg0) {
+        public void mousePressed(final MouseEvent arg0) {
         }
 
         @Override
-        public void mouseReleased(MouseEvent arg0) {
+        public void mouseReleased(final MouseEvent arg0) {
         }
     }
 
@@ -188,20 +191,19 @@ public class BlocksFinder {
      * @param menuContainer BlockSearchPanel
      * @param searchText    String
      */
-    public void createSearchMenu(BlockSearchPanel menuContainer, String searchText) {
-        ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
+    public void createSearchMenu(final BlockSearchPanel menuContainer, String searchText) {
+        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
 
         if (plugins.size() == 0) {
-            JMenuItem item = new JMenuItem(
-                    "The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
+            final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
             item.setFont(item.getFont().deriveFont(Font.ITALIC));
             menuContainer.add(item);
             return;
         }
 
-        for (PluginDescriptor descriptor : plugins) {
+        for (final PluginDescriptor descriptor : plugins) {
 
-            Class<? extends Plugin> _class = descriptor.getPluginClass();
+            final Class<? extends Plugin> _class = descriptor.getPluginClass();
             final Class<? extends Block> blockClass = _class.asSubclass(Block.class);
 
             if (ClassUtil.isAbstract(blockClass))
@@ -238,10 +240,10 @@ public class BlocksFinder {
             testString = testString.toLowerCase();
 
             searchText = searchText.trim().toLowerCase();
-            String searchTextNoSpaces = searchText.replace(" ", "");
+            final String searchTextNoSpaces = searchText.replace(" ", "");
 
             if (testString.contains(searchText) || testString.contains(searchTextNoSpaces)) {
-                DND_MenuItem menuItem = new DND_MenuItem(descriptor);
+                final DND_MenuItem menuItem = new DND_MenuItem(descriptor);
                 menuItem.addMenuItemListener(menuContainer);
                 menuItem.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
                 menuItem.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -269,7 +271,7 @@ public class BlocksFinder {
      * @param workFlowPane  WorkFlowContainer
      * @param location      Point
      */
-    public final void createJMenu(Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
+    public final void createJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
         final IcyMenu mnBlocks = new IcyMenu("Blocks...", GoogleMaterialDesignIcons.WIDGETS);
         //mnBlocks.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"), 22));
 
@@ -300,15 +302,14 @@ public class BlocksFinder {
         final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
 
         if (plugins.size() == 0) {
-            final IcyMenuItem item = new IcyMenuItem(
-                    "The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
+            final IcyMenuItem item = new IcyMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
             item.setFont(item.getFont().deriveFont(Font.ITALIC));
             menuContainer.add(item);
             return;
         }
 
-        for (PluginDescriptor descriptor : plugins) {
-            Class<? extends Plugin> clazz = descriptor.getPluginClass();
+        for (final PluginDescriptor descriptor : plugins) {
+            final Class<? extends Plugin> clazz = descriptor.getPluginClass();
             try {
                 final Class<? extends Block> blockClass = clazz.asSubclass(Block.class);
 
@@ -336,16 +337,14 @@ public class BlocksFinder {
                 menuItem.setText(name);
 
                 if (!descriptor.getDescription().isEmpty()) {
-                    menuItem.setToolTipText(
-                            "<html>" + descriptor.getDescription().replaceAll("\n", "<br/>") + "</html>"
-                    );
+                    menuItem.setToolTipText("<html>" + descriptor.getDescription().replaceAll("\n", "<br/>") + "</html>");
                 }
 
                 menuItem.addActionListener(arg0 -> {
                     try {
                         addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                     }
-                    catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+                    catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
                         e1.printStackTrace();
                     }
                 });
@@ -363,7 +362,7 @@ public class BlocksFinder {
                         try {
                             addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                         }
-                        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+                        catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
                             e1.printStackTrace();
                         }
                     });
@@ -400,17 +399,17 @@ public class BlocksFinder {
 
                 if (parseAnnotations) {
                     // find annotated methods
-                    ArrayList<BlockAnnotations> blocks = BlockAnnotations.findBlockMethods(clazz);
+                    final ArrayList<BlockAnnotations> blocks = BlockAnnotations.findBlockMethods(clazz);
 
                     for (final BlockAnnotations annotatedMethod : blocks) {
-                        IcyMenuItem item2 = new IcyMenuItem(clazz.getSimpleName() + "." + annotatedMethod.getName());
+                        final IcyMenuItem item2 = new IcyMenuItem(clazz.getSimpleName() + "." + annotatedMethod.getName());
                         item2.setToolTipText(annotatedMethod.getDescription());
                         item2.addActionListener(e -> addBlock(workFlowPane, annotatedMethod.createBlock(), location));
                         mnBlocks.add(item2);
                     }
                 }
             }
-            catch (ClassCastException e1) {
+            catch (final ClassCastException e1) {
                 // Ignore it
             }
         }
@@ -437,12 +436,12 @@ public class BlocksFinder {
 
         // and add the Display block last
 
-        IcyMenuItem mnDisp = new IcyMenuItem("Display", GoogleMaterialDesignIcons.VISIBILITY);
+        final IcyMenuItem mnDisp = new IcyMenuItem("Display", GoogleMaterialDesignIcons.VISIBILITY);
         mnDisp.addActionListener(arg0 -> {
             try {
                 addBlock(workFlowPane, Display.class.getDeclaredConstructor().newInstance(), location);
             }
-            catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+            catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }
         });
@@ -531,15 +530,14 @@ public class BlocksFinder {
         // });
 
         // In the meantime...
-        for (PluginDescriptor plugin : PluginLoader.getPlugins(WorkFlow.class)) {
-            JMenuItem menuItem = new JMenuItem(getFlattened(plugin.getName()));
-            final PluginDescriptor pf = plugin;
+        for (final PluginDescriptor plugin : PluginLoader.getPlugins(WorkFlow.class)) {
+            final JMenuItem menuItem = new JMenuItem(getFlattened(plugin.getName()));
 
             menuItem.addActionListener(arg0 -> {
                 try {
-                    workFlowPane.embedWorkFlow(pf.getPluginClass().asSubclass(WorkFlow.class));
+                    workFlowPane.embedWorkFlow(plugin.getPluginClass().asSubclass(WorkFlow.class));
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     e.printStackTrace();
                 }
             });
@@ -547,9 +545,8 @@ public class BlocksFinder {
         }
     }
 
-    private static void addBlock(WorkFlowContainer workFlowPane, Block block, Point location) {
-        BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor()
-                : new BlockDescriptor(-1, block));
+    private static void addBlock(final WorkFlowContainer workFlowPane, final Block block, final Point location) {
+        final BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor() : new BlockDescriptor(-1, block));
 
         blockDesc.setLocation(location.x, location.y);
 
@@ -564,8 +561,8 @@ public class BlocksFinder {
      * @param menu            the menu to break into smaller sub-menus
      * @param maxItemsPerMenu the maximum number of items to display in each sub-menu
      */
-    private void splitLongMenus(JMenu menu, int maxItemsPerMenu) {
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(menu.getPopupMenu().getComponents()));
+    private void splitLongMenus(final JMenu menu, final int maxItemsPerMenu) {
+        final ArrayList<Component> components = new ArrayList<>(Arrays.asList(menu.getPopupMenu().getComponents()));
 
         if (components.size() > maxItemsPerMenu) {
             menu.removeAll();
@@ -573,7 +570,7 @@ public class BlocksFinder {
             JMenu currentMenu = menu;
 
             while (components.size() > 0) {
-                int n = Math.min(components.size(), maxItemsPerMenu - 1);
+                final int n = Math.min(components.size(), maxItemsPerMenu - 1);
 
                 for (int i = 0; i < n; i++)
                     currentMenu.add(components.remove(0));
@@ -587,7 +584,7 @@ public class BlocksFinder {
         }
 
         // do this recursively for sub-menus
-        for (Component component : menu.getPopupMenu().getComponents()) {
+        for (final Component component : menu.getPopupMenu().getComponents()) {
             if (component instanceof JMenu)
                 splitLongMenus((JMenu) component, maxItemsPerMenu);
         }
@@ -596,8 +593,8 @@ public class BlocksFinder {
     /**
      * Creates a flattened version of the provided String. The flattening operation
      * splits the string by inserting spaces between words starting with an upper
-     * case letter, and converts upper case letters to lower case (with the
-     * exception of the first word). Note that <b>consecutive upper case letters</b>
+     * case letter, and converts upper case letters to lowercase (with the
+     * except of the first word). Note that <b>consecutive upper case letters</b>
      * <b>will remain grouped</b>, as they are considered to represent an acronym.<br>
      * <br>
      * <u>NOTE:</u> This method is optimized for class names that follow the Java
@@ -610,15 +607,15 @@ public class BlocksFinder {
      * @return a flattened (i.e. pretty-printed) String based on the name of the
      * string
      */
-    public static String getFlattened(String string) {
-        String[] words = string.split("(?=[A-Z])");
+    public static String getFlattened(final String string) {
+        final String[] words = string.split("(?=[A-Z])");
 
         final StringBuilder output = new StringBuilder(words[0]);
         if (words.length > 1) {
-            int nextWordIndex = 1;
+            final int nextWordIndex = 1;
 
             for (int i = nextWordIndex; i < words.length; i++) {
-                String word = words[i];
+                final String word = words[i];
                 if (word.length() == 1) {
                     // single letter
                     if (words[i - 1].length() == 1) {

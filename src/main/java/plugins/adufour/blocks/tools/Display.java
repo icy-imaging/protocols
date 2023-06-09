@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2010-2023. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package plugins.adufour.blocks.tools;
 
 import icy.main.Icy;
@@ -20,23 +38,23 @@ public class Display extends Plugin implements Block {
     }
 
     @Override
-    public void declareOutput(VarList outputMap) {
+    public void declareOutput(final VarList outputMap) {
 
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void declareInput(VarList inputMap) {
+    public void declareInput(final VarList inputMap) {
         inputMap.add("object", object);
 
-        object.addListener(new VarListener<Object>() {
+        object.addListener(new VarListener<>() {
             @Override
-            public void referenceChanged(Var<Object> source, Var<? extends Object> oldReference, Var<? extends Object> newReference) {
+            public void referenceChanged(final Var<Object> source, final Var<?> oldReference, final Var<?> newReference) {
                 if (newReference == null && !object.isReferenced()) object.setType(null);
             }
 
             @Override
-            public void valueChanged(Var<Object> source, Object oldValue, Object newValue) {
+            public void valueChanged(final Var<Object> source, final Object oldValue, final Object newValue) {
 
             }
         });

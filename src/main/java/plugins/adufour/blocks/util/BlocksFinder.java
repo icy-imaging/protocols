@@ -20,7 +20,7 @@ package plugins.adufour.blocks.util;
 
 import icy.gui.component.menu.IcyMenu;
 import icy.gui.component.menu.IcyMenuItem;
-import icy.gui.menu.PluginMenuItem;
+import icy.gui.component.menu.IcyPluginMenuItem;
 import icy.plugin.PluginDescriptor;
 import icy.plugin.PluginLoader;
 import icy.plugin.abstract_.Plugin;
@@ -66,10 +66,8 @@ public class BlocksFinder {
      *
      * @author Ludovic Laborde, Alexandre Dufour
      */
-    // FIXME: 08/06/2023 Replace PluginMenuItem dependency
-    public static class DND_MenuItem extends PluginMenuItem implements MouseListener, Transferable, DragSourceListener, DragGestureListener {
+    public static class DND_MenuItem extends IcyPluginMenuItem implements MouseListener, Transferable, DragSourceListener, DragGestureListener {
         private final DragSource source;
-        private final TransferHandler handler;
         private final PluginDescriptor descriptor;
 
         private final List<MenuItemListener> menuItemListeners;
@@ -84,7 +82,7 @@ public class BlocksFinder {
             descriptor = d;
             menuItemListeners = new ArrayList<>();
 
-            handler = new TransferHandler() {
+            final TransferHandler handler = new TransferHandler() {
                 @Override
                 public Transferable createTransferable(final JComponent c) {
                     return new DND_MenuItem(descriptor);
@@ -321,7 +319,7 @@ public class BlocksFinder {
                     continue;
 
                 // create the menu item
-                final PluginMenuItem menuItem = new PluginMenuItem(descriptor);
+                final IcyPluginMenuItem menuItem = new IcyPluginMenuItem(descriptor);
 
                 // remove the internal action listener
                 menuItem.removeActionListener(menuItem);
@@ -493,7 +491,6 @@ public class BlocksFinder {
         // }
         // catch (Exception e)
         // {
-        // // TODO Auto-generated catch block
         // e.printStackTrace();
         // }
         // }

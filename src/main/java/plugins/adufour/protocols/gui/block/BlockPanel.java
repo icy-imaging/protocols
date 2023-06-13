@@ -61,7 +61,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             int dx = e.getX();
             int dy = e.getY();
 
-            final int minWidth = jPanelTitle.getPreferredSize().width;
+            final int minWidth = toolBar.getPreferredSize().width;
             int w = resizing_EAST ? Math.max(minWidth, dx) : getWidth();
 
             final int minHeight = MIN_HEIGHT + 5;
@@ -99,6 +99,9 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                     y += dy;
                     h -= dy;
                 }
+                h = Math.max(h, toolBar.getPreferredSize().height + jPanelContent.getPreferredSize().height);
+                final int tmpW = Math.max(toolBar.getPreferredSize().width, jPanelContent.getPreferredSize().width);
+                w = Math.max(w, tmpW);
                 if (x >= 0 && y >= 0)
                     setBounds(x, y, w, h);
             }
@@ -151,53 +154,10 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
         @Override
         public void mouseClicked(final MouseEvent e) {
-            final Component c = getComponentAt(e.getX(), e.getY());
-            if (e.getClickCount() == 2 && !e.isConsumed() && c != null && c.equals(jPanelTitle)) {
-                e.consume();
-
-                final JPanel renamePanel = new JPanel();
-                final JTextField newName = new JTextField(blockDesc.getDefinedName());
-                final JPanel buttonPanel = new JPanel();
-                final JButton ok = new JButton("OK");
-                final JButton cancel = new JButton("Cancel");
-
-                ok.addActionListener(okEvent -> {
-                    blockDesc.setDefinedName(newName.getText());
-                    name.setText(blockDesc.getDefinedName() + " ");
-                    workFlowPane.moveToBack(renamePanel);
-                    workFlowPane.remove(renamePanel);
-
-                    setSize(getPreferredSize());
-                });
-
-                cancel.addActionListener(cancelEvent -> {
-                    workFlowPane.moveToBack(renamePanel);
-                    workFlowPane.remove(renamePanel);
-                });
-
-                buttonPanel.add(ok);
-                buttonPanel.add(cancel);
-
-                renamePanel.setLayout(new GridLayout(2, 1));
-                renamePanel.add(newName);
-                renamePanel.add(buttonPanel);
-
-                //renamePanel.setOpaque(false);
-                renamePanel.setSize(new Dimension(180, 60));
-                //renamePanel.setBorder(BorderFactory.createRaisedBevelBorder());
-                renamePanel.setLocation(
-                        jPanelTitle.getLocationOnScreen().x - workFlowPane.getLocationOnScreen().x,
-                        jPanelTitle.getLocationOnScreen().y - workFlowPane.getLocationOnScreen().y - renamePanel.getHeight()
-                );
-
-                workFlowPane.add(renamePanel);
-                workFlowPane.moveToFront(renamePanel);
-            }
         }
 
         @Override
         public void mouseEntered(final MouseEvent e) {
-            // Nothing to do
         }
 
         @Override
@@ -268,7 +228,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
     }
 
-    @Deprecated
     //protected static final int SHADOW_SIZE = 4;
     protected static final int SHADOW_SIZE = 0;
 
@@ -312,9 +271,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
      */
     private static final ImageIcon ICON_ERROR = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.ERROR, ICON_SIZE_F, Color.RED.darker()));
 
-    @Deprecated
-    protected final JPanel jPanelTitle = new JPanel(new GridBagLayout());
-
     protected final JToolBar toolBar;
 
     protected final JPanel jPanelContent = new JPanel(new GridBagLayout());
@@ -354,7 +310,9 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     protected final Runnable refresher;
 
-    private final JLabel name;
+    //private final JLabel name;
+    private final JTextField name;
+    private final IcyButton btnEdit = new IcyButton(GoogleMaterialDesignIcons.EDIT);
 
     private boolean selected = false;
 
@@ -369,14 +327,42 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         this.workFlowPane = wfPane;
 
         // create the label
-        name = new JLabel(" " + blockDesc.getDefinedName() + " ", JLabel.CENTER);
+        //name = new JLabel(" " + blockDesc.getDefinedName() + " ", JLabel.CENTER);
+        name = new JTextField(blockDesc.getDefinedName());
+        name.setEnabled(false);
+        name.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(final KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(final KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+                final String tmpName = blockDesc.getDefinedName();
+                if (e.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
+                    // Validate name
+                    final String newName = name.getText().trim();
+                    blockDesc.setDefinedName(newName);
+                    name.setText(newName);
+                    name.setEnabled(false);
+                    btnEdit.setEnabled(true);
+                }
+                else if (e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
+                    // Cancel
+                    name.setText(tmpName);
+                    name.setEnabled(false);
+                    btnEdit.setEnabled(true);
+                }
+            }
+        });
 
         // Layout
         setLayout(new BorderLayout());
 
-        // Title bar
-        //jPanelTitle.setOpaque(false);
-        //add(jPanelTitle, BorderLayout.NORTH);
+        // Toolbar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(bMenu);
@@ -387,6 +373,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         toolBar.add(bID);
         //toolBar.add(new JLabel(blockDesc.getName()));
         toolBar.add(name);
+        toolBar.add(btnEdit);
         toolBar.add(Box.createHorizontalStrut(10));
         updateStatusIcon(blockDesc.getStatus());
         toolBar.add(bStatus);
@@ -417,6 +404,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
         blockDesc.addBlockListener(this);
+        btnEdit.addActionListener(this);
 
         //setBorder(BorderFactory.createLineBorder(null, 1, true));
         //setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(null, 1, true), BorderFactory.createEmptyBorder(BORDER_SIZE_Y, 0, BORDER_SIZE_Y, 0)));
@@ -466,7 +454,11 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         if (toolBar == null)
             return;
 
-        toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getForeground()));
+        // If the block is collapsed, remove the toolbar bottom border
+        if (!blockDesc.isCollapsed())
+            toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getForeground()));
+        else
+            toolBar.setBorder(null);
     }
 
     @Override
@@ -516,6 +508,10 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             // reset now if necessary
             if (!blockDesc.keepsResults())
                 blockDesc.reset();
+        }
+        else if (e.getSource().equals(btnEdit)) {
+            name.setEnabled(true);
+            btnEdit.setEnabled(false);
         }
     }
 
@@ -592,11 +588,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
 
         return dragZone;
-    }
-
-    @Deprecated
-    protected DragDropZone createVarDropZone(final Var<?> variable, final boolean allowExposure, final Image icon) {
-        return createVarDropZone(variable, allowExposure);
     }
 
     protected DragDropZone createVarDropZone(final Var<?> variable, final boolean allowExposure) {
@@ -680,7 +671,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
 
         jPanelContent.removeAll();
-        jPanelTitle.removeAll();
         menu.removeAll();
 
         drawMenu();
@@ -693,19 +683,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             oldSize = expandedSize;
         }
         else {
-            if (oldSize.width == 0 || oldSize.height == 0) {
-                // check if the descriptor has a stored size
-                if (!blockDesc.isCollapsed() && blockDesc.getDimension().width != 0) {
-                    // use it
-                    oldSize = blockDesc.getDimension();
-                }
-                else {
-                    // use the default preferred size
-                    oldSize = getPreferredSize();
-                }
-            }
-            else
-                oldSize = getPreferredSize();
+            oldSize.setSize(toolBar.getPreferredSize());
         }
 
         setBounds(blockDesc.getLocation().x, blockDesc.getLocation().y, oldSize.width, oldSize.height);
@@ -972,14 +950,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
      */
     public int getVarPanelWidth() {
         return getWidth();
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        if (blockDesc.isCollapsed())
-            return new Dimension(jPanelTitle.getPreferredSize().width, MIN_HEIGHT);
-
-        return super.getPreferredSize();
     }
 
     public VarEditor<?> getVarEditor(final Var<?> variable) {

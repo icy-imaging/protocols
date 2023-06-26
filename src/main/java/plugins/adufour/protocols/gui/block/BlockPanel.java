@@ -329,7 +329,10 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         // create the label
         //name = new JLabel(" " + blockDesc.getDefinedName() + " ", JLabel.CENTER);
         name = new JTextField(blockDesc.getDefinedName());
-        name.setEnabled(false);
+        name.setBorder(null);
+        name.setOpaque(false);
+        name.setEditable(false);
+        name.setFocusable(false);
         name.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(final KeyEvent e) {
@@ -347,13 +350,17 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                     final String newName = name.getText().trim();
                     blockDesc.setDefinedName(newName);
                     name.setText(newName);
-                    name.setEnabled(false);
+                    name.setEditable(false);
+                    name.setFocusable(false);
+                    name.setOpaque(false);
                     btnEdit.setEnabled(true);
                 }
                 else if (e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
                     // Cancel
                     name.setText(tmpName);
-                    name.setEnabled(false);
+                    name.setEditable(false);
+                    name.setFocusable(false);
+                    name.setOpaque(false);
                     btnEdit.setEnabled(true);
                 }
             }
@@ -365,18 +372,26 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         // Toolbar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
+
         toolBar.add(bMenu);
+
         toolBar.add(bRunUntilHere);
+
         final int id = 1 + workFlowPane.getWorkFlow().indexOf(blockDesc);
         bID.setText(String.valueOf(id));
         bID.setMargin(new Insets(0, 0, 0, 0));
         toolBar.add(bID);
-        //toolBar.add(new JLabel(blockDesc.getName()));
+
         toolBar.add(name);
+
         toolBar.add(btnEdit);
+
         toolBar.add(Box.createHorizontalStrut(10));
+
         updateStatusIcon(blockDesc.getStatus());
         toolBar.add(bStatus);
+
+        toolBar.add(Box.createHorizontalStrut(5));
 
         // Need to remove all the mouse listeners to dispatch the event
         for (final MouseListener ml : toolBar.getMouseListeners())
@@ -391,10 +406,6 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         for (final AbstractButton button : new AbstractButton[]{bMenu, menuCollapse, bRunUntilHere, menuKeepResults, menuRemove, bID}) {
             button.addActionListener(this);
         }
-
-        // Status
-        //bStatus.setPreferredSize(new Dimension(ICON_SIZE + 3, ICON_SIZE + 3));
-        //bStatus.setEnabled(false);
 
         // Main content
         add(jPanelContent, BorderLayout.CENTER);
@@ -510,7 +521,10 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                 blockDesc.reset();
         }
         else if (e.getSource().equals(btnEdit)) {
-            name.setEnabled(true);
+            name.setEditable(true);
+            name.setFocusable(true);
+            name.setOpaque(true);
+            name.requestFocus();
             btnEdit.setEnabled(false);
         }
     }

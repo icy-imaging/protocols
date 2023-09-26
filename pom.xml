@@ -25,10 +25,6 @@
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>ezplug</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>javadocparser</artifactId>
-        </dependency>
         <!-- javacl also include ochafik-util classes required by Protocols -->
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>

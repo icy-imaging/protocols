@@ -24,10 +24,6 @@ import icy.network.NetworkUtil;
 import icy.plugin.PluginDescriptor;
 import icy.plugin.abstract_.Plugin;
 import icy.util.StringUtil;
-import japa.parser.JavaParser;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.JavadocComment;
-import japa.parser.ast.body.TypeDeclaration;
 import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import plugins.adufour.blocks.util.BlocksFinder;
 import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
@@ -43,7 +39,6 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
-import java.io.InputStream;
 
 /**
  * A search panel for the Protocols interface, where blocks can be found by keyword search
@@ -204,68 +199,6 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
         }
         else
             description.append("<i>").append(d.getDescription()).append("</i>");
-
-        // add JavaDoc (if available) to the description
-        try {
-            final InputStream stream = d.getPluginClass().getResourceAsStream(d.getSimpleClassName() + ".java");
-            final CompilationUnit unit = JavaParser.parse(stream); // retrieve the block's source file
-            if (stream != null)
-                stream.close();
-
-            if (unit.getComments() != null) {
-                // get the first declared type (should be the main class per Java convention)
-                final TypeDeclaration declaration = unit.getTypes().get(0);
-                final JavadocComment doc = declaration.getJavaDoc();
-
-                // the "real" new line markers are "<br/>\n" or "* \n"
-                // to split them all at once, replace one by the other
-
-                String docString = doc.getContent().trim().replace("* \n", "<br/>\n");
-                // now remove "fake" new line markers
-                docString = docString.replace("* ", "").replace("\n", "");
-                final String[] lines = docString.split("<br/> ");
-
-                if (lines.length > 0) {
-                    description.append("<h3>Developer documentation:</h3>");
-
-                    description.append("<i>");
-                    for (String line : lines) {
-                        if (line.startsWith("@")) {
-                            // watch out for the "@author" annotation
-                            if (line.startsWith("@author") && author.isEmpty()) author = line.replace("@author ", "");
-                            // but discard the rest for now
-                        }
-                        else {
-                            while (line.contains("@link")) {
-                                // hide links (for now)
-                                final int start = line.indexOf("{@link");
-                                final int end = line.indexOf("}", start);
-                                final String link = line.substring(start, end + 1);
-                                // if the link has a name after the target, use it
-                                final String[] linkWords = link.substring(7, link.length() - 1).split(" ");
-                                final StringBuilder linkReplacement = new StringBuilder("<b>");
-                                if (linkWords.length == 1) {
-                                    linkReplacement.append(linkWords[0]);
-                                }
-                                else {
-                                    linkReplacement.append(linkWords[1]);
-                                    for (int i = 2; i < linkWords.length; i++)
-                                        linkReplacement.append(" ").append(linkWords[i]);
-                                }
-                                linkReplacement.append("</b>");
-                                line = line.replace(link, linkReplacement.toString());
-                            }
-
-                            description.append(line).append("<br/>");
-                        }
-                    }
-                    description.append("</i>");
-                }
-            }
-        }
-        catch (final Exception e) {
-            // The source file probably wasn't found. Don't bother then...
-        }
 
         String doc = "<html><body style=\"font-family: Tahoma\">";
         doc += "<h2 align=\"center\">" + name + "</h2>";

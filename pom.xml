@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>org.bioimageanalysis.icy</groupId>
-        <artifactId>parent-pom-plugin</artifactId>
-        <version>1.0.8</version>
+        <artifactId>pom-icy</artifactId>
+        <version>2.1.0</version>
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>3.2.3</version>
 
     <packaging>jar</packaging>
 
@@ -23,20 +23,22 @@
     <dependencies>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
+            <artifactId>icy-kernel</artifactId>
+            <version>2.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>ezplug</artifactId>
-            <version>${ezplug.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>javadocparser</artifactId>
-            <version>${javadocparser.version}</version>
         </dependency>
         <!-- javacl also include ochafik-util classes required by Protocols -->
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>javacl</artifactId>
-            <version>1.0.6</version>
-            <type>pom</type>
         </dependency>
     </dependencies>
 

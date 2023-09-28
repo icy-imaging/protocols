@@ -354,7 +354,7 @@ public class BlocksML {
         // scan the protocol for missing plugins
         final Set<String> missingPlugins = getMissingPlugins(xmlRoot, fileVersion);
 
-        if (missingPlugins.size() > 0) {
+        if (!missingPlugins.isEmpty()) {
             // Are we connected to the internet?
             if (!NetworkUtil.hasInternetAccess())
                 throw new IcyHandledException("Some plugins required by this protocol are missing, but no internet connection is available");
@@ -379,7 +379,7 @@ public class BlocksML {
                 if (pDesc == null) {
                     // sadly, I believe the plugin loader could be reloaded at anytime...
                     // double check that for every plugin, just to be safe
-                    if (PluginLoader.getPlugins(Block.class, true, false, false).size() == 0)
+                    if (PluginLoader.getPlugins(Block.class, true, false, false).isEmpty())
                         throw new BlocksReloadedException();
 
                     throw new BlocksException("Couldn't find plugin " + ClassUtil.getSimpleClassName(className) + " online", true);
@@ -402,7 +402,7 @@ public class BlocksML {
         }
 
         switch (fileVersion) {
-            /*case 1:
+            case 1:
                 loadWorkFlow_V1(xmlRoot, targetWorkFlow);
                 break;
             case 2:
@@ -410,7 +410,7 @@ public class BlocksML {
                 break;
             case 3:
                 loadWorkFlow_V3(xmlRoot, targetWorkFlow);
-                break;*/
+                break;
             case 4:
                 loadWorkFlow_V4(xmlRoot, targetWorkFlow);
                 break;
@@ -464,6 +464,374 @@ public class BlocksML {
 
         return missingPlugins;
     }
+
+    /**
+     * @param workFlowRoot XML element of the workflow root to be loaded.
+     * @param workFlow     Target workflow to add elements from document.
+     */
+    private synchronized void loadWorkFlow_V1(final Element workFlowRoot, final WorkFlow workFlow) {
+        final Element blocksRoot = XMLUtil.getElement(workFlowRoot, "blocks");
+
+        final ArrayList<Element> blocksNode = XMLUtil.getElements(blocksRoot);
+
+        for (final Element blockNode : blocksNode) {
+            final String className = XMLUtil.getAttributeValue(blockNode, "type", null);
+
+            final int xPos = XMLUtil.getAttributeIntValue(blockNode, "xLocation", 0);
+            final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", 0);
+
+            try {
+                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
+
+                final Block block = blockClass.getConstructor().newInstance();
+
+                if (block == null)
+                    throw new BlocksException("Couldn't create block from class " + blockClass.getName(), true);
+
+                if (block instanceof WorkFlow) {
+                    // load the inner work flow
+                    loadWorkFlow_V1(blockNode, (WorkFlow) block);
+
+                    final BlockDescriptor blockDescriptor = ((WorkFlow) block).getBlockDescriptor();
+                    blockDescriptor.setContainer((WorkFlow) block);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    // adjust visibility triggers
+                    {
+                        final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+
+                        final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+
+                        for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                            final int id = XMLUtil.getAttributeIntValue(varNode, "ID", -1);
+                            final Var<?> var = blockDescriptor.inputVars.get(id);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.inputVars.setVisible(var, visible);
+                        }
+                        final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+
+                        for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                            final int id = XMLUtil.getAttributeIntValue(varNode, "ID", -1);
+                            final Var<?> var = blockDescriptor.outputVars.get(id);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.outputVars.setVisible(var, visible);
+                        }
+                    }
+                }
+                else {
+                    final BlockDescriptor blockDescriptor = new BlockDescriptor(-1, block);
+                    blockDescriptor.setContainer(workFlow);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+                    final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+                    for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                        final int id = XMLUtil.getAttributeIntValue(varNode, Var.XML_KEY_ID, -1);
+                        final Var<?> var = blockDescriptor.inputVars.get(id);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.inputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+                    }
+                    final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+                    for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                        final int id = XMLUtil.getAttributeIntValue(varNode, Var.XML_KEY_ID, -1);
+                        final Var<?> var = blockDescriptor.outputVars.get(id);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.outputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+                    }
+                }
+            }
+            catch (final Exception e1) {
+                throw new BlocksException("Cannot create block (" + e1.getMessage() + ")", true);
+            }
+        }
+
+        final Element linkRoot = XMLUtil.getElement(workFlowRoot, "links");
+
+        for (final Element linkNode : XMLUtil.getElements(linkRoot)) {
+            final int srcBlockID = XMLUtil.getAttributeIntValue(linkNode, "srcBlockID", -1);
+            final int srcVarID = XMLUtil.getAttributeIntValue(linkNode, "srcVarID", -1);
+            final int dstBlockID = XMLUtil.getAttributeIntValue(linkNode, "dstBlockID", -1);
+            final int dstVarID = XMLUtil.getAttributeIntValue(linkNode, "dstVarID", -1);
+
+            final BlockDescriptor srcBlock = workFlow.getBlock(srcBlockID);
+            // this is assumed correct
+            final Var<Object> srcVar = srcBlock.outputVars.get(srcVarID);
+
+            final BlockDescriptor dstBlock = workFlow.getBlock(dstBlockID);
+            // this is assumed correct
+            final Var<Object> dstVar = dstBlock.inputVars.get(dstVarID);
+
+            workFlow.addLink(srcBlock, srcVar, dstBlock, dstVar);
+        }
+    }
+
+    /**
+     * @param workFlowRoot XML element of the workflow root to be loaded.
+     * @param workFlow     Target workflow to add elements from document.
+     */
+    private synchronized void loadWorkFlow_V2(final Element workFlowRoot, final WorkFlow workFlow) {
+        final Element blocksRoot = XMLUtil.getElement(workFlowRoot, "blocks");
+
+        final ArrayList<Element> blocksNode = XMLUtil.getElements(blocksRoot);
+
+        for (final Element blockNode : blocksNode) {
+            final String className = XMLUtil.getAttributeValue(blockNode, "type", null);
+
+            final int xPos = XMLUtil.getAttributeIntValue(blockNode, "xLocation", -1);
+            final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
+
+            try {
+                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
+
+                final Block block = blockClass.getDeclaredConstructor().newInstance();
+
+                if (block == null)
+                    throw new BlocksException("Couldn't create block from class " + blockClass.getName(), true);
+
+                if (block instanceof WorkFlow) {
+                    final BlockDescriptor blockDescriptor = ((WorkFlow) block).getBlockDescriptor();
+                    blockDescriptor.setContainer((WorkFlow) block);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    // load the inner work flow
+                    loadWorkFlow_V2(blockNode, (WorkFlow) block);
+
+                    // adjust visibility triggers
+                    {
+                        final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+
+                        final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+
+                        for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                            final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                            final Var<?> var = blockDescriptor.inputVars.get(uid);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.inputVars.setVisible(var, visible);
+                        }
+                        final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+
+                        for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                            final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                            final Var<?> var = blockDescriptor.outputVars.get(uid);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.outputVars.setVisible(var, visible);
+                        }
+                    }
+                }
+                else {
+                    final BlockDescriptor blockDescriptor = new BlockDescriptor(-1, block);
+                    blockDescriptor.setContainer(workFlow);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+                    final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+                    for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                        final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                        final Var<?> var = blockDescriptor.inputVars.get(uid);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.inputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+
+                        if (var instanceof MutableType) {
+                            final String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                            if (type != null) {
+                                if (var instanceof VarMutable) {
+                                    ((MutableType) var).setType(Class.forName(type));
+                                }
+                                else if (var instanceof VarMutableArray) {
+                                    ((MutableType) var).setType(Class.forName("[L" + type + ";"));
+                                }
+                            }
+                        }
+                    }
+                    final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+                    for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                        final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                        final Var<?> var = blockDescriptor.outputVars.get(uid);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.outputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+
+                        if (var instanceof MutableType) {
+                            final String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                            if (type != null) {
+                                if (var instanceof VarMutable) {
+                                    ((MutableType) var).setType(Class.forName(type));
+                                }
+                                else if (var instanceof VarMutableArray) {
+                                    ((MutableType) var).setType(Class.forName("[L" + type + ";"));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (final Exception e1) {
+                throw new BlocksException("Cannot create block (" + e1.getMessage() + ")", true);
+            }
+        }
+
+        final Element linkRoot = XMLUtil.getElement(workFlowRoot, "links");
+
+        for (final Element linkNode : XMLUtil.getElements(linkRoot)) {
+            final int srcBlockID = XMLUtil.getAttributeIntValue(linkNode, "srcBlockID", -1);
+            final String srcVarID = XMLUtil.getAttributeValue(linkNode, "srcVarID", null);
+            final int dstBlockID = XMLUtil.getAttributeIntValue(linkNode, "dstBlockID", -1);
+            final String dstVarID = XMLUtil.getAttributeValue(linkNode, "dstVarID", null);
+
+            final BlockDescriptor srcBlock = workFlow.getBlock(srcBlockID);
+            Var<Object> srcVar = srcBlock.outputVars.get(srcVarID);
+            if (srcVar == null)
+                srcVar = srcBlock.inputVars.get(srcVarID);
+
+            final BlockDescriptor dstBlock = workFlow.getBlock(dstBlockID);
+            final Var<Object> dstVar = dstBlock.inputVars.get(dstVarID);
+
+            workFlow.addLink(srcBlock, srcVar, dstBlock, dstVar);
+        }
+    }
+
+    /**
+     * Legacy method for protocols V3.
+     *
+     * @param workFlowRoot XML element of the workflow root to be loaded.
+     * @param workFlow     Target workflow to add elements from document.
+     */
+    private synchronized void loadWorkFlow_V3(final Element workFlowRoot, final WorkFlow workFlow) {
+        final Element blocksRoot = XMLUtil.getElement(workFlowRoot, "blocks");
+
+        final ArrayList<Element> blocksNode = XMLUtil.getElements(blocksRoot);
+
+        for (final Element blockNode : blocksNode) {
+            final String blockType = XMLUtil.getAttributeValue(blockNode, "blockType", null);
+
+            final int xPos = XMLUtil.getAttributeIntValue(blockNode, "xLocation", -1);
+            final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
+
+            try {
+                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(blockType);
+
+                final Block block = blockClass.getDeclaredConstructor().newInstance();
+
+                if (block == null)
+                    throw new BlocksException("Couldn't create block from class " + blockClass.getName(), true);
+
+                if (block instanceof WorkFlow) {
+                    final int width = XMLUtil.getAttributeIntValue(blockNode, "width", 500);
+                    final int height = XMLUtil.getAttributeIntValue(blockNode, "height", 500);
+
+                    final BlockDescriptor blockDescriptor = ((WorkFlow) block).getBlockDescriptor();
+                    blockDescriptor.setDimension(width, height);
+                    blockDescriptor.setContainer((WorkFlow) block);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    // load the inner work flow
+                    loadWorkFlow_V3(blockNode, (WorkFlow) block);
+
+                    // adjust visibility triggers
+                    {
+                        final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+
+                        final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+
+                        for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                            final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                            final Var<?> var = blockDescriptor.inputVars.get(uid);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.inputVars.setVisible(var, visible);
+                        }
+                        final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+
+                        for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                            final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                            final Var<?> var = blockDescriptor.outputVars.get(uid);
+                            final boolean visible = XMLUtil.getAttributeBooleanValue(varNode, "visible", false);
+                            blockDescriptor.outputVars.setVisible(var, visible);
+                        }
+                    }
+                }
+                else {
+                    final BlockDescriptor blockDescriptor = new BlockDescriptor(-1, block);
+                    blockDescriptor.setContainer(workFlow);
+                    blockDescriptor.setLocation(xPos, yPos);
+
+                    workFlow.addBlock(blockDescriptor);
+
+                    final Element varRoot = XMLUtil.getElement(blockNode, "variables");
+                    final Element inVarRoot = XMLUtil.getElement(varRoot, "input");
+                    for (final Element varNode : XMLUtil.getElements(inVarRoot)) {
+                        final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                        final Var<?> var = blockDescriptor.inputVars.get(uid);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.inputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+
+                        if (var instanceof MutableType) {
+                            final String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                            if (type != null) {
+                                if (var instanceof VarMutable) {
+                                    ((MutableType) var).setType(Class.forName(type));
+                                }
+                                else if (var instanceof VarMutableArray) {
+                                    ((MutableType) var).setType(Class.forName("[L" + type + ";"));
+                                }
+                            }
+                        }
+                    }
+
+                    final Element outVarRoot = XMLUtil.getElement(varRoot, "output");
+                    for (final Element varNode : XMLUtil.getElements(outVarRoot)) {
+                        final String uid = XMLUtil.getAttributeValue(varNode, "ID", null);
+                        final Var<?> var = blockDescriptor.outputVars.get(uid);
+                        var.loadFromXML(varNode);
+                        blockDescriptor.outputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+
+                        if (var instanceof MutableType) {
+                            final String type = XMLUtil.getAttributeValue(varNode, "type", null);
+                            if (type != null) {
+                                if (var instanceof VarMutable) {
+                                    ((MutableType) var).setType(Class.forName(type));
+                                }
+                                else if (var instanceof VarMutableArray) {
+                                    ((MutableType) var).setType(Class.forName("[L" + type + ";"));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (final Exception e1) {
+                throw new BlocksException("Cannot create block (" + e1.getMessage() + ")", true);
+            }
+        }
+
+        final Element linkRoot = XMLUtil.getElement(workFlowRoot, "links");
+
+        for (final Element linkNode : XMLUtil.getElements(linkRoot)) {
+            final int srcBlockID = XMLUtil.getAttributeIntValue(linkNode, "srcBlockID", -1);
+            final String srcVarID = XMLUtil.getAttributeValue(linkNode, "srcVarID", null);
+            final int dstBlockID = XMLUtil.getAttributeIntValue(linkNode, "dstBlockID", -1);
+            final String dstVarID = XMLUtil.getAttributeValue(linkNode, "dstVarID", null);
+
+            final BlockDescriptor srcBlock = workFlow.getBlock(srcBlockID);
+            Var<Object> srcVar = srcBlock.outputVars.get(srcVarID);
+            if (srcVar == null)
+                srcVar = srcBlock.inputVars.get(srcVarID);
+
+            final BlockDescriptor dstBlock = workFlow.getBlock(dstBlockID);
+            final Var<Object> dstVar = dstBlock.inputVars.get(dstVarID);
+
+            workFlow.addLink(srcBlock, srcVar, dstBlock, dstVar);
+        }
+    }
+
 
     /**
      * @param workFlowRoot XML element of the workflow root to be loaded.

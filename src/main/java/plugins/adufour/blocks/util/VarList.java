@@ -156,6 +156,26 @@ public class VarList implements Iterable<Var<?>> {
     }
 
     /**
+     * Legacy method (used to load old XML work flows).
+     *
+     * @param <T>   Type of the variable value.
+     * @param varID Variable identifier.
+     * @return The stored variable.
+     * @throws NoSuchVariableException If no variable is not found with the given identifier
+     */
+    @SuppressWarnings("unchecked")
+    <T> Var<T> get(final int varID) throws NoSuchVariableException {
+        int id = 0;
+        for (final Var<?> var : this) {
+            if (id == varID)
+                return (Var<T>) var;
+            id++;
+        }
+        throw new NoSuchVariableException("No variable with ID " + varID);
+    }
+
+
+    /**
      * Returns the unique ID of the specified variable. Although the underlying structure
      *
      * @param var Target variable

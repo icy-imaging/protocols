@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,15 +18,15 @@
 
 package plugins.adufour.protocols.livebar;
 
-import icy.network.NetworkUtil;
-import icy.search.OnlineSearchResultProducer;
-import icy.search.SearchResult;
-import icy.search.SearchResultConsumer;
-import icy.search.SearchResultProducer;
-import icy.system.SystemUtil;
-import icy.system.thread.ThreadUtil;
-import icy.util.StringUtil;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.common.string.StringUtil;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.network.NetworkUtil;
+import org.bioimageanalysis.icy.network.search.OnlineSearchResultProducer;
+import org.bioimageanalysis.icy.network.search.SearchResult;
+import org.bioimageanalysis.icy.network.search.SearchResultConsumer;
+import org.bioimageanalysis.icy.network.search.SearchResultProducer;
+import org.bioimageanalysis.icy.system.SystemUtil;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import plugins.adufour.protocols.Protocols;

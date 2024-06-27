@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import icy.gui.component.button.IcyButton;
-import icy.gui.component.menu.IcyMenuItem;
-import icy.gui.util.LookAndFeelUtil;
-import icy.system.thread.ThreadUtil;
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
-import jiconfont.swing.IconFontSwing;
+import org.bioimageanalysis.icy.gui.LookAndFeelUtil;
+import org.bioimageanalysis.icy.gui.component.button.IcyButton;
+import org.bioimageanalysis.icy.gui.component.icon.IcySVGImageIcon;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.lang.WorkFlow;
@@ -45,6 +45,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class BlockPanel extends JPanel implements ActionListener, BlockListener {
     private final class BlockMotionManager implements MouseInputListener {
@@ -242,48 +243,45 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     protected static final int ARC_SIZE = 10;
 
-    //@Deprecated
-    //protected static final int ICON_SIZE = 16;
-    protected static final int ICON_SIZE = LookAndFeelUtil.getDefaultIconSizeAsInt();
+    protected static final int ICON_SIZE = LookAndFeelUtil.getDefaultIconSize();
 
+    @SuppressWarnings("resource")
     private static final Image BLOCKS = new Protocols().getDescriptor().getIconAsImage();
     private static final ImageIcon ICON_BLOCKS = new ImageIcon(BLOCKS.getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
-
-    private static final float ICON_SIZE_F = LookAndFeelUtil.getDefaultIconSizeAsFloat();
 
     /**
      * Indicates that the block is dirty (results aren't ready)
      */
-    private static final ImageIcon ICON_DIRTY = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.WARNING, ICON_SIZE_F, Color.ORANGE.darker()));
+    private static final ImageIcon ICON_DIRTY = new IcySVGImageIcon(SVGIcon.WARNING, Color.ORANGE.darker());
 
     /**
      * Indicates that the block is currently running
      */
-    private static final ImageIcon ICON_RUNNING = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.FLASH_ON, ICON_SIZE_F, Color.BLUE.brighter()));
+    private static final ImageIcon ICON_RUNNING = new IcySVGImageIcon(SVGIcon.BOLT, Color.BLUE.brighter());
 
     /**
      * Indicates that the block has finished running (the result is ready)
      */
-    private static final ImageIcon ICON_READY = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.CHECK_CIRCLE, ICON_SIZE_F, Color.GREEN.darker()));
+    private static final ImageIcon ICON_READY = new IcySVGImageIcon(SVGIcon.CHECK_CIRCLE, Color.GREEN.darker());
 
     /**
      * Indicates that the block generated an error
      */
-    private static final ImageIcon ICON_ERROR = new ImageIcon(IconFontSwing.buildImage(GoogleMaterialDesignIcons.ERROR, ICON_SIZE_F, Color.RED.darker()));
+    private static final ImageIcon ICON_ERROR = new IcySVGImageIcon(SVGIcon.ERROR, Color.RED.darker());
 
     protected final JToolBar toolBar;
 
     protected final JPanel jPanelContent = new JPanel(new GridBagLayout());
 
-    protected final IcyButton bMenu = new IcyButton(ICON_BLOCKS);
-    protected final IcyButton bRunUntilHere = new IcyButton(GoogleMaterialDesignIcons.PLAY_ARROW);
-    protected final IcyButton bID = new IcyButton("");
+    protected final JButton bMenu = new JButton(ICON_BLOCKS);
+    protected final IcyButton bRunUntilHere = new IcyButton(SVGIcon.PLAY_CIRCLE);
+    protected final JButton bID = new JButton("");
     protected final JLabel bStatus = new JLabel(ICON_DIRTY);
     protected final JPopupMenu menu = new JPopupMenu();
     protected final JCheckBox menuKeepResults = new JCheckBox("Remember results");
     // protected final JPanel menuCommandLineID = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", GoogleMaterialDesignIcons.UNFOLD_LESS);
-    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", GoogleMaterialDesignIcons.DELETE);
+    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", SVGIcon.UNFOLD_LESS);
+    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", SVGIcon.DELETE);
 
     //private final ShadowRenderer renderer = new ShadowRenderer(SHADOW_SIZE, 0.5f, Color.BLACK);
 
@@ -312,7 +310,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     //private final JLabel name;
     private final JTextField name;
-    private final IcyButton btnEdit = new IcyButton(GoogleMaterialDesignIcons.EDIT);
+    private final IcyButton btnEdit = new IcyButton(SVGIcon.EDIT);
 
     private boolean selected = false;
 
@@ -447,7 +445,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         final boolean isDarkMode = LookAndFeelUtil.isDarkMode();
-        final Color bgcRoot = LookAndFeelUtil.getUIDefaults().getColor("RootPane.background");
+        final Color bgcRoot = Objects.requireNonNull(LookAndFeelUtil.getUIDefaults()).getColor("RootPane.background");
 
         if (bgcRoot == null)
             return;
@@ -727,7 +725,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             fieldID.setToolTipText(tooltip);
             menuCLID.add(fieldID);
 
-            final IcyButton bStoreFieldID = new IcyButton(GoogleMaterialDesignIcons.CHECK);
+            final IcyButton bStoreFieldID = new IcyButton(SVGIcon.CHECK);
             bStoreFieldID.setFlat(true);
             //bStoreFieldID.setFocusable(false);
             //bStoreFieldID.setBorderPainted(false);

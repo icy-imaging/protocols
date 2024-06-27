@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,15 +18,18 @@
 
 package plugins.adufour.protocols;
 
-import icy.common.Version;
-import icy.file.FileUtil;
-import icy.main.Icy;
-import icy.plugin.PluginLoader;
-import icy.plugin.abstract_.PluginActionable;
-import icy.preferences.PluginsPreferences;
-import icy.preferences.XMLPreferences;
-import icy.system.thread.ThreadUtil;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.Icy;
+import org.bioimageanalysis.icy.common.Version;
+import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.PluginActionable;
+import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginIcon;
+import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginName;
+import org.bioimageanalysis.icy.io.FileUtil;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.bioimageanalysis.icy.system.preferences.PluginsPreferences;
+import org.bioimageanalysis.icy.system.preferences.XMLPreferences;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -53,7 +56,11 @@ import java.util.Map;
 /**
  * Protocols plugin
  */
+@IcyPluginName("Protocols")
+@IcyPluginIcon(path = "/protocols.svg")
 public class Protocols extends PluginActionable {
+    public static final Version VERSION = new Version(4, 0, 0);
+
     // "command" on Mac, "ctrl" on others
     public static final int MENU_SHORTCUT_KEY;
 
@@ -67,8 +74,7 @@ public class Protocols extends PluginActionable {
 
     private static boolean reloading = false;
 
-    public static final String downloadedProtocolFolder = FileUtil.getApplicationDirectory() + File.separator
-            + "protocols";
+    public static final String downloadedProtocolFolder = FileUtil.getApplicationDirectory() + File.separator + "protocols";
 
     private static final XMLPreferences preferences = PluginsPreferences.getPreferences().node(Protocols.class.getName());
 
@@ -109,8 +115,7 @@ public class Protocols extends PluginActionable {
      */
     public void reload(final Document reloadingXML, final String reloadingPath) {
         // 0) avoid silly situations...
-        if (mainFrame == null)
-            return;
+        if (mainFrame == null) return;
 
         reloading = true;
 
@@ -137,19 +142,16 @@ public class Protocols extends PluginActionable {
                 final XMLPreferences node = preferences.node("Protocol #" + counter++);
                 node.putBoolean("dirty", protocol.isDirty());
                 node.put("xml", xmlProtocol);
-                if (attachedFile != null)
-                    node.put("fileName", attachedFile.getAbsolutePath());
+                if (attachedFile != null) node.put("fileName", attachedFile.getAbsolutePath());
             }
             catch (final TransformerException e) {
-                System.err.println("Warning: couldn't store protocol " + protocol.getName() + ":");
-                e.printStackTrace();
-                System.err.println("---");
+                IcyLogger.warn(Protocols.class, e, "Couldn't store protocol " + protocol.getName() + ".");
             }
         }
 
         // 2) close the current Protocols instance
 
-        close();
+        closeProtocols();
 
         ThreadUtil.invokeLater(() -> {
             // 3) launch a new instance of the Protocols plug-in
@@ -157,7 +159,7 @@ public class Protocols extends PluginActionable {
                 ((PluginActionable) PluginLoader.getPluginClass(Protocols.class.getName()).getDeclaredConstructor().newInstance()).run();
             }
             catch (final Exception e) {
-                e.printStackTrace();
+                IcyLogger.error(Protocols.class, e, e.getLocalizedMessage());
             }
         });
     }
@@ -197,8 +199,7 @@ public class Protocols extends PluginActionable {
                 final Document xml = XMLUtil.loadDocument(protocolPath);
 
                 // Discard invalid files
-                if (xml != null)
-                    panel.setFile(new File(protocolPath));
+                if (xml != null) panel.setFile(new File(protocolPath));
 
                 mainFrame.addProtocolPane(panel);
 
@@ -211,7 +212,7 @@ public class Protocols extends PluginActionable {
                         return;
                     }
                     catch (final BlocksException e2) {
-                        e2.printStackTrace();
+                        IcyLogger.error(Protocols.class, e2, e2.getLocalizedMessage());
                     }
                 }
             }
@@ -220,16 +221,14 @@ public class Protocols extends PluginActionable {
                 final ArrayList<XMLPreferences> protocols = preferences.getChildren();
 
                 // no protocol info in XML preference
-                if (protocols.size() == 0)
-                    mainFrame.addProtocolPane(new ProtocolPanel(mainFrame));
+                if (protocols.isEmpty()) mainFrame.addProtocolPane(new ProtocolPanel(mainFrame));
                 else {
                     final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
                     for (final XMLPreferences node : preferences.getChildren()) {
                         final ProtocolPanel panel = new ProtocolPanel(mainFrame);
                         final String fileName = node.get("fileName", null);
-                        if (fileName != null)
-                            panel.setFile(new File(fileName));
+                        if (fileName != null) panel.setFile(new File(fileName));
                         mainFrame.addProtocolPane(panel);
 
                         final Document xml = builder.parse(new InputSource(new StringReader(node.get("xml", null))));
@@ -245,14 +244,14 @@ public class Protocols extends PluginActionable {
                             return;
                         }
                         catch (final BlocksException e2) {
-                            e2.printStackTrace();
+                            IcyLogger.error(Protocols.class, e2, e2.getLocalizedMessage());
                         }
                     }
                 }
             }
         }
         catch (final ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            IcyLogger.error(Protocols.class, e, e.getLocalizedMessage());
         }
 
         mainFrame.addToDesktopPane();
@@ -270,8 +269,7 @@ public class Protocols extends PluginActionable {
         for (final String clarg : clargs) {
             // checking sanity
             if (!clarg.contains("=")) {
-                if (verify)
-                    throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+                if (verify) throw new IllegalArgumentException("Invalid command line argument: " + clarg);
 
                 // next arg
                 continue;
@@ -279,8 +277,7 @@ public class Protocols extends PluginActionable {
 
             final String[] keyValuePair = clarg.split("=");
             if (keyValuePair.length != 2) {
-                if (verify)
-                    throw new IllegalArgumentException("Invalid command line argument: " + clarg);
+                if (verify) throw new IllegalArgumentException("Invalid command line argument: " + clarg);
 
                 // next arg
                 continue;
@@ -290,16 +287,14 @@ public class Protocols extends PluginActionable {
             final String value = keyValuePair[1];
 
             if (key.isEmpty()) {
-                if (verify)
-                    throw new IllegalArgumentException("Invalid command line argument (no key): " + clarg);
+                if (verify) throw new IllegalArgumentException("Invalid command line argument (no key): " + clarg);
 
                 // next arg
                 continue;
             }
 
             if (value.isEmpty()) {
-                if (verify)
-                    throw new IllegalArgumentException("Invalid command line argument (no value): " + clarg);
+                if (verify) throw new IllegalArgumentException("Invalid command line argument (no value): " + clarg);
 
                 // next arg
                 continue;
@@ -309,13 +304,11 @@ public class Protocols extends PluginActionable {
                 result = value;
                 ok = true;
             }
-            else
-                commandLineArguments.put(key, value);
+            else commandLineArguments.put(key, value);
         }
 
         // we correctly parsed arguments? --> clear it so no other plugin can reparse them
-        if (ok)
-            Icy.clearCommandLinePluginArgs();
+        if (ok) Icy.clearCommandLinePluginArgs();
 
         return result;
     }
@@ -326,37 +319,28 @@ public class Protocols extends PluginActionable {
         final Document xml = XMLUtil.loadDocument(protocolFile);
 
         // Discard invalid files
-        if (xml == null)
-            throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
+        if (xml == null) throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
 
-        System.out.println("Loading workflow...");
+        IcyLogger.info(Protocols.class, "Loading workflow...");
         final WorkFlow workFlow = new WorkFlow(true);
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);
 
         workFlow.run();
     }
 
+    @SuppressWarnings("resource")
     public static void loadWorkFlow(final File file) {
-        if (mainFrame == null)
-            new Protocols().run();
+        if (mainFrame == null) new Protocols().run();
 
         mainFrame.loadWorkFlow(file);
     }
 
-    public static void close() {
-        if (mainFrame != null && mainFrame.isVisible())
-            mainFrame.close();
+    public static void closeProtocols() {
+        if (mainFrame != null && mainFrame.isVisible()) mainFrame.close();
         mainFrame = null;
     }
 
     public static void dispatchEvent(final KeyEvent key) {
-        if (mainFrame != null)
-            mainFrame.getContentPane().dispatchEvent(key);
+        if (mainFrame != null) mainFrame.getContentPane().dispatchEvent(key);
     }
-
-    public String getFriendlyVersion() {
-        final Version v = getDescriptor().getVersion();
-        return "Blocks engine v." + v.getMajor() + "." + v.getMinor();
-    }
-
 }

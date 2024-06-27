@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,16 +18,15 @@
 
 package plugins.adufour.blocks.util;
 
-import icy.gui.frame.progress.AnnounceFrame;
-import icy.main.Icy;
-import icy.network.NetworkUtil;
-import icy.plugin.*;
-import icy.plugin.interface_.PluginBundled;
-import icy.system.IcyExceptionHandler;
-import icy.system.IcyHandledException;
-import icy.system.thread.ThreadUtil;
-import icy.util.ClassUtil;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.common.reflect.ClassUtil;
+import org.bioimageanalysis.icy.extension.plugin.*;
+import org.bioimageanalysis.icy.extension.plugin.interface_.PluginBundled;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.network.NetworkUtil;
+import org.bioimageanalysis.icy.system.IcyExceptionHandler;
+import org.bioimageanalysis.icy.system.IcyHandledException;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -231,9 +230,7 @@ public class BlocksML {
             if ((block instanceof InputBlock) || (block instanceof OutputBlock))
                 XMLUtil.setAttributeValue(blockNode, "CommandLineID", blockData.getCommandLineID());
 
-            if (blockData.isWorkFlow() && block instanceof WorkFlow) {
-                final WorkFlow innerWorkFlow = (WorkFlow) block;
-
+            if (blockData.isWorkFlow() && block instanceof final WorkFlow innerWorkFlow) {
                 saveWorkFlow_V4(innerWorkFlow, blockNode);
 
                 final Element varRoot = XMLUtil.addElement(blockNode, "variables");
@@ -243,7 +240,7 @@ public class BlocksML {
                 for (final Var<?> var : blockData.inputVars) {
                     final BlockDescriptor owner = innerWorkFlow.getInputOwner(var);
                     if (owner == null) {
-                        System.err.println("Warning: could not find owner for input variable: \"" + var + "\", skipping");
+                        IcyLogger.warn(BlocksML.class, "Could not find owner for input variable: \"" + var + "\", skipping.");
                         continue;
                     }
                     final Element varNode = XMLUtil.addElement(inputVarRoot, "variable");
@@ -258,8 +255,7 @@ public class BlocksML {
                 for (final Var<?> var : blockData.outputVars) {
                     final BlockDescriptor owner = innerWorkFlow.getOutputOwner(var);
                     if (owner == null) {
-                        System.err.println(
-                                "Warning: could not find owner for output variable: \"" + var + "\", skipping");
+                        IcyLogger.warn(BlocksML.class, "Could not find owner for output variable: \"" + var + "\", skipping.");
                         continue;
                     }
                     final Element varNode = XMLUtil.addElement(outputVarRoot, "variable");
@@ -366,11 +362,11 @@ public class BlocksML {
 
             // we are live!
             final String message = "[Protocols] Installing required plugins...";
-            System.out.println(message);
-            AnnounceFrame announcement = null;
+            IcyLogger.info(BlocksML.class, message);
+            //AnnounceFrame announcement = null;
 
-            if (!Icy.getMainInterface().isHeadLess())
-                announcement = new AnnounceFrame(message);
+            /*if (!Icy.getMainInterface().isHeadLess())
+                announcement = new AnnounceFrame(message);*/
 
             final Set<PluginDescriptor> descriptors = new HashSet<>(missingPlugins.size());
 
@@ -379,7 +375,7 @@ public class BlocksML {
                 if (pDesc == null) {
                     // sadly, I believe the plugin loader could be reloaded at anytime...
                     // double check that for every plugin, just to be safe
-                    if (PluginLoader.getPlugins(Block.class, true, false, false).isEmpty())
+                    if (PluginLoader.getPlugins(Block.class, false, false).isEmpty())
                         throw new BlocksReloadedException();
 
                     throw new BlocksException("Couldn't find plugin " + ClassUtil.getSimpleClassName(className) + " online", true);
@@ -393,9 +389,9 @@ public class BlocksML {
             PluginInstaller.waitInstall();
             PluginLoader.waitWhileLoading();
 
-            System.out.println("[Protocols] Plugins installed successfully.");
-            if (announcement != null)
-                announcement.close();
+            IcyLogger.info(BlocksML.class, "[Protocols] Plugins installed successfully.");
+            /*if (announcement != null)
+                announcement.close();*/
 
             // reload the whole mother!
             throw new BlocksReloadedException();
@@ -839,7 +835,7 @@ public class BlocksML {
      * @throws BlocksException If an error occurs while loading the workflow.
      */
     public synchronized void loadWorkFlow_V4(final Element workFlowRoot, final WorkFlow workFlow) throws BlocksException {
-        boolean hasWarnings = false;
+        //boolean hasWarnings = false;
 
         // Prepare a list of blocks to collapse after loading
         final ArrayList<BlockDescriptor> blocksToCollapse = new ArrayList<>();
@@ -914,7 +910,7 @@ public class BlocksML {
                         final Var<?> var = blockDescriptor.inputVars.get(uid);
 
                         if (var == null) {
-                            System.err.println(new NoSuchVariableException(blockDescriptor, uid).getMessage());
+                            IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
                             continue;
                         }
 
@@ -928,11 +924,11 @@ public class BlocksML {
                                 blockDescriptor.inputVars.setVisible(var, visible);
                             }
                             catch (final NoSuchVariableException e) {
-                                if (!hasWarnings) {
+                                /*if (!hasWarnings) {
                                     System.err.println("Error(s) while loading protocol:");
                                     hasWarnings = true;
-                                }
-                                System.err.println(new NoSuchVariableException(blockDescriptor, uid).getMessage());
+                                }*/
+                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
                             }
                         }
                     }
@@ -953,11 +949,11 @@ public class BlocksML {
                             blockDescriptor.outputVars.setVisible(var, visible);
                         }
                         catch (final NoSuchVariableException e) {
-                            if (!hasWarnings) {
+                            /*if (!hasWarnings) {
                                 System.err.println("Error(s) while loading protocol:");
                                 hasWarnings = true;
-                            }
-                            System.err.println(new NoSuchVariableException(blockDescriptor, uid).getMessage());
+                            }*/
+                            IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
                             // throw new NoSuchVariableException(blockInfo, uid);
                         }
                     }
@@ -982,11 +978,11 @@ public class BlocksML {
                                 blockDescriptor.inputVars.addRuntimeVariable(uid, (VarMutable) var);
                             }
                             else {
-                                if (!hasWarnings) {
+                                /*if (!hasWarnings) {
                                     System.err.println("Error(s) while loading protocol:");
                                     hasWarnings = true;
-                                }
-                                System.err.println(new NoSuchVariableException(blockDescriptor, uid).getMessage());
+                                }*/
+                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
                                 continue;
                                 // throw new NoSuchVariableException(blockInfo, uid);
                             }
@@ -1032,8 +1028,7 @@ public class BlocksML {
                             message += "Reason: " + e.getClass().getName() + " (" + e.getMessage() + ")";
                             throw new BlocksException(message, true);
                         }
-                        blockDescriptor.inputVars.setVisible(var,
-                                XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+                        blockDescriptor.inputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
                     }
                 }
 
@@ -1054,18 +1049,17 @@ public class BlocksML {
                                 blockDescriptor.outputVars.addRuntimeVariable(uid, (VarMutable) var);
                             }
                             else {
-                                if (!hasWarnings) {
+                                /*if (!hasWarnings) {
                                     System.err.println("Error(s) while loading protocol:");
                                     hasWarnings = true;
-                                }
-                                System.err.println(new NoSuchVariableException(blockDescriptor, uid).getMessage());
+                                }*/
+                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
                                 continue;
                                 // throw new NoSuchVariableException(blockInfo, uid);
                             }
                         }
 
-                        blockDescriptor.outputVars.setVisible(var,
-                                XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
+                        blockDescriptor.outputVars.setVisible(var, XMLUtil.getAttributeBooleanValue(varNode, "visible", false));
 
                         if (var instanceof MutableType)
                             try {
@@ -1073,8 +1067,7 @@ public class BlocksML {
                                 if (type != null) {
                                     if (var instanceof VarMutable) {
                                         final Class<?> mutableType = getPrimitiveType(type);
-                                        ((MutableType) var)
-                                                .setType(mutableType != null ? mutableType : Class.forName(type));
+                                        ((MutableType) var).setType(mutableType != null ? mutableType : Class.forName(type));
                                     }
                                     else if (var instanceof VarMutableArray) {
                                         ((MutableType) var).setType(Class.forName("[L" + type + ";"));
@@ -1082,8 +1075,7 @@ public class BlocksML {
                                 }
                             }
                             catch (final ClassNotFoundException e) {
-                                String message = "Unable to read output variable \"" + var.getName() + "\" in block \""
-                                        + blockDescriptor.getDefinedName() + "\".\n";
+                                String message = "Unable to read output variable \"" + var.getName() + "\" in block \"" + blockDescriptor.getDefinedName() + "\".\n";
                                 message += "Reason: " + e.getClass().getName() + " (" + e.getMessage() + ")";
                                 throw new BlocksException(message, true);
                             }
@@ -1125,8 +1117,7 @@ public class BlocksML {
                 srcVar = srcBlock.inputVars.get(srcVarID);
 
             if (srcVar == null) {
-                System.err.println("Cannot create a link from variable " + srcVarID + " (from block " + srcBlock
-                        + "). It may have been removed or renamed.");
+                IcyLogger.warn(BlocksML.class, "Cannot create a link from variable " + srcVarID + " (from block " + srcBlock + "). It may have been removed or renamed.");
                 continue;
             }
 
@@ -1155,8 +1146,7 @@ public class BlocksML {
             final Var<Object> dstVar = dstBlock.inputVars.get(dstVarID);
 
             if (dstVar == null) {
-                System.err.println("Cannot link to variable " + dstVarID + " (from block " + dstBlock
-                        + "). It may have been removed or renamed.");
+                IcyLogger.warn(BlocksML.class, "Cannot link to variable " + dstVarID + " (from block " + dstBlock + "). It may have been removed or renamed.");
                 continue;
             }
 
@@ -1167,12 +1157,12 @@ public class BlocksML {
         for (final BlockDescriptor block : blocksToCollapse)
             block.setCollapsed(true);
 
-        if (hasWarnings)
-            System.err.println("--");
+        /*if (hasWarnings)
+            System.err.println("--");*/
     }
 
     public synchronized void loadWorkFlow_V5(final Element workFlowRoot, final WorkFlow workFlow, final WorkFlow parentFlow) throws BlocksException {
-        boolean noWarnings = true;
+        //boolean noWarnings = true;
 
         final Element blocksRoot = XMLUtil.getElement(workFlowRoot, "blocks");
 
@@ -1180,7 +1170,8 @@ public class BlocksML {
 
         for (final Element blockNode : blocksNode) {
             final BlockDescriptor blockDesc = new BlockDescriptor();
-            noWarnings &= blockDesc.loadFromXML(blockNode);
+            /*noWarnings &= */
+            blockDesc.loadFromXML(blockNode);
             workFlow.addBlock(blockDesc);
         }
 
@@ -1191,8 +1182,8 @@ public class BlocksML {
             link.loadFromXML(linkNode);
         }
 
-        if (!noWarnings)
-            System.err.println("--");
+        /*if (!noWarnings)
+            System.err.println("--");*/
     }
 
     /**

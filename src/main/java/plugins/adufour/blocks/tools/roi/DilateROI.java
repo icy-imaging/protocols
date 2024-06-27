@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,12 +18,17 @@
 
 package plugins.adufour.blocks.tools.roi;
 
-import icy.roi.*;
-import icy.type.point.Point3D;
+import org.bioimageanalysis.extension.kernel.roi.roi2d.ROI2DArea;
+import org.bioimageanalysis.extension.kernel.roi.roi3d.ROI3DArea;
+import org.bioimageanalysis.icy.common.geom.point.Point3D;
+import org.bioimageanalysis.icy.model.roi.ROI;
+import org.bioimageanalysis.icy.model.roi.ROI2D;
+import org.bioimageanalysis.icy.model.roi.ROI3D;
+import org.bioimageanalysis.icy.model.roi.mask.BooleanMask2D;
+import org.bioimageanalysis.icy.model.roi.mask.BooleanMask3D;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.util.VarException;
-import plugins.kernel.roi.roi2d.ROI2DArea;
-import plugins.kernel.roi.roi3d.ROI3DArea;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -200,9 +205,7 @@ public class DilateROI extends MorphROI {
 
             return r2;
         }
-        else if (roi instanceof ROI3D) {
-            final ROI3D roi3D = (ROI3D) roi;
-
+        else if (roi instanceof final ROI3D roi3D) {
             final BooleanMask3D m3 = roi3D.getBooleanMask(true);
 
             final ROI3DArea r3 = new ROI3DArea(m3);
@@ -247,7 +250,7 @@ public class DilateROI extends MorphROI {
             return r3;
         }
 
-        System.out.println("[Dilate ROI] Warning: unsupported ROI: " + roi.getName());
+        IcyLogger.warn(DilateROI.class, "Unsupported ROI: " + roi.getName());
         return null;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,11 +18,12 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import icy.file.FileUtil;
-import icy.file.Loader;
-import icy.file.SequenceFileImporter;
-import icy.gui.dialog.ConfirmDialog;
-import icy.system.thread.ThreadUtil;
+import org.bioimageanalysis.icy.gui.dialog.ConfirmDialog;
+import org.bioimageanalysis.icy.io.FileUtil;
+import org.bioimageanalysis.icy.io.Loader;
+import org.bioimageanalysis.icy.io.SequenceFileImporter;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.*;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.util.BlocksFinder;
@@ -276,8 +277,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             final BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
 
             if ((srcBlockPanel == null) || (dstBlockPanel == null)) {
-                System.err.println("Warning: cannot recover link between " + link.srcBlock.getDefinedName()
-                        + " and " + link.dstBlock.getDefinedName() + " !");
+                IcyLogger.warn(WorkFlowContainer.class, "Cannot recover link between " + link.srcBlock.getDefinedName() + " and " + link.dstBlock.getDefinedName() + " !");
             }
             else {
                 linkLines.put(link, new RoundedSquareLine(srcBlockPanel, dstBlockPanel, link));
@@ -456,7 +456,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             for (final Link<?> l : workFlow.getLinkSelection())
                 workFlow.removeLink(l.dstVar);
             while (!workFlow.getBlockSelection().isEmpty()) {
-                final BlockDescriptor tmp = workFlow.getBlockSelection().get(0);
+                final BlockDescriptor tmp = workFlow.getBlockSelection().getFirst();
                 if (tmp.getBlock() instanceof WorkFlow)
                     ((WorkFlow) tmp.getBlock()).newSelection();
                 workFlow.removeBlock(tmp, true);
@@ -481,7 +481,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
      * @return A rectangle representing the bounds of this container's contents
      */
     public Rectangle getContentsBoundingBox() {
-        if (blockPanels.size() == 0)
+        if (blockPanels.isEmpty())
             return new Rectangle(0, 0, getWidth(), getHeight());
 
         Rectangle bounds = null;
@@ -551,8 +551,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             g2.setColor(Color.gray);
             g2.setFont(g2.getFont().deriveFont(Font.ITALIC));
             final Rectangle2D r = g2.getFontMetrics().getStringBounds(s, g);
-            g2.drawString(s, (float) (getWidth() / 2 - r.getWidth() / 2),
-                    (float) (getHeight() / 2 + r.getHeight() / 2));
+            g2.drawString(s, (float) (getWidth() / 2 - r.getWidth() / 2), (float) (getHeight() / 2 + r.getHeight() / 2));
         }
 
         for (final Line line : linkLines.values()) {
@@ -569,7 +568,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         final Line line = linkLines.remove(link);
 
         if (line == null)
-            System.err.println("Warning: missing link, cannot be removed properly");
+            IcyLogger.warn(WorkFlowContainer.class, "Missing link, cannot be removed properly.");
         else
             line.dispose();
 
@@ -708,9 +707,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 
             // quick & easy case first
-            if (t.getTransferData(d[0]) instanceof DND_MenuItem) {
+            if (t.getTransferData(d[0]) instanceof final DND_MenuItem menuItem) {
                 // block coming from the search panel
-                final DND_MenuItem menuItem = (DND_MenuItem) t.getTransferData(d[0]);
                 if (menuItemTransferHandler.canImport(this, d))
                     menuItemTransferHandler.importData(this, menuItem, mouseLocation);
             }
@@ -745,7 +743,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             }
         }
         catch (final UnsupportedFlavorException | IOException e) {
-            e.printStackTrace();
+            IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
         }
         finally {
             dtde.dropComplete(true);
@@ -769,7 +767,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                         return true;
             }
             catch (final ClassNotFoundException e) {
-                e.printStackTrace();
+                IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
             }
             return false;
         }
@@ -794,7 +792,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                           | NoSuchMethodException
                           | InvocationTargetException e
             ) {
-                e.printStackTrace();
+                IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
             }
         }
     }

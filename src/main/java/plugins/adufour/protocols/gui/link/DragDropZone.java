@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
-import icy.sequence.Sequence;
+import org.bioimageanalysis.icy.model.sequence.Sequence;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
@@ -97,8 +97,7 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
             dataType = variable.getType();
 
         if (dataType != null) {
-            if (variable instanceof VarGenericArray) {
-                final VarGenericArray<?> array = (VarGenericArray<?>) variable;
+            if (variable instanceof final VarGenericArray<?> array) {
                 dataType = array.getInnerType();
             }
             else if (dataType.isArray()) {

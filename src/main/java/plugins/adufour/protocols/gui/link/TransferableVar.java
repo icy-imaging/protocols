@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.vars.lang.Var;
 
@@ -48,7 +49,7 @@ public class TransferableVar<T> implements Transferable {
     }
 
     @Override
-    public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+    public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
         if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
 
         return this;

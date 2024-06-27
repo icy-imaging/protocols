@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 package plugins.adufour.blocks.tools;
 
-import icy.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.blocks.util.VarListListener;
 import plugins.adufour.vars.lang.Var;
@@ -36,6 +36,7 @@ public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListene
 
     private final VarMutable output = new VarMutable("output", null);
 
+    @SuppressWarnings("SuspiciousSystemArraycopy")
     @Override
     public void run() {
         int arrayLength = 0;

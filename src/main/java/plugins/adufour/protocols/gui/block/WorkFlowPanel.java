@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import icy.gui.component.menu.IcyMenuItem;
-import icy.system.thread.ThreadUtil;
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.blocks.lang.Loop;
@@ -54,7 +54,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
 
     final protected Box varBox;
 
-    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", GoogleMaterialDesignIcons.CLOSE);
+    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", SVGIcon.CLOSE);
 
     public WorkFlowPanel(final WorkFlowContainer wfPane, final BlockDescriptor blockDesc) {
         super(wfPane, blockDesc);

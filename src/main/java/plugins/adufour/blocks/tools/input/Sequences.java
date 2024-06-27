@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
 
 package plugins.adufour.blocks.tools.input;
 
-import icy.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarSequenceArray;
 
 /**
- * Utility block reading a list of {@link icy.sequence.Sequence} objects
+ * Utility block reading a list of {@link org.bioimageanalysis.icy.model.sequence.Sequence} objects
  *
  * @author Alexandre Dufour
  */

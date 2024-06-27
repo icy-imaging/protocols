@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 
 package plugins.adufour.blocks.util;
 
-import icy.plugin.abstract_.Plugin;
-import icy.sequence.Sequence;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.model.sequence.Sequence;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.vars.lang.*;
 
@@ -153,7 +154,7 @@ public class BlockAnnotations {
                     if (outputVariable != null) outputVariable.setValue(result);
                 }
                 catch (final Exception e) {
-                    e.printStackTrace();
+                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
                 }
             }
 
@@ -171,7 +172,7 @@ public class BlockAnnotations {
                     }
                 }
                 catch (final Exception e) {
-                    e.printStackTrace();
+                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
                 }
 
                 if (outputVariable != null) outputMap.add("output", outputVariable);
@@ -201,7 +202,7 @@ public class BlockAnnotations {
                     }
                 }
                 catch (final Exception e) {
-                    e.printStackTrace();
+                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
                 }
             }
         };

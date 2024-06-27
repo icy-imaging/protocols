@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 
 package plugins.adufour.blocks.tools;
 
-import icy.main.Icy;
-import icy.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.Icy;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
@@ -33,7 +34,7 @@ public class Display extends Plugin implements Block {
     public void run() {
         if (Icy.getMainInterface().isHeadLess()) {
             // Print to the standard output stream
-            System.out.println(object.getValueAsString());
+            IcyLogger.info(Display.class, object.getValueAsString());
         }
     }
 

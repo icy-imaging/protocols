@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,16 +18,17 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.file.xml.XMLPersistent;
-import icy.gui.plugin.PluginErrorReport;
-import icy.network.NetworkUtil;
-import icy.plugin.PluginDescriptor;
-import icy.plugin.PluginInstaller;
-import icy.plugin.PluginRepositoryLoader;
-import icy.plugin.abstract_.Plugin;
-import icy.util.ClassUtil;
-import icy.util.StringUtil;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.common.reflect.ClassUtil;
+import org.bioimageanalysis.icy.common.string.StringUtil;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.PluginInstaller;
+import org.bioimageanalysis.icy.extension.plugin.PluginRepositoryLoader;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.gui.plugin.PluginErrorReport;
+import org.bioimageanalysis.icy.io.xml.XMLPersistent;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.network.NetworkUtil;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import plugins.adufour.blocks.tools.Display;
@@ -604,8 +605,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         final String blockType = XMLUtil.getAttributeValue(blockNode, "blockType", null);
 
         try {
-            final Class<? extends Block> blockClass = installRequiredBlock(
-                    XMLUtil.getAttributeValue(blockNode, "className", null), blockType);
+            final Class<? extends Block> blockClass = installRequiredBlock(XMLUtil.getAttributeValue(blockNode, "className", null), blockType);
 
             block = blockClass.getDeclaredConstructor().newInstance();
 
@@ -632,11 +632,12 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 final Var<?> var = inputVars.get(uid);
 
                 if (var == null) {
-                    if (noWarnings) {
+                    /*if (noWarnings) {
                         System.err.println("Error(s) while loading protocol:");
                         noWarnings = false;
                     }
-                    System.err.println(new NoSuchVariableException(this, uid).getMessage());
+                    System.err.println(new NoSuchVariableException(this, uid).getMessage());*/
+                    IcyLogger.warn(BlockDescriptor.class, new NoSuchVariableException(this, uid), "Error while loading protocol.");
                     continue;
                 }
 
@@ -669,11 +670,12 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 final Var<?> var = outputVars.get(uid);
 
                 if (var == null) {
-                    if (noWarnings) {
+                    /*if (noWarnings) {
                         System.err.println("Error(s) while loading protocol:");
                         noWarnings = false;
                     }
-                    System.err.println(new NoSuchVariableException(this, uid).getMessage());
+                    System.err.println(new NoSuchVariableException(this, uid).getMessage());*/
+                    IcyLogger.warn(BlockDescriptor.class, new NoSuchVariableException(this, uid), "Error while loading protocol.");
                     continue;
                 }
 
@@ -698,7 +700,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             throw new BlocksException("Cannot create block (" + e1.getMessage() + ") => class not found", true);
         }
         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+            IcyLogger.error(BlockDescriptor.class, e, e.getLocalizedMessage());
         }
 
         return noWarnings;
@@ -802,11 +804,10 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             newBlock = blockClass.getDeclaredConstructor().newInstance();
         }
         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-            e1.printStackTrace();
+            IcyLogger.error(BlockDescriptor.class, e1, e1.getLocalizedMessage());
         }
 
-        cpy = (newBlock instanceof WorkFlow ? ((WorkFlow) newBlock).getBlockDescriptor()
-                : new BlockDescriptor(-1, newBlock));
+        cpy = (newBlock instanceof WorkFlow ? ((WorkFlow) newBlock).getBlockDescriptor() : new BlockDescriptor(-1, newBlock));
 
         cpy.setDefinedName(getDefinedName());
         cpy.setLocation(getLocation().x + 12, getLocation().y + 12);
@@ -950,24 +951,28 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     private static void cloneLinks(final Iterable<Link<?>> iterable, final Map<BlockDescriptor, BlockDescriptor> copies, final WorkFlow dest) {
         for (final Link<?> l : iterable) {
             if (l.srcBlock.getBlock() instanceof Loop || l.dstBlock.getBlock() instanceof Loop) {
-                System.err.println("Warning : cannot copy a link to a loop variable");
+                IcyLogger.warn(BlockDescriptor.class, "Cannot copy a link to a loop variable.");
                 continue;
             }
             if (l.srcBlock.getBlock() instanceof WorkFlow || l.dstBlock.getBlock() instanceof WorkFlow) {
-                System.err.println("Warning : cannot copy a link to an exposed variable");
+                IcyLogger.warn(BlockDescriptor.class, "Cannot copy a link to an exposed variable.");
                 continue;
             }
             try {
-                dest.addLink(copies.get(l.srcBlock),
+                dest.addLink(
+                        copies.get(l.srcBlock),
                         copies.get(l.srcBlock).inputVars.get(l.srcBlock.inputVars.getID(l.srcVar)),
                         copies.get(l.dstBlock),
-                        copies.get(l.dstBlock).inputVars.get(l.dstBlock.inputVars.getID(l.dstVar)));
+                        copies.get(l.dstBlock).inputVars.get(l.dstBlock.inputVars.getID(l.dstVar))
+                );
             }
             catch (final NoSuchVariableException nsve) {
-                dest.addLink(copies.get(l.srcBlock),
+                dest.addLink(
+                        copies.get(l.srcBlock),
                         copies.get(l.srcBlock).outputVars.get(l.srcBlock.outputVars.getID(l.srcVar)),
                         copies.get(l.dstBlock),
-                        copies.get(l.dstBlock).inputVars.get(l.dstBlock.inputVars.getID(l.dstVar)));
+                        copies.get(l.dstBlock).inputVars.get(l.dstBlock.inputVars.getID(l.dstVar))
+                );
             }
         }
     }

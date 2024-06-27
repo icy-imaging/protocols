@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,13 +18,13 @@
 
 package plugins.adufour.protocols.gui;
 
-import icy.gui.component.IcyTextFieldHint;
-import icy.gui.frame.progress.AnnounceFrame;
-import icy.network.NetworkUtil;
-import icy.plugin.PluginDescriptor;
-import icy.plugin.abstract_.Plugin;
-import icy.util.StringUtil;
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import org.bioimageanalysis.icy.common.string.StringUtil;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.gui.component.field.IcyTextFieldHint;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
+import org.bioimageanalysis.icy.network.NetworkUtil;
 import plugins.adufour.blocks.util.BlocksFinder;
 import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
 import plugins.adufour.blocks.util.MenuItemListener;
@@ -62,7 +62,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
     private final JScrollPane blockInfoDisplay;
 
     public BlockSearchPanel() {
-        searchField = new IcyTextFieldHint(GoogleMaterialDesignIcons.SEARCH, DEFAULT_SEARCH_TEXT);
+        searchField = new IcyTextFieldHint(SVGIcon.SEARCH, DEFAULT_SEARCH_TEXT);
         final Box searchBar = Box.createHorizontalBox();
 
         finder = new BlocksFinder();
@@ -175,7 +175,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
 
         String name = d.getName();
         final StringBuilder description = new StringBuilder("<h3>Public description:</h3>");
-        String author = d.getAuthor();
+        final String author = d.getAuthor();
 
         // if (_class.isAnnotationPresent(BlockSearchAnnotation.class))
         // {

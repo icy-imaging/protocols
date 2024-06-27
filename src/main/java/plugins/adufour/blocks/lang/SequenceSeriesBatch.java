@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.common.exception.UnsupportedFormatException;
-import icy.file.Loader;
-import icy.file.SequenceFileImporter;
-import icy.sequence.MetaDataUtil;
+import org.bioimageanalysis.icy.common.exception.UnsupportedFormatException;
+import org.bioimageanalysis.icy.io.Loader;
+import org.bioimageanalysis.icy.io.SequenceFileImporter;
+import org.bioimageanalysis.icy.model.sequence.MetaDataUtil;
 import plugins.adufour.vars.gui.FileMode;
 import plugins.adufour.vars.gui.model.FileTypeModel;
 import plugins.adufour.vars.lang.VarFile;
@@ -30,7 +30,6 @@ import plugins.adufour.vars.util.VarException;
 import plugins.kernel.importer.LociImporterPlugin;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * A Sequence series batch will iteratively load all series contained in a multi-series
@@ -93,11 +92,11 @@ public class SequenceSeriesBatch extends Batch {
         catch (final UnsupportedFormatException e) {
             throw new VarException(multiSeriesFile, path + " is not an imaging file");
         }
-        catch (final IOException e) {
-            throw new VarException(multiSeriesFile, "Unable to read " + path);
-        }
         catch (final InterruptedException e) {
             throw new VarException(multiSeriesFile, "Process interrupted !");
+        }
+        catch (final Exception e) {
+            throw new VarException(multiSeriesFile, "Unable to read " + path);
         }
     }
 

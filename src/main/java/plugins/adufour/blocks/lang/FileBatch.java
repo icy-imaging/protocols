@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.file.FileUtil;
-import icy.gui.frame.progress.AnnounceFrame;
-import icy.main.Icy;
+import org.bioimageanalysis.icy.Icy;
+import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
+import org.bioimageanalysis.icy.io.FileUtil;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.gui.FileMode;
 import plugins.adufour.vars.gui.model.FileTypeModel;

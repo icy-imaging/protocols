@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
-import icy.system.thread.ThreadUtil;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.protocols.gui.block.BlockPanel;

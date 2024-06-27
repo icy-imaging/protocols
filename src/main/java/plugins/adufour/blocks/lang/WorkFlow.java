@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,13 +18,14 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.gui.dialog.ConfirmDialog;
-import icy.main.Icy;
-import icy.math.UnitUtil;
-import icy.plugin.abstract_.Plugin;
-import icy.system.IcyHandledException;
-import icy.system.thread.ThreadUtil;
-import icy.util.StringUtil;
+import org.bioimageanalysis.icy.Icy;
+import org.bioimageanalysis.icy.common.math.UnitUtil;
+import org.bioimageanalysis.icy.common.string.StringUtil;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.gui.dialog.ConfirmDialog;
+import org.bioimageanalysis.icy.system.IcyHandledException;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.input.InputBlock;
 import plugins.adufour.blocks.tools.output.OutputBlock;
@@ -432,7 +433,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
     }
 
     @Override
-    public Iterator<BlockDescriptor> iterator() {
+    public @NotNull Iterator<BlockDescriptor> iterator() {
         // return orderedBlocks.iterator();
         return new Iterator<>() {
             private final Iterator<BlockDescriptor> orderedBlocksIt = orderedBlocks.iterator();
@@ -518,8 +519,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
 
     public void removeBlock(final BlockDescriptor blockInfo, boolean checkSelection) {
         // pops out workflows' selections
-        if (blockInfo.getBlock() instanceof WorkFlow) {
-            final WorkFlow wf = ((WorkFlow) blockInfo.getBlock());
+        if (blockInfo.getBlock() instanceof final WorkFlow wf) {
             if (checkSelection && !wf.getBlockSelection().isEmpty())
                 try {
                     // use location in the main container instead of in the inner workflow
@@ -722,7 +722,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
      */
     @Override
     public void run() {
-        if (orderedBlocks.size() == 0)
+        if (orderedBlocks.isEmpty())
             return;
 
         descriptor.setStatus(BlockStatus.RUNNING);

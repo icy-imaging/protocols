@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
@@ -116,7 +117,7 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
                 errorPopup.setLocation(location.x + 10, location.y + 20);
                 errorPopup.setVisible(true);
 
-                error.printStackTrace();
+                IcyLogger.error(DropZone.class, error, error.getLocalizedMessage());
             }
         }
     }
@@ -134,8 +135,7 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
             e.dropComplete(true);
         }
         catch (final Exception e1) {
-            JOptionPane.showMessageDialog(null, e1.getMessage() + "\n(stack trace will be sent to the console)", "Error", JOptionPane.ERROR_MESSAGE);
-            e1.printStackTrace();
+            IcyLogger.error(DropZone.class, e1, "Error while dropping.");
             e.dropComplete(false);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,27 +18,27 @@
 
 package plugins.adufour.protocols.gui;
 
-import icy.common.listener.AcceptListener;
-import icy.file.Loader;
-import icy.gui.component.CloseableTabbedPane;
-import icy.gui.component.CloseableTabbedPane.CloseableTabbedPaneListener;
-import icy.gui.component.button.IcyButton;
-import icy.gui.component.button.IcyToggleButton;
-import icy.gui.frame.IcyFrame;
-import icy.gui.frame.IcyFrameEvent;
-import icy.gui.frame.IcyFrameListener;
-import icy.gui.frame.progress.AnnounceFrame;
-import icy.main.Icy;
-import icy.plugin.PluginDescriptor;
-import icy.plugin.PluginInstaller;
-import icy.plugin.PluginLoader;
-import icy.system.FileDrop;
-import icy.system.FileDrop.FileDropListener;
-import icy.system.IcyExceptionHandler;
-import icy.system.IcyHandledException;
-import icy.system.thread.ThreadUtil;
-import icy.util.XMLUtil;
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import org.bioimageanalysis.icy.Icy;
+import org.bioimageanalysis.icy.common.listener.AcceptListener;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.PluginInstaller;
+import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
+import org.bioimageanalysis.icy.gui.component.button.IcyButton;
+import org.bioimageanalysis.icy.gui.component.button.IcyToggleButton;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIconPack;
+import org.bioimageanalysis.icy.gui.component.tabbedpane.CloseableTabbedPane;
+import org.bioimageanalysis.icy.gui.frame.IcyFrame;
+import org.bioimageanalysis.icy.gui.frame.IcyFrameEvent;
+import org.bioimageanalysis.icy.gui.frame.IcyFrameListener;
+import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
+import org.bioimageanalysis.icy.io.Loader;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.system.FileDrop;
+import org.bioimageanalysis.icy.system.IcyExceptionHandler;
+import org.bioimageanalysis.icy.system.IcyHandledException;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 import org.w3c.dom.Document;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
@@ -69,18 +69,18 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListener, CloseableTabbedPaneListener, AcceptListener, ChangeListener, BlockListener, FileDropListener {
+public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListener, CloseableTabbedPane.CloseableTabbedPaneListener, AcceptListener, ChangeListener, BlockListener, FileDrop.FileDropListener {
     private static final String UNTITLED = "untitled";
 
     private final JToolBar toolBar;
 
-    private final IcyButton bNew = new IcyButton("New", GoogleMaterialDesignIcons.NOTE_ADD);
-    private final IcyButton bLoad = new IcyButton("Load", GoogleMaterialDesignIcons.FOLDER_OPEN);
-    private final IcyButton bSave = new IcyButton("Save", GoogleMaterialDesignIcons.SAVE);
-    private final IcyButton bSaveAs = new IcyButton("Save as", GoogleMaterialDesignIcons.FILE_DOWNLOAD);
-    private final IcyButton bEmbed = new IcyButton("Embed", GoogleMaterialDesignIcons.OPEN_IN_NEW);
-    private final IcyToggleButton bRun = new IcyToggleButton("Run", GoogleMaterialDesignIcons.PLAY_ARROW, GoogleMaterialDesignIcons.STOP);
-    private final IcyButton bClean = new IcyButton("Reset", GoogleMaterialDesignIcons.RESTORE);
+    private final IcyButton bNew = new IcyButton("New", SVGIcon.NOTE_ADD);
+    private final IcyButton bLoad = new IcyButton("Load", SVGIcon.FOLDER_OPEN);
+    private final IcyButton bSave = new IcyButton("Save", SVGIcon.SAVE);
+    private final IcyButton bSaveAs = new IcyButton("Save as", SVGIcon.SAVE_AS);
+    private final IcyButton bEmbed = new IcyButton("Embed", SVGIcon.OPEN_IN_NEW);
+    private final IcyToggleButton bRun = new IcyToggleButton("Run", new SVGIconPack(SVGIcon.PLAY_CIRCLE, SVGIcon.STOP_CIRCLE));
+    private final IcyButton bClean = new IcyButton("Reset", SVGIcon.DEVICE_RESET);
 
     private final CloseableTabbedPane closeableTabbedPane = new CloseableTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 
@@ -103,7 +103,8 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     private boolean isFrameClosing = false;
 
     public MainFrame(final Protocols pluginInstance) {
-        super("Protocols editor (" + pluginInstance.getFriendlyVersion() + ")", true, true, true, true, true);
+        //super("Protocols editor (" + pluginInstance.getFriendlyVersion() + ")", true, true, true, true, true);
+        super("Protocols editor", true, true, true, true, true);
 
         this.pluginInstance = pluginInstance;
 
@@ -193,6 +194,12 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
             }
         });
 
+        final JToolBar statusBar = new JToolBar(JToolBar.HORIZONTAL);
+        statusBar.setFloatable(false);
+        statusBar.add(new JLabel("Engine v" + Protocols.VERSION.toShortString()));
+
+        getContentPane().add(statusBar, BorderLayout.SOUTH);
+
         Icy.getMainInterface().addCanExitListener(this);
 
         pack();
@@ -245,7 +252,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
             @SuppressWarnings("rawtypes") final Link clone = linkClone(wf, l);
 
             if (clone == null) {
-                System.err.println("Warning: cannot copy a link to an exposed variable");
+                IcyLogger.warn(MainFrame.class, "Cannot copy a link to an exposed variable.");
                 continue;
             }
 
@@ -549,9 +556,9 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
                 PluginInstaller.waitInstall();
                 PluginLoader.waitWhileLoading();
 
-                final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
+                final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
 
-                if (plugins.size() == 0)
+                if (plugins.isEmpty())
                     throw new BlocksReloadedException();
 
                 panel.loadWorkFlow(xml, false);
@@ -580,7 +587,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
                                 message += "\n\n" + BlocksML.getInstance().toString(xml);
                             }
                             catch (final TransformerFactoryConfigurationError | TransformerException e2) {
-                                e2.printStackTrace();
+                                IcyLogger.error(MainFrame.class, e2, e2.getLocalizedMessage());
                             }
 
                             //$FALL-THROUGH$ Send the report anyway
@@ -694,7 +701,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
 
         Icy.getMainInterface().removeCanExitListener(this);
 
-        Protocols.close();
+        Protocols.closeProtocols();
 
         return true;
     }

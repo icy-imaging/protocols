@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -29,7 +29,6 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
 
 public class LoopPanel extends WorkFlowPanel {
     private final Loop loop;
@@ -47,24 +46,25 @@ public class LoopPanel extends WorkFlowPanel {
 
         // create a special panel to receive the loop variables
         innerLoopPanel = new JPanel(new GridBagLayout()) {
-            @Override
+            /*@Override
             public void paintChildren(final Graphics g) {
                 final Graphics2D g2 = (Graphics2D) g;
 
-                final Point2D p1 = gradient.getPoint1();
-                p1.setLocation(p1.getX() + 1, p1.getY() - 30);
-                g2.setPaint(new GradientPaint(p1, gradient.getColor1(), gradient.getPoint2(), gradient.getColor2()));
-                g2.fillRect(5, 0, getWidth() - 11, getHeight());
-                g2.setPaint(null);
-                g2.setColor(Color.gray);
-                g2.drawLine(15, getHeight() - 1, getWidth() - 6, getHeight() - 1);
-                g2.drawLine(getWidth() - 6, 0, getWidth() - 6, getHeight());
+                //final Point2D p1 = gradient.getPoint1();
+                //p1.setLocation(p1.getX() + 1, p1.getY() - 30);
+                //g2.setPaint(new GradientPaint(p1, gradient.getColor1(), gradient.getPoint2(), gradient.getColor2()));
+                //g2.setColor(getBackground());
+                //g2.fillRect(5, 0, getWidth() - 11, getHeight());
+                //g2.setPaint(null);
+                //g2.setColor(getForeground());
+                //g2.drawLine(15, getHeight() - 1, getWidth() - 6, getHeight() - 1);
+                //g2.drawLine(getWidth() - 6, 0, getWidth() - 6, getHeight());
 
                 super.paintChildren(g2);
-            }
+            }*/
         };
 
-        innerLoopPanel.setOpaque(false);
+        innerLoopPanel.setOpaque(true);
         innerLoopPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 2));
 
         menuStopOnFirstError.addActionListener(this);
@@ -100,8 +100,7 @@ public class LoopPanel extends WorkFlowPanel {
         // add other loop variables
         for (final Var<?> loopVariable : loop.getLoopVariables()) {
             // don't re-draw batch elements again...
-            if (blockDesc.getBlock() instanceof Batch) {
-                final Batch batch = (Batch) blockDesc.getBlock();
+            if (blockDesc.getBlock() instanceof final Batch batch) {
                 if (loopVariable == batch.getBatchSource() || loopVariable == batch.getBatchElement())
                     continue;
             }

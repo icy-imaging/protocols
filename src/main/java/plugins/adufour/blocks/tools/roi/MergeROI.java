@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 
 package plugins.adufour.blocks.tools.roi;
 
-import icy.plugin.abstract_.Plugin;
-import icy.roi.ROI;
-import icy.roi.ROIUtil;
-import icy.util.ShapeUtil.BooleanOperator;
+import org.bioimageanalysis.icy.common.geom.shape.ShapeUtil;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.model.roi.ROI;
+import org.bioimageanalysis.icy.model.roi.ROIUtil;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarEnum;
 import plugins.adufour.vars.lang.VarROIArray;
@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MergeROI extends Plugin implements ROIBlock {
-    private final VarEnum<BooleanOperator> operation = new VarEnum<>("Merge operation", BooleanOperator.AND);
+    private final VarEnum<ShapeUtil.BooleanOperator> operation = new VarEnum<>("Merge operation", ShapeUtil.BooleanOperator.AND);
 
     private final VarROIArray roiIn = new VarROIArray("List of ROI");
 

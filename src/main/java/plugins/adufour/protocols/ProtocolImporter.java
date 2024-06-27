@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,10 +18,12 @@
 
 package plugins.adufour.protocols;
 
-import icy.file.FileImporter;
-import icy.gui.frame.progress.FileFrame;
-import icy.plugin.abstract_.Plugin;
-import icy.system.thread.ThreadUtil;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginIcon;
+import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginName;
+import org.bioimageanalysis.icy.gui.frame.progress.FileFrame;
+import org.bioimageanalysis.icy.io.FileImporter;
+import org.bioimageanalysis.icy.system.thread.ThreadUtil;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.List;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Protocol Importer")
 public class ProtocolImporter extends Plugin implements FileImporter {
     @Override
     public boolean acceptFile(final String path) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,14 +18,16 @@
 
 package plugins.adufour.blocks.util;
 
-import icy.gui.component.menu.IcyMenu;
-import icy.gui.component.menu.IcyMenuItem;
-import icy.gui.component.menu.IcyPluginMenuItem;
-import icy.plugin.PluginDescriptor;
-import icy.plugin.PluginLoader;
-import icy.plugin.abstract_.Plugin;
-import icy.util.ClassUtil;
-import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import org.bioimageanalysis.icy.common.reflect.ClassUtil;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenu;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
+import org.bioimageanalysis.icy.gui.component.menu.IcyPluginMenuItem;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.Loop;
@@ -33,7 +35,6 @@ import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.blocks.tools.Display;
 import plugins.adufour.blocks.tools.ReLoop;
 import plugins.adufour.blocks.tools.ToolsBlock;
-import plugins.adufour.blocks.tools.ij.IJBlock;
 import plugins.adufour.blocks.tools.input.InputBlock;
 import plugins.adufour.blocks.tools.io.IOBlock;
 import plugins.adufour.blocks.tools.output.OutputBlock;
@@ -106,18 +107,17 @@ public class BlocksFinder {
         }
 
         @Override
-        public Object getTransferData(final DataFlavor flavor) {
+        public @NotNull Object getTransferData(final DataFlavor flavor) {
             return this;
         }
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
             try {
-                return new DataFlavor[]{
-                        new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList")};
+                return new DataFlavor[]{new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList")};
             }
             catch (final ClassNotFoundException e) {
-                e.printStackTrace();
+                IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
             }
             return null;
         }
@@ -190,9 +190,9 @@ public class BlocksFinder {
      * @param searchText    String
      */
     public void createSearchMenu(final BlockSearchPanel menuContainer, String searchText) {
-        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
+        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
 
-        if (plugins.size() == 0) {
+        if (plugins.isEmpty()) {
             final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
             item.setFont(item.getFont().deriveFont(Font.ITALIC));
             menuContainer.add(item);
@@ -270,37 +270,34 @@ public class BlocksFinder {
      * @param location      Point
      */
     public final void createJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
-        final IcyMenu mnBlocks = new IcyMenu("Blocks...", GoogleMaterialDesignIcons.WIDGETS);
+        final IcyMenu mnBlocks = new IcyMenu("Blocks...", SVGIcon.WIDGETS);
         //mnBlocks.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"), 22));
 
-        final IcyMenu mnInput = new IcyMenu("Read...", GoogleMaterialDesignIcons.REDO);
+        final IcyMenu mnInput = new IcyMenu("Read...", SVGIcon.REDO);
         //mnInput.setIcon(new IcyIcon(ResourceUtil.ICON_REDO, 22));
 
-        final IcyMenu mnOutput = new IcyMenu("Out...", GoogleMaterialDesignIcons.UNDO);
+        final IcyMenu mnOutput = new IcyMenu("Out...", SVGIcon.UNDO);
         //mnOutput.setIcon(new IcyIcon(ResourceUtil.ICON_UNDO, 22));
 
-        final IcyMenu mnIO = new IcyMenu("I/O...", GoogleMaterialDesignIcons.SAVE);
+        final IcyMenu mnIO = new IcyMenu("I/O...", SVGIcon.SAVE);
         //mnIO.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE, 22));
 
-        final IcyMenu mnSeq = new IcyMenu("Sequence...", GoogleMaterialDesignIcons.PHOTO);
+        final IcyMenu mnSeq = new IcyMenu("Sequence...", SVGIcon.IMAGE);
         //mnSeq.setIcon(new IcyIcon(ResourceUtil.ICON_PHOTO, 22));
 
-        final IcyMenu mnROI = new IcyMenu("ROI...", GoogleMaterialDesignIcons.GRAIN);
+        final IcyMenu mnROI = new IcyMenu("ROI...", SVGIcon.DRAW_ABSTRACT);
         //mnROI.setIcon(new IcyIcon(ResourceUtil.ICON_ROI_POLYGON, 22));
 
-        final IcyMenu mnImageJ = new IcyMenu("ImageJ...", GoogleMaterialDesignIcons.REPORT);
-        //mnImageJ.setIcon(new IcyIcon(ResourceUtil.ICON_TOIJ, 22));
-
-        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", GoogleMaterialDesignIcons.LOOP);
+        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", SVGIcon.LAPS);
         //mnLoops.setIcon(new IcyIcon(ResourceUtil.ICON_RELOAD, 22));
 
-        final IcyMenu mnTools = new IcyMenu("Tools...", GoogleMaterialDesignIcons.SETTINGS);
+        final IcyMenu mnTools = new IcyMenu("Tools...", SVGIcon.SETTINGS);
         //mnTools.setIcon(new IcyIcon(ResourceUtil.ICON_TOOLS, 22));
 
-        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, true, false, false);
+        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
 
-        if (plugins.size() == 0) {
-            final IcyMenuItem item = new IcyMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
+        if (plugins.isEmpty()) {
+            final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
             item.setFont(item.getFont().deriveFont(Font.ITALIC));
             menuContainer.add(item);
             return;
@@ -343,7 +340,7 @@ public class BlocksFinder {
                         addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                     }
                     catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                        e1.printStackTrace();
+                        IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
                     }
                 });
 
@@ -361,7 +358,7 @@ public class BlocksFinder {
                             addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                         }
                         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                            e1.printStackTrace();
+                            IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
                         }
                     });
                     mnLoops.add(item);
@@ -381,9 +378,6 @@ public class BlocksFinder {
                 else if (ROIBlock.class.isAssignableFrom(blockClass)) {
                     mnROI.add(menuItem);
                 }
-                else if (IJBlock.class.isAssignableFrom(blockClass)) {
-                    mnImageJ.add(menuItem);
-                }
                 else if (ToolsBlock.class.isAssignableFrom(blockClass)) {
                     if (blockClass == ReLoop.class)
                         continue; // TODO
@@ -400,7 +394,7 @@ public class BlocksFinder {
                     final ArrayList<BlockAnnotations> blocks = BlockAnnotations.findBlockMethods(clazz);
 
                     for (final BlockAnnotations annotatedMethod : blocks) {
-                        final IcyMenuItem item2 = new IcyMenuItem(clazz.getSimpleName() + "." + annotatedMethod.getName());
+                        final JMenuItem item2 = new JMenuItem(clazz.getSimpleName() + "." + annotatedMethod.getName());
                         item2.setToolTipText(annotatedMethod.getDescription());
                         item2.addActionListener(e -> addBlock(workFlowPane, annotatedMethod.createBlock(), location));
                         mnBlocks.add(item2);
@@ -418,7 +412,6 @@ public class BlocksFinder {
         splitLongMenus(mnSeq, 15);
         splitLongMenus(mnROI, 15);
         splitLongMenus(mnIO, 15);
-        splitLongMenus(mnImageJ, 15);
         splitLongMenus(mnLoops, 15);
         splitLongMenus(mnTools, 15);
 
@@ -428,19 +421,18 @@ public class BlocksFinder {
         menuContainer.add(mnSeq);
         menuContainer.add(mnROI);
         menuContainer.add(mnIO);
-        menuContainer.add(mnImageJ);
         menuContainer.add(mnLoops);
         menuContainer.add(mnTools);
 
         // and add the Display block last
 
-        final IcyMenuItem mnDisp = new IcyMenuItem("Display", GoogleMaterialDesignIcons.VISIBILITY);
+        final IcyMenuItem mnDisp = new IcyMenuItem("Display", SVGIcon.VISIBILITY);
         mnDisp.addActionListener(arg0 -> {
             try {
                 addBlock(workFlowPane, Display.class.getDeclaredConstructor().newInstance(), location);
             }
             catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                e1.printStackTrace();
+                IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
             }
         });
         //mnDisp.setIcon(new IcyIcon(ImageUtil.scaleQuality(ResourceUtil.getAlphaIconAsImage("eye_open.png"), 22, 22)));
@@ -535,7 +527,7 @@ public class BlocksFinder {
                     workFlowPane.embedWorkFlow(plugin.getPluginClass().asSubclass(WorkFlow.class));
                 }
                 catch (final Exception e) {
-                    e.printStackTrace();
+                    IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
                 }
             });
             menuContainer.add(menuItem);
@@ -566,17 +558,17 @@ public class BlocksFinder {
 
             JMenu currentMenu = menu;
 
-            while (components.size() > 0) {
+            while (!components.isEmpty()) {
                 final int n = Math.min(components.size(), maxItemsPerMenu - 1);
 
                 for (int i = 0; i < n; i++)
-                    currentMenu.add(components.remove(0));
+                    currentMenu.add(components.removeFirst());
 
-                if (components.size() > 0)
+                if (!components.isEmpty())
                     currentMenu = (JMenu) currentMenu.add(new JMenu("More..."));
             }
 
-            if (components.size() > 0)
+            if (!components.isEmpty())
                 throw new RuntimeException("Error while splitting menus: " + components.size() + " are remaining.");
         }
 
@@ -631,5 +623,4 @@ public class BlocksFinder {
 
         return output.toString();
     }
-
 }

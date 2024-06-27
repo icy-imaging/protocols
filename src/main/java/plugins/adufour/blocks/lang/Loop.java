@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.system.IcyHandledException;
+import org.bioimageanalysis.icy.system.IcyHandledException;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.ReLoop;
 import plugins.adufour.blocks.util.BlocksException;
@@ -145,7 +145,7 @@ public class Loop extends WorkFlow {
             afterIteration();
         }
 
-        if (exceptions.size() > 0) {
+        if (!exceptions.isEmpty()) {
             final StringBuilder message = new StringBuilder("The following errors occurred during the loop:\n\n");
             for (final Exception e : exceptions)
                 message.append(" - ").append(e.getMessage()).append("\n");
@@ -213,9 +213,7 @@ public class Loop extends WorkFlow {
         }
         catch (final LoopException e) {
             // authorize loops only if the destination is a "ReLoop" block
-            if (link.dstBlock.getBlock() instanceof ReLoop) {
-                final ReLoop reLoop = (ReLoop) link.dstBlock.getBlock();
-
+            if (link.dstBlock.getBlock() instanceof final ReLoop reLoop) {
                 if (link.dstVar == reLoop.reloopValue)
                     return;
             }

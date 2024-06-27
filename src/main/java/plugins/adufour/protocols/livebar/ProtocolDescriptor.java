@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,11 +18,12 @@
 
 package plugins.adufour.protocols.livebar;
 
-import icy.file.FileUtil;
-import icy.file.xml.XMLPersistent;
-import icy.network.NetworkUtil;
-import icy.plugin.PluginLoader;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
+import org.bioimageanalysis.icy.io.FileUtil;
+import org.bioimageanalysis.icy.io.xml.XMLPersistent;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.network.NetworkUtil;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.w3c.dom.Node;
 import plugins.adufour.protocols.Protocols;
 
@@ -83,7 +84,7 @@ public class ProtocolDescriptor implements XMLPersistent {
             return new File(filePath);
         }
         catch (final IOException e) {
-            e.printStackTrace();
+            IcyLogger.error(ProtocolDescriptor.class, e, e.getLocalizedMessage());
             return null;
         }
     }
@@ -112,5 +113,4 @@ public class ProtocolDescriptor implements XMLPersistent {
     public boolean saveToXML(final Node node) {
         return false;
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023. Institut Pasteur.
+ * Copyright (c) 2010-2024. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 
 package plugins.adufour.blocks.lang;
 
-import icy.file.xml.XMLPersistent;
-import icy.util.XMLUtil;
+import org.bioimageanalysis.icy.io.xml.XMLPersistent;
+import org.bioimageanalysis.icy.io.xml.XMLUtil;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import plugins.adufour.blocks.util.BlocksException;
@@ -86,7 +87,7 @@ public class Link<T> implements XMLPersistent {
             theSrcVar = theSrcBlock.inputVars.get(srcVarID);
 
         if (theSrcVar == null) {
-            System.err.println("Cannot create a link from variable " + srcVarID + " (from block " + theSrcBlock + ")");
+            IcyLogger.error(Link.class, "Cannot create a link from variable " + srcVarID + " (from block " + theSrcBlock + ")");
             return false;
         }
 

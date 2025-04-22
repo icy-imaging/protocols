@@ -269,6 +269,8 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
      */
     private static final ImageIcon ICON_ERROR = new IcySVGImageIcon(SVGIcon.ERROR, Color.RED.darker());
 
+    private static final ImageIcon ICON_DRAG = new IcySVGImageIcon(SVGIcon.DRAG_PAN);
+
     protected final JToolBar toolBar;
 
     protected final JPanel jPanelContent = new JPanel(new GridBagLayout());
@@ -276,6 +278,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     protected final JButton bMenu = new JButton(ICON_BLOCKS);
     protected final IcyButton bRunUntilHere = new IcyButton(SVGIcon.PLAY_CIRCLE);
     protected final JButton bID = new JButton("");
+    protected final JLabel dragLabel = new JLabel(ICON_DRAG);
     protected final JLabel bStatus = new JLabel(ICON_DIRTY);
     protected final JPopupMenu menu = new JPopupMenu();
     protected final JCheckBox menuKeepResults = new JCheckBox("Remember results");
@@ -328,7 +331,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         //name = new JLabel(" " + blockDesc.getDefinedName() + " ", JLabel.CENTER);
         name = new JTextField(blockDesc.getDefinedName());
         name.setBorder(null);
-        name.setOpaque(false);
+        name.setOpaque(true);
         name.setEditable(false);
         name.setFocusable(false);
         name.addKeyListener(new KeyListener() {
@@ -350,7 +353,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                     name.setText(newName);
                     name.setEditable(false);
                     name.setFocusable(false);
-                    name.setOpaque(false);
+                    name.setOpaque(true);
                     btnEdit.setEnabled(true);
                 }
                 else if (e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -358,7 +361,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
                     name.setText(tmpName);
                     name.setEditable(false);
                     name.setFocusable(false);
-                    name.setOpaque(false);
+                    name.setOpaque(true);
                     btnEdit.setEnabled(true);
                 }
             }
@@ -384,10 +387,15 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
         toolBar.add(btnEdit);
 
-        toolBar.add(Box.createHorizontalStrut(10));
-
         updateStatusIcon(blockDesc.getStatus());
         toolBar.add(bStatus);
+
+        toolBar.add(Box.createHorizontalStrut(5));
+
+        toolBar.add(dragLabel); // FIXME: Dragging is disable when changing theme
+        dragLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        dragLabel.setFocusable(false);
+        dragLabel.setOpaque(false);
 
         toolBar.add(Box.createHorizontalStrut(5));
 

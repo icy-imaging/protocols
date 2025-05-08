@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>4.0.0-a.2</version>
+    <version>4.0.0-a.3</version>
 
     <name>Protocols</name>
     <description>
@@ -27,10 +27,9 @@
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>ezplug</artifactId>
         </dependency>
-        <!-- javacl also include ochafik-util classes required by Protocols -->
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>javacl</artifactId>
+            <artifactId>ochafik</artifactId>
         </dependency>
     </dependencies>
 </project>

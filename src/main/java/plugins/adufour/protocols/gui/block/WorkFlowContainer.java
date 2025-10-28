@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import org.bioimageanalysis.icy.io.Loader;
 import org.bioimageanalysis.icy.io.SequenceFileImporter;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.*;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.util.BlocksFinder;
@@ -61,7 +62,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         ArrayList<BlockDescriptor> currentlySelectedBlocks = new ArrayList<>();
 
         @Override
-        public void mousePressed(final MouseEvent e) {
+        public void mousePressed(final @NotNull MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 if (!((e.getModifiersEx() & Protocols.MENU_SHORTCUT_KEY) == Protocols.MENU_SHORTCUT_KEY)) {
                     workFlow.newSelection();
@@ -98,7 +99,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseDragged(final MouseEvent e) {
+        public void mouseDragged(final @NotNull MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 final Rectangle selection = new Rectangle(Math.min(e.getX(), pressedX), Math.min(e.getY(), pressedY),
                         Math.abs(pressedX - e.getX()), Math.abs(pressedY - e.getY()));
@@ -113,7 +114,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseReleased(final MouseEvent e) {
+        public void mouseReleased(final @NotNull MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 validateSelection();
 
@@ -124,7 +125,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
 
         @Override
-        public void mouseClicked(final MouseEvent e) {
+        public void mouseClicked(final @NotNull MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON2 || e.isMetaDown()) {
                 popupMenu.removeAll();
                 new BlocksFinder().createJMenu(popupMenu, WorkFlowContainer.this, e.getPoint());
@@ -449,7 +450,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
         }
     }
 
-    private void doEmbedWorkflow(final Class<? extends WorkFlow> embedType) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    private void doEmbedWorkflow(final @NotNull Class<? extends WorkFlow> embedType) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         final WorkFlow embed = embedType.getDeclaredConstructor().newInstance();
 
         if (!workFlow.getBlockSelection().isEmpty()) {
@@ -542,7 +543,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void paintChildren(final Graphics g) {
+    public void paintChildren(final @NotNull Graphics g) {
         final Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -661,7 +662,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void keyPressed(final KeyEvent key) {
+    public void keyPressed(final @NotNull KeyEvent key) {
         if (key.getKeyCode() == KeyEvent.VK_DELETE || key.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
             final ArrayList<BlockDescriptor> tmp = new ArrayList<>(workFlow.getBlockSelection());
             for (final BlockDescriptor bd : tmp)
@@ -696,7 +697,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     }
 
     @Override
-    public void drop(final DropTargetDropEvent dtde) {
+    public void drop(final @NotNull DropTargetDropEvent dtde) {
         try {
             final Transferable t = dtde.getTransferable();
             final DataFlavor[] d = t.getTransferDataFlavors();
@@ -758,7 +759,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     private class MenuItemTransferHandler extends TransferHandler {
 
         @Override
-        public boolean canImport(final JComponent c, final DataFlavor[] f) {
+        public boolean canImport(final JComponent c, final DataFlavor @NotNull [] f) {
             final DataFlavor tmp;
             try {
                 tmp = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList");
@@ -772,7 +773,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             return false;
         }
 
-        public void importData(final WorkFlowContainer workFlowContainer, final Transferable t, final Point p) {
+        public void importData(final @NotNull WorkFlowContainer workFlowContainer, final @NotNull Transferable t, final @NotNull Point p) {
             final Block block;
             final Class<? extends Block> blockClass;
             try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package plugins.adufour.blocks.tools.io;
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.io.Loader;
 import org.bioimageanalysis.icy.model.sequence.Sequence;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarFile;
 import plugins.adufour.vars.lang.VarInteger;
@@ -54,13 +55,13 @@ public class FileToSequence extends Plugin implements IOBlock {
     }
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         inputMap.add("input file", inputFile);
         inputMap.add("Series", series);
     }
 
     @Override
-    public void declareOutput(final VarList outputMap) {
+    public void declareOutput(final @NotNull VarList outputMap) {
         outputMap.add("sequence", outputSequence);
     }
 

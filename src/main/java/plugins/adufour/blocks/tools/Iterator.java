@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package plugins.adufour.blocks.tools;
 
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.*;
 import plugins.adufour.vars.util.VarListener;
@@ -48,7 +49,7 @@ public class Iterator extends Plugin implements ToolsBlock {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         inputMap.add("array", array);
 
         array.addListener(new VarListener<>() {
@@ -64,7 +65,7 @@ public class Iterator extends Plugin implements ToolsBlock {
     }
 
     @Override
-    public void declareOutput(final VarList outputMap) {
+    public void declareOutput(final @NotNull VarList outputMap) {
         outputMap.add("element", element);
         outputMap.add("index", index);
         outputMap.add("end", end);

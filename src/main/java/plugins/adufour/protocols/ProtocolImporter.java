@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -24,6 +24,8 @@ import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginName;
 import org.bioimageanalysis.icy.gui.frame.progress.FileFrame;
 import org.bioimageanalysis.icy.io.FileImporter;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
@@ -37,7 +39,7 @@ import java.util.List;
 @IcyPluginName("Protocol Importer")
 public class ProtocolImporter extends Plugin implements FileImporter {
     @Override
-    public boolean acceptFile(final String path) {
+    public boolean acceptFile(final @NotNull String path) {
         return path.toLowerCase().endsWith(".protocol") && new File(path).isFile();
     }
 
@@ -45,12 +47,13 @@ public class ProtocolImporter extends Plugin implements FileImporter {
     public List<FileFilter> getFileFilters() {
         final FileFilter filter = new FileFilter() {
             @Override
-            public boolean accept(final File f) {
+            public boolean accept(final @NotNull File f) {
                 return acceptFile(f.getPath());
             }
 
+            @Contract(pure = true)
             @Override
-            public String getDescription() {
+            public @NotNull String getDescription() {
                 return "Icy protocols (.protocol)";
             }
         };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -20,13 +20,12 @@ package plugins.adufour.protocols.gui;
 
 import org.bioimageanalysis.icy.Icy;
 import org.bioimageanalysis.icy.common.listener.AcceptListener;
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
 import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.PluginInstaller;
-import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
 import org.bioimageanalysis.icy.gui.component.button.IcyButton;
 import org.bioimageanalysis.icy.gui.component.button.IcyToggleButton;
-import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
-import org.bioimageanalysis.icy.gui.component.icon.SVGIconPack;
+import org.bioimageanalysis.icy.gui.component.icon.IcyIconPack;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
 import org.bioimageanalysis.icy.gui.component.tabbedpane.CloseableTabbedPane;
 import org.bioimageanalysis.icy.gui.frame.IcyFrame;
 import org.bioimageanalysis.icy.gui.frame.IcyFrameEvent;
@@ -39,6 +38,9 @@ import org.bioimageanalysis.icy.system.IcyExceptionHandler;
 import org.bioimageanalysis.icy.system.IcyHandledException;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
@@ -68,27 +70,24 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListener, CloseableTabbedPane.CloseableTabbedPaneListener, AcceptListener, ChangeListener, BlockListener, FileDrop.FileDropListener {
     private static final String UNTITLED = "untitled";
 
     private final JToolBar toolBar;
 
-    private final IcyButton bNew = new IcyButton("New", SVGIcon.NOTE_ADD);
-    private final IcyButton bLoad = new IcyButton("Load", SVGIcon.FOLDER_OPEN);
-    private final IcyButton bSave = new IcyButton("Save", SVGIcon.SAVE);
-    private final IcyButton bSaveAs = new IcyButton("Save as", SVGIcon.SAVE_AS);
-    private final IcyButton bEmbed = new IcyButton("Embed", SVGIcon.OPEN_IN_NEW);
-    private final IcyToggleButton bRun = new IcyToggleButton("Run", new SVGIconPack(SVGIcon.PLAY_CIRCLE, SVGIcon.STOP_CIRCLE));
-    private final IcyButton bClean = new IcyButton("Reset", SVGIcon.DEVICE_RESET);
+    private final IcyButton bNew = new IcyButton("New", SVGResource.NOTE_ADD);
+    private final IcyButton bLoad = new IcyButton("Load", SVGResource.FOLDER_OPEN);
+    private final IcyButton bSave = new IcyButton("Save", SVGResource.SAVE);
+    private final IcyButton bSaveAs = new IcyButton("Save as", SVGResource.SAVE_AS);
+    //private final IcyButton bEmbed = new IcyButton("Embed", SVGIcon.OPEN_IN_NEW);
+    private final IcyToggleButton bRun = new IcyToggleButton("Run", new IcyIconPack(SVGResource.PLAY_CIRCLE, SVGResource.STOP_CIRCLE));
+    private final IcyButton bClean = new IcyButton("Reset", SVGResource.DEVICE_RESET);
 
     private final CloseableTabbedPane closeableTabbedPane = new CloseableTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 
     private final ArrayList<ProtocolPanel> protocolPanels = new ArrayList<>();
-
-    private final BlockSearchPanel blockSearchPanel = new BlockSearchPanel();
-
-    private final JSplitPane splitPane;
 
     // Copy-paste support
     private static final HashMap<BlockDescriptor, BlockDescriptor> blocksClipBoard = new HashMap<>();
@@ -120,7 +119,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
 
         getContentPane().add(toolBar, BorderLayout.NORTH);
 
-        for (final IcyButton button : new IcyButton[]{bNew, bLoad, bSave, bSaveAs, bEmbed, bClean})
+        for (final IcyButton button : new IcyButton[]{bNew, bLoad, bSave, bSaveAs, /*bEmbed,*/ bClean})
             button.addActionListener(this);
 
         for (final IcyToggleButton button : new IcyToggleButton[]{bRun})
@@ -130,10 +129,10 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         bLoad.setToolTipText("Load a protocol from a file");
         bSave.setToolTipText("Save the current protocol");
         bSaveAs.setToolTipText("Save the protocol to a new file");
-        bEmbed.setToolTipText(
+        /*bEmbed.setToolTipText(
                 "Embed the current selection into\r\n" +
                         "a new work flow or a batch"
-        );
+        );*/
         bRun.setToolTipText("Run the current protocol");
         bClean.setToolTipText(
                 "Clear all intermediate results\r\n" +
@@ -144,15 +143,16 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         toolBar.add(bLoad);
         toolBar.add(bSave);
         toolBar.add(bSaveAs);
-        toolBar.add(new JToolBar.Separator());
-        toolBar.add(bEmbed);
+        //toolBar.add(new JToolBar.Separator());
+        //toolBar.add(bEmbed);
         toolBar.add(new JToolBar.Separator());
         toolBar.add(bRun);
         toolBar.add(bClean);
 
         closeableTabbedPane.addCloseableTabbedPaneListener(this);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, blockSearchPanel, closeableTabbedPane);
+        final BlockSearchPanel blockSearchPanel = new BlockSearchPanel();
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, blockSearchPanel, closeableTabbedPane);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
         splitPane.setUI(new MySplitPaneUI());
@@ -249,7 +249,8 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         }
 
         for (final Link<?> l : linksClipBoard) {
-            @SuppressWarnings("rawtypes") final Link clone = linkClone(wf, l);
+            @SuppressWarnings("rawtypes")
+            final Link clone = linkClone(wf, l);
 
             if (clone == null) {
                 IcyLogger.warn(MainFrame.class, "Cannot copy a link to an exposed variable.");
@@ -275,7 +276,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         }
     }
 
-    private static void deleteSelection(final WorkFlow wf) {
+    private static void deleteSelection(final @NotNull WorkFlow wf) {
         if (wf.getBlockSelection().isEmpty()) {
             final ArrayList<Link<?>> tmp = new ArrayList<>();
             for (final Link<?> l : wf.getLinksIterator())
@@ -297,7 +298,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         }
     }
 
-    private static boolean linkCut(final Iterable<Link<?>> links) {
+    private static boolean linkCut(final @NotNull Iterable<Link<?>> links) {
         for (final Link<?> l : links)
             if (blocksClipBoard.containsKey(l.dstBlock) ^ blocksClipBoard.containsKey(l.srcBlock))
                 return true;
@@ -305,7 +306,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static Link<?> linkClone(final WorkFlow wf, final Link<?> l) {
+    private static @Nullable Link<?> linkClone(final WorkFlow wf, final @NotNull Link<?> l) {
         Var<?> newSrc, newDst;
 
         try {
@@ -355,7 +356,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(final @NotNull ActionEvent e) {
         if (e.getSource() == bNew) {
             addProtocolPane(new ProtocolPanel(this));
         }
@@ -396,11 +397,11 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
                 wf.runWorkFlow();
             }
         }
-        else if (e.getSource() == bEmbed) {
+        /*else if (e.getSource() == bEmbed) {
             final ProtocolPanel panel = getActiveProtocol();
             if (panel != null)
                 panel.showBlocksEmbedMenu(bEmbed);
-        }
+        }*/
         else if (e.getSource() == bClean) {
             final ProtocolPanel protocol = getActiveProtocol();
 
@@ -413,7 +414,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @Override
-    public void propertyChange(final PropertyChangeEvent evt) {
+    public void propertyChange(final @NotNull PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(ProtocolPanel.WORKFLOW_MODIFIED) && !isFrameClosing) {
             final ProtocolPanel protocolPanel = (ProtocolPanel) evt.getSource();
             final int index = getProtocolPanels().indexOf(protocolPanel);
@@ -492,7 +493,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         return true;
     }
 
-    private File getFile() {
+    private @Nullable File getFile() {
         final JFileChooser jfc = new JFileChooser(Protocols.getDefaultProtocolFolder());
 
         jfc.setFileFilter(BlocksML.XML_FILE_FILTER);
@@ -553,10 +554,10 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
             final AnnounceFrame announce = new AnnounceFrame("Loading protocol " + workingFile.getName() + "...");
 
             try {
-                PluginInstaller.waitInstall();
-                PluginLoader.waitWhileLoading();
+                //PluginInstaller.waitInstall();
+                ExtensionLoader.waitWhileLoading();
 
-                final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
+                final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
 
                 if (plugins.isEmpty())
                     throw new BlocksReloadedException();
@@ -610,12 +611,10 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @Override
-    public void icyFrameClosing(final IcyFrameEvent e) {
+    public void icyFrameClosing(final @NotNull IcyFrameEvent e) {
         if (e.getFrame() == this) {
-            isFrameClosing = true;
 
-            if (!accept(this))
-                isFrameClosing = false;
+            isFrameClosing = accept(this);
         }
     }
 
@@ -649,7 +648,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @Override
-    public void filesDropped(final File[] files) {
+    public void filesDropped(final File @NotNull [] files) {
         for (final File file : files) {
             try {
                 loadWorkFlow(file);
@@ -707,7 +706,7 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
     }
 
     @Override
-    public void stateChanged(final ChangeEvent e) {
+    public void stateChanged(final @NotNull ChangeEvent e) {
         final ProtocolPanel panel = getActiveProtocol();
 
         if (e.getSource() == closeableTabbedPane && panel != null) {
@@ -717,14 +716,8 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
         }
     }
 
-    private void updateRunButton(final BlockStatus status) {
-        switch (status) {
-            case RUNNING:
-                bRun.setSelected(true);
-                break;
-            default:
-                bRun.setSelected(false);
-        }
+    private void updateRunButton(final @NotNull BlockStatus status) {
+        bRun.setSelected(status == BlockStatus.RUNNING);
     }
 
     @Override
@@ -761,22 +754,23 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
             }
 
             @Override
-            protected JButton createLeftOneTouchButton() {
+            protected @NotNull JButton createLeftOneTouchButton() {
                 final JButton button = super.createLeftOneTouchButton();
                 button.setPreferredSize(new Dimension(20, 40));
                 return button;
             }
 
             @Override
-            protected JButton createRightOneTouchButton() {
+            protected @NotNull JButton createRightOneTouchButton() {
                 final JButton button = super.createRightOneTouchButton();
                 button.setPreferredSize(new Dimension(20, 40));
                 return button;
             }
         }
 
+        @Contract(" -> new")
         @Override
-        public BasicSplitPaneDivider createDefaultDivider() {
+        public @NotNull BasicSplitPaneDivider createDefaultDivider() {
             return new MySplitPaneDivider(this);
         }
     }

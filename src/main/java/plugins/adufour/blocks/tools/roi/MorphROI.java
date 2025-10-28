@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package plugins.adufour.blocks.tools.roi;
 
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.model.roi.ROI;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.gui.model.IntegerRangeModel;
 import plugins.adufour.vars.lang.VarEnum;
@@ -52,7 +53,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
     protected VarROIArray roiOUT;
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         x.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
         y.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
         z.setDefaultEditorModel(new IntegerRangeModel(1, 0, 100, 1));
@@ -64,7 +65,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
     }
 
     @Override
-    public void declareOutput(final VarList outputMap) {
+    public void declareOutput(final @NotNull VarList outputMap) {
         outputMap.add("output ROI", roiOUT);
     }
 
@@ -78,7 +79,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusX(final ROI roi, final int pct) {
+    static int percentageToRadiusX(final @NotNull ROI roi, final int pct) {
         final double size = roi.getBounds5D().getSizeX();
         final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);
@@ -94,7 +95,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusY(final ROI roi, final int pct) {
+    static int percentageToRadiusY(final @NotNull ROI roi, final int pct) {
         final double size = roi.getBounds5D().getSizeY();
         final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);
@@ -110,7 +111,7 @@ abstract class MorphROI extends Plugin implements ROIBlock {
      * {@link DilateROI#dilateROI(ROI, int, int, int)} methods
      * @author Joel Rogers, Alexandre Dufour
      */
-    static int percentageToRadiusZ(final ROI roi, final int pct) {
+    static int percentageToRadiusZ(final @NotNull ROI roi, final int pct) {
         final double size = roi.getBounds5D().getSizeZ();
         final double diff = (size * pct / 100);
         return (int) Math.round(diff * 0.5);

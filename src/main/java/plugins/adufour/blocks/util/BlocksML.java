@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,14 +19,19 @@
 package plugins.adufour.blocks.util;
 
 import org.bioimageanalysis.icy.common.reflect.ClassUtil;
-import org.bioimageanalysis.icy.extension.plugin.*;
-import org.bioimageanalysis.icy.extension.plugin.interface_.PluginBundled;
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.PluginRepositoryLoader;
+import org.bioimageanalysis.icy.extension.plugin.PluginUpdater;
 import org.bioimageanalysis.icy.io.xml.XMLUtil;
 import org.bioimageanalysis.icy.network.NetworkUtil;
 import org.bioimageanalysis.icy.system.IcyExceptionHandler;
 import org.bioimageanalysis.icy.system.IcyHandledException;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -72,13 +77,14 @@ public class BlocksML {
     public static final int CURRENT_VERSION = 4;
 
     public static final FileFilter XML_FILE_FILTER = new FileFilter() {
+        @Contract(pure = true)
         @Override
-        public String getDescription() {
+        public @NotNull String getDescription() {
             return "Icy protocols (.xml | .protocol)";
         }
 
         @Override
-        public boolean accept(final File f) {
+        public boolean accept(final @NotNull File f) {
             return f.isDirectory() || f.getPath().toLowerCase().endsWith(".xml")
                     || f.getPath().toLowerCase().endsWith(".protocol");
         }
@@ -128,7 +134,7 @@ public class BlocksML {
      * @return An XML representation of this workflow as a String object
      * @throws TransformerException If an unrecoverable error occurs during the course of the transformation.
      */
-    public synchronized String toString(final Document xml) throws TransformerException {
+    public synchronized String toString(final @NotNull Document xml) throws TransformerException {
         xml.normalizeDocument();
 
         final DocumentType doctype = xml.getDoctype();
@@ -198,7 +204,7 @@ public class BlocksML {
      * @param workFlow     The workflow to save.
      * @param workFlowRoot Root element where elements are to be inserted.
      */
-    public synchronized void saveWorkFlow_V4(final WorkFlow workFlow, final Element workFlowRoot) {
+    public synchronized void saveWorkFlow_V4(final @NotNull WorkFlow workFlow, final Element workFlowRoot) {
         final Element blocksNode = XMLUtil.addElement(workFlowRoot, "blocks");
 
         for (final BlockDescriptor blockData : workFlow) {
@@ -214,7 +220,7 @@ public class BlocksML {
             }
 
             final String blockClass = block.getClass().getName();
-            final String mainClass = block instanceof PluginBundled ? ((PluginBundled) block).getMainPluginClassName() : blockClass;
+            final String mainClass = /*block instanceof PluginBundled ? ((PluginBundled) block).getMainPluginClassName() :*/ blockClass;
 
             XMLUtil.setAttributeValue(blockNode, "className", mainClass);
             XMLUtil.setAttributeValue(blockNode, "blockType", blockClass);
@@ -375,7 +381,7 @@ public class BlocksML {
                 if (pDesc == null) {
                     // sadly, I believe the plugin loader could be reloaded at anytime...
                     // double check that for every plugin, just to be safe
-                    if (PluginLoader.getPlugins(Block.class, false, false).isEmpty())
+                    if (ExtensionLoader.getPlugins(Block.class, false, false).isEmpty())
                         throw new BlocksReloadedException();
 
                     throw new BlocksException("Couldn't find plugin " + ClassUtil.getSimpleClassName(className) + " online", true);
@@ -383,13 +389,15 @@ public class BlocksML {
                 descriptors.add(pDesc);
             }
 
+            // TODO enable this when kernel is fixed
+            /*
             for (final PluginDescriptor pDesc : descriptors)
                 PluginInstaller.install(pDesc, false);
 
             PluginInstaller.waitInstall();
-            PluginLoader.waitWhileLoading();
+            ExtensionLoader.waitWhileLoading();
 
-            IcyLogger.info(BlocksML.class, "[Protocols] Plugins installed successfully.");
+            IcyLogger.info(BlocksML.class, "[Protocols] Plugins installed successfully.");*/
             /*if (announcement != null)
                 announcement.close();*/
 
@@ -417,7 +425,7 @@ public class BlocksML {
         return fileVersion == CURRENT_VERSION;
     }
 
-    private Set<String> getMissingPlugins(final Element workFlowRoot, final int fileVersion) {
+    private @NotNull Set<String> getMissingPlugins(final Element workFlowRoot, final int fileVersion) {
         final Set<String> missingPlugins = new HashSet<>();
 
         final Element blocksRoot = XMLUtil.getElement(workFlowRoot, "blocks");
@@ -441,7 +449,7 @@ public class BlocksML {
             catch (final ClassNotFoundException e) {
                 // the block appears to be missing
                 // => is the corresponding plug-in missing or out-dated?
-                final PluginDescriptor mainPlugin = PluginLoader.getPlugin(pluginClassName);
+                final PluginDescriptor mainPlugin = ExtensionLoader.getPlugin(pluginClassName);
                 if (mainPlugin == null || PluginUpdater.getUpdate(mainPlugin) != null) {
                     // store the class name of the missing plug-in
                     missingPlugins.add(pluginClassName);
@@ -477,7 +485,8 @@ public class BlocksML {
             final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", 0);
 
             try {
-                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
+                @SuppressWarnings("unchecked")
+                final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
 
                 final Block block = blockClass.getConstructor().newInstance();
 
@@ -581,7 +590,8 @@ public class BlocksML {
             final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
 
             try {
-                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
+                @SuppressWarnings("unchecked")
+                final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(className);
 
                 final Block block = blockClass.getDeclaredConstructor().newInstance();
 
@@ -711,7 +721,8 @@ public class BlocksML {
             final int yPos = XMLUtil.getAttributeIntValue(blockNode, "yLocation", -1);
 
             try {
-                @SuppressWarnings("unchecked") final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(blockType);
+                @SuppressWarnings("unchecked")
+                final Class<? extends Block> blockClass = (Class<? extends Block>) ClassUtil.findClass(blockType);
 
                 final Block block = blockClass.getDeclaredConstructor().newInstance();
 
@@ -1191,26 +1202,19 @@ public class BlocksML {
      * @return The Java primitive type represented by the given name, or null if the given name does
      * not represent a primitive type
      */
-    public static Class<?> getPrimitiveType(final String primitiveName) {
-        if (primitiveName.equals("byte"))
-            return byte.class;
-        if (primitiveName.equals("short"))
-            return short.class;
-        if (primitiveName.equals("int"))
-            return int.class;
-        if (primitiveName.equals("long"))
-            return long.class;
-        if (primitiveName.equals("char"))
-            return char.class;
-        if (primitiveName.equals("float"))
-            return float.class;
-        if (primitiveName.equals("double"))
-            return double.class;
-        if (primitiveName.equals("boolean"))
-            return boolean.class;
-        if (primitiveName.equals("void"))
-            return void.class;
+    public static @Nullable Class<?> getPrimitiveType(final @NotNull String primitiveName) {
+        return switch (primitiveName) {
+            case "byte" -> byte.class;
+            case "short" -> short.class;
+            case "int" -> int.class;
+            case "long" -> long.class;
+            case "char" -> char.class;
+            case "float" -> float.class;
+            case "double" -> double.class;
+            case "boolean" -> boolean.class;
+            case "void" -> void.class;
+            default -> null;
+        };
 
-        return null;
     }
 }

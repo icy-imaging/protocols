@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.blocks.lang;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarArray;
@@ -147,7 +148,7 @@ public class Batch extends Loop {
      * the batch as loop variables, therefore they don't need to be declared by overriding classes
      */
     @Override
-    public void declareLoopVariables(final List<Var<?>> loopVariables) {
+    public void declareLoopVariables(final @NotNull List<Var<?>> loopVariables) {
         loopVariables.add(getBatchSource());
         loopVariables.add(getBatchElement());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,15 +19,14 @@
 package plugins.adufour.blocks.tools.text;
 
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.extension.plugin.interface_.PluginBundled;
 import org.bioimageanalysis.icy.model.sequence.Sequence;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.tools.ToolsBlock;
 import plugins.adufour.blocks.util.VarList;
-import plugins.adufour.protocols.Protocols;
 import plugins.adufour.vars.lang.VarObject;
 import plugins.adufour.vars.lang.VarString;
 
-public class AppendText extends Plugin implements ToolsBlock, PluginBundled {
+public class AppendText extends Plugin implements ToolsBlock {
     private final VarObject in = new VarObject("input", null);
     private final VarString separator = new VarString("Separator", "_");
     private final VarObject suffix = new VarObject("Suffix", "");
@@ -48,19 +47,14 @@ public class AppendText extends Plugin implements ToolsBlock, PluginBundled {
     }
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         inputMap.add("input", in);
         inputMap.add("Separator", separator);
         inputMap.add("Suffix", suffix);
     }
 
     @Override
-    public void declareOutput(final VarList outputMap) {
+    public void declareOutput(final @NotNull VarList outputMap) {
         outputMap.add("output", out);
-    }
-
-    @Override
-    public String getMainPluginClassName() {
-        return Protocols.class.getName();
     }
 }

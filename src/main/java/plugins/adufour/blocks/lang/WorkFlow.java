@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -120,7 +120,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         this.topLevel = topLevel;
     }
 
-    public void addBlock(final BlockDescriptor blockInfo) {
+    public void addBlock(final @NotNull BlockDescriptor blockInfo) {
         blockInfo.setContainer(this);
 
         orderedBlocks.add(blockInfo);
@@ -253,7 +253,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         return link;
     }
 
-    protected <T> void checkScope(final Link<T> link) throws ScopeException {
+    protected <T> void checkScope(final @NotNull Link<T> link) throws ScopeException {
         if (contains(link.srcBlock) != contains(link.dstBlock))
             throw new ScopeException();
 
@@ -262,12 +262,12 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
             throw new ScopeException();
     }
 
-    protected <T> void checkLoop(final Link<T> link) throws LoopException {
+    protected <T> void checkLoop(final @NotNull Link<T> link) throws LoopException {
         if (link.srcBlock.equals(link.dstBlock) || depends(link.srcBlock, link.dstBlock))
             throw new LoopException();
     }
 
-    protected <T> void checkType(final Link<T> link) throws ClassCastException {
+    protected <T> void checkType(final @NotNull Link<T> link) throws ClassCastException {
         // filter all valid cases
 
         if (link.dstVar.isAssignableFrom(link.srcVar))
@@ -517,7 +517,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
             listener.workFlowReordered(this);
     }
 
-    public void removeBlock(final BlockDescriptor blockInfo, boolean checkSelection) {
+    public void removeBlock(final @NotNull BlockDescriptor blockInfo, boolean checkSelection) {
         // pops out workflows' selections
         if (blockInfo.getBlock() instanceof final WorkFlow wf) {
             if (checkSelection && !wf.getBlockSelection().isEmpty())
@@ -863,7 +863,7 @@ public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>
         }
     }
 
-    public void setLocation(final BlockDescriptor blockInfo, final Point point) {
+    public void setLocation(final @NotNull BlockDescriptor blockInfo, final @NotNull Point point) {
         blockInfo.setLocation(point.x, point.y);
     }
 

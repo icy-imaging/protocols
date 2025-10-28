@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import plugins.adufour.vars.gui.model.FileTypeModel;
 import plugins.adufour.vars.lang.VarFile;
 import plugins.adufour.vars.lang.VarSequence;
 import plugins.adufour.vars.util.VarException;
-import plugins.kernel.importer.LociImporterPlugin;
+import icy.plugins.kernel.importer.LociImporterPlugin;
 
 import java.io.File;
 

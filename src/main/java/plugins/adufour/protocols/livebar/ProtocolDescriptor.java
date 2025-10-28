@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
 
 package plugins.adufour.protocols.livebar;
 
-import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.gui.LookAndFeelUtil;
 import org.bioimageanalysis.icy.io.FileUtil;
 import org.bioimageanalysis.icy.io.xml.XMLPersistent;
 import org.bioimageanalysis.icy.io.xml.XMLUtil;
@@ -54,8 +56,18 @@ public class ProtocolDescriptor implements XMLPersistent {
         return name;
     }
 
-    public ImageIcon getIcon() {
-        return PluginLoader.getPlugin(Protocols.class.getName()).getIcon();
+    public Icon getIcon() {
+        final PluginDescriptor pd = ExtensionLoader.getPlugin(Protocols.class.getName());
+        if (pd != null)
+            return pd.getSVG().getIcon(LookAndFeelUtil.getDefaultIconSize());
+        return null;
+    }
+
+    public Image getIconAsImage() {
+        final PluginDescriptor pd = ExtensionLoader.getPlugin(Protocols.class.getName());
+        if (pd != null)
+            return pd.getSVG().getImage(LookAndFeelUtil.getDefaultIconSize());
+        return null;
     }
 
     public String getWeb() {

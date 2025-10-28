@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.blocks.util;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
@@ -211,11 +212,11 @@ public class VarList implements Iterable<Var<?>> {
     }
 
     @Override
-    public Iterator<Var<?>> iterator() {
+    public @NotNull Iterator<Var<?>> iterator() {
         return varMap.values().iterator();
     }
 
-    public void remove(final Var<?> var) {
+    public void remove(final @NotNull Var<?> var) {
         if (var.getReference() != null) {
             var.setReference(null);
             return;

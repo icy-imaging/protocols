@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package plugins.adufour.blocks.tools.output;
 
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.gui.FileMode;
 import plugins.adufour.vars.gui.model.FileTypeListModel;
@@ -35,7 +36,7 @@ public class FoldersOutput extends Plugin implements OutputBlock {
     }
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         final VarFileArray vf = new VarFileArray("folders", new java.io.File[0]);
         vf.setDefaultEditorModel(new FileTypeListModel("", FileMode.FOLDERS, null, false));
         inputMap.add("folders", vf);

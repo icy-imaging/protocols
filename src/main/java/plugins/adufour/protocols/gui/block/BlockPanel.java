@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,12 +18,15 @@
 
 package plugins.adufour.protocols.gui.block;
 
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
 import org.bioimageanalysis.icy.gui.LookAndFeelUtil;
 import org.bioimageanalysis.icy.gui.component.button.IcyButton;
-import org.bioimageanalysis.icy.gui.component.icon.IcySVGImageIcon;
-import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.icon.IcySVG;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
 import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.lang.WorkFlow;
@@ -56,7 +59,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         private boolean resizeable = false;
 
         @Override
-        public void mouseDragged(final MouseEvent e) {
+        public void mouseDragged(final @NotNull MouseEvent e) {
             int x = getX();
             int y = getY();
             int dx = e.getX();
@@ -109,7 +112,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
 
         @Override
-        public void mousePressed(final MouseEvent e) {
+        public void mousePressed(final @NotNull MouseEvent e) {
             toFront();
             pressedX = e.getX();
             pressedY = e.getY();
@@ -141,7 +144,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
 
         @Override
-        public void mouseReleased(final MouseEvent e) {
+        public void mouseReleased(final @NotNull MouseEvent e) {
             dragging = false;
             resizing_EAST = false;
             resizing_SOUTH = false;
@@ -167,7 +170,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         }
 
         @Override
-        public void mouseMoved(final MouseEvent e) {
+        public void mouseMoved(final @NotNull MouseEvent e) {
             final int x = e.getX();
             final int y = e.getY();
 
@@ -245,46 +248,47 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     protected static final int ICON_SIZE = LookAndFeelUtil.getDefaultIconSize();
 
-    @SuppressWarnings("resource")
-    private static final Image BLOCKS = new Protocols().getDescriptor().getIconAsImage();
-    private static final ImageIcon ICON_BLOCKS = new ImageIcon(BLOCKS.getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+    //private static final Image BLOCKS = new Protocols().getDescriptor().getIconAsImage();
+    private static final PluginDescriptor pd = ExtensionLoader.getPlugin(Protocols.class.getName());
+    @SuppressWarnings("all")
+    private static final Icon ICON_BLOCKS = pd.getSVG().getIcon(ICON_SIZE);
 
     /**
      * Indicates that the block is dirty (results aren't ready)
      */
-    private static final ImageIcon ICON_DIRTY = new IcySVGImageIcon(SVGIcon.WARNING, Color.ORANGE.darker());
+    private static final Icon ICON_DIRTY = new IcySVG(SVGResource.WARNING).getIcon(ICON_SIZE, Color.ORANGE.darker());
 
     /**
      * Indicates that the block is currently running
      */
-    private static final ImageIcon ICON_RUNNING = new IcySVGImageIcon(SVGIcon.BOLT, Color.BLUE.brighter());
+    private static final Icon ICON_RUNNING = new IcySVG(SVGResource.BOLT).getIcon(ICON_SIZE, Color.BLUE.brighter());
 
     /**
      * Indicates that the block has finished running (the result is ready)
      */
-    private static final ImageIcon ICON_READY = new IcySVGImageIcon(SVGIcon.CHECK_CIRCLE, Color.GREEN.darker());
+    private static final Icon ICON_READY = new IcySVG(SVGResource.CHECK_CIRCLE).getIcon(ICON_SIZE, Color.GREEN.darker());
 
     /**
      * Indicates that the block generated an error
      */
-    private static final ImageIcon ICON_ERROR = new IcySVGImageIcon(SVGIcon.ERROR, Color.RED.darker());
+    private static final Icon ICON_ERROR = new IcySVG(SVGResource.ERROR).getIcon(ICON_SIZE, Color.RED.darker());
 
-    private static final ImageIcon ICON_DRAG = new IcySVGImageIcon(SVGIcon.DRAG_PAN);
+    private static final Icon ICON_DRAG = new IcySVG(SVGResource.DRAG_PAN).getIcon(ICON_SIZE);
 
     protected final JToolBar toolBar;
 
     protected final JPanel jPanelContent = new JPanel(new GridBagLayout());
 
     protected final JButton bMenu = new JButton(ICON_BLOCKS);
-    protected final IcyButton bRunUntilHere = new IcyButton(SVGIcon.PLAY_CIRCLE);
+    protected final IcyButton bRunUntilHere = new IcyButton(SVGResource.PLAY_CIRCLE);
     protected final JButton bID = new JButton("");
     protected final JLabel dragLabel = new JLabel(ICON_DRAG);
     protected final JLabel bStatus = new JLabel(ICON_DIRTY);
     protected final JPopupMenu menu = new JPopupMenu();
     protected final JCheckBox menuKeepResults = new JCheckBox("Remember results");
     // protected final JPanel menuCommandLineID = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", SVGIcon.UNFOLD_LESS);
-    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", SVGIcon.DELETE);
+    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", SVGResource.UNFOLD_LESS);
+    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", SVGResource.DELETE);
 
     //private final ShadowRenderer renderer = new ShadowRenderer(SHADOW_SIZE, 0.5f, Color.BLACK);
 
@@ -313,7 +317,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     //private final JLabel name;
     private final JTextField name;
-    private final IcyButton btnEdit = new IcyButton(SVGIcon.EDIT);
+    private final IcyButton btnEdit = new IcyButton(SVGResource.EDIT);
 
     private boolean selected = false;
 
@@ -323,7 +327,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
      * @param wfPane    The work flow pane containing this panel
      * @param blockDesc The block controlled by this panel
      */
-    public BlockPanel(final WorkFlowContainer wfPane, final BlockDescriptor blockDesc) {
+    public BlockPanel(final WorkFlowContainer wfPane, final @NotNull BlockDescriptor blockDesc) {
         this.blockDesc = blockDesc;
         this.workFlowPane = wfPane;
 
@@ -479,7 +483,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(final @NotNull ActionEvent e) {
         if (e.getSource() == bMenu) {
             bMenu.getComponentPopupMenu().show(bMenu, 0, bMenu.getHeight());
         }
@@ -648,7 +652,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         return dropZone;
     }
 
-    protected <T> VarEditor<T> createVarEditor(final Var<T> variable) {
+    protected <T> VarEditor<T> createVarEditor(final @NotNull Var<T> variable) {
         final VarEditor<T> editor = variable.isEnabled() ? variable.createVarEditor() : variable.createVarViewer();
         editor.setEnabled(true); // activates listeners
         return editor;
@@ -733,7 +737,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             fieldID.setToolTipText(tooltip);
             menuCLID.add(fieldID);
 
-            final IcyButton bStoreFieldID = new IcyButton(SVGIcon.CHECK);
+            final IcyButton bStoreFieldID = new IcyButton(SVGResource.CHECK);
             bStoreFieldID.setFlat(true);
             //bStoreFieldID.setFocusable(false);
             //bStoreFieldID.setBorderPainted(false);
@@ -888,7 +892,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
         updateStatusIcon(blockDesc.getStatus());
     }
 
-    private void updateStatusIcon(final BlockStatus status) {
+    private void updateStatusIcon(final @NotNull BlockStatus status) {
         switch (status) {
             case READY:
                 bStatus.setIcon(ICON_READY);

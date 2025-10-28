@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.blocks.util;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.vars.lang.Var;
 
@@ -26,7 +27,7 @@ public class NoSuchVariableException extends BlocksException {
         super("Variable not found: '" + varName + "'", false);
     }
 
-    public NoSuchVariableException(final BlockDescriptor blockInfo, final String varName) {
+    public NoSuchVariableException(final @NotNull BlockDescriptor blockInfo, final String varName) {
         super("Variable '" + varName + "' not found in block '" + blockInfo.getName() + "'. It may have been removed or renamed.", false);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
 
 package plugins.adufour.protocols.gui.block;
 
+import org.bioimageanalysis.icy.gui.LookAndFeelUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Batch;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.Loop;
@@ -29,6 +31,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 public class LoopPanel extends WorkFlowPanel {
     private final Loop loop;
@@ -62,6 +65,45 @@ public class LoopPanel extends WorkFlowPanel {
 
                 super.paintChildren(g2);
             }*/
+
+            @Override
+            protected void paintComponent(final Graphics g) {
+                super.paintComponent(g);
+                //final Dimension arcs = new Dimension(ARC_SIZE, ARC_SIZE);
+                final int width = getWidth();
+                final int height = getHeight();
+                final Graphics2D graphics = (Graphics2D) g;
+
+                //Sets antialiasing
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+                final boolean isDarkMode = LookAndFeelUtil.isDarkMode();
+                final Color bgcRoot = Objects.requireNonNull(LookAndFeelUtil.getUIDefaults()).getColor("RootPane.background");
+
+                if (bgcRoot == null)
+                    return;
+
+                final Color bgc;
+                if (isDarkMode)
+                    bgc = new Color(bgcRoot.getRed() + 50, bgcRoot.getGreen() + 50, bgcRoot.getBlue() + 50);
+                else
+                    bgc = new Color(bgcRoot.getRed() - 20, bgcRoot.getGreen() - 20, bgcRoot.getBlue() - 20);
+
+                //Draws the opaque panel with borders.
+                graphics.setColor(bgc);
+                graphics.fillRect(0, 0, width, height);//, arcs.width, arcs.height);
+
+                if (toolBar == null)
+                    return;
+
+                // If the block is collapsed, remove the toolbar bottom border
+                if (!blockDesc.isCollapsed())
+                    toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getForeground()));
+                else
+                    toolBar.setBorder(null);
+            }
         };
 
         innerLoopPanel.setOpaque(true);
@@ -71,7 +113,7 @@ public class LoopPanel extends WorkFlowPanel {
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(final @NotNull ActionEvent e) {
         if (e.getSource() == menuStopOnFirstError) {
             loop.stopOnFirstError.setValue(menuStopOnFirstError.isSelected());
         }

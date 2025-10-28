@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -147,7 +147,8 @@ public class RoundedSquareLine extends Line {
 
     @Override
     public boolean contains(final double x, final double y) {
-        if (shapes.size() < 0) return false;
+        if (shapes.isEmpty())
+            return false;
 
         for (final Shape shape : shapes)
             if (shape.intersects(x - 2, y - 2, 3, 3)) return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package plugins.adufour.blocks.lang;
 
 import org.bioimageanalysis.icy.io.Loader;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.vars.lang.VarSequence;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class SequenceFileBatch extends FileBatch {
     }
 
     @Override
-    public boolean accept(final File f) {
+    public boolean accept(final @NotNull File f) {
         return f.isDirectory() || super.accept(f) && Loader.isSupportedImageFile(f.getPath());
     }
 

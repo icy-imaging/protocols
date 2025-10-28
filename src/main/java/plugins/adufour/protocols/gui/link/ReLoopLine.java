@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.protocols.gui.block.BlockPanel;
 
@@ -31,7 +32,7 @@ public class ReLoopLine extends RoundedSquareLine {
     }
 
     @Override
-    public void updateShape(final Path2D path, final Ellipse2D closeButton) {
+    public void updateShape(final @NotNull Path2D path, final @NotNull Ellipse2D closeButton) {
         path.moveTo(x1, y1);
 
         final float xControl = Math.max(x1 + 10, x2 + 10);

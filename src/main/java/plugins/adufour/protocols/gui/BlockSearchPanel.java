@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -22,9 +22,11 @@ import org.bioimageanalysis.icy.common.string.StringUtil;
 import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.gui.component.field.IcyTextFieldHint;
-import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
 import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
 import org.bioimageanalysis.icy.network.NetworkUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.BlocksFinder;
 import plugins.adufour.blocks.util.BlocksFinder.DND_MenuItem;
 import plugins.adufour.blocks.util.MenuItemListener;
@@ -62,7 +64,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
     private final JScrollPane blockInfoDisplay;
 
     public BlockSearchPanel() {
-        searchField = new IcyTextFieldHint(SVGIcon.SEARCH, DEFAULT_SEARCH_TEXT);
+        searchField = new IcyTextFieldHint(SVGResource.SEARCH, DEFAULT_SEARCH_TEXT);
         final Box searchBar = Box.createHorizontalBox();
 
         finder = new BlocksFinder();
@@ -222,22 +224,23 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
             }
 
             @Override
-            protected JButton createLeftOneTouchButton() {
+            protected @NotNull JButton createLeftOneTouchButton() {
                 final JButton button = super.createLeftOneTouchButton();
                 button.setPreferredSize(new Dimension(40, 40));
                 return button;
             }
 
             @Override
-            protected JButton createRightOneTouchButton() {
+            protected @NotNull JButton createRightOneTouchButton() {
                 final JButton button = super.createRightOneTouchButton();
                 button.setPreferredSize(new Dimension(40, 40));
                 return button;
             }
         }
 
+        @Contract(" -> new")
         @Override
-        public BasicSplitPaneDivider createDefaultDivider() {
+        public @NotNull BasicSplitPaneDivider createDefaultDivider() {
             return new MySplitPaneDivider(this);
         }
     }

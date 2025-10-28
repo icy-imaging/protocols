@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ import org.bioimageanalysis.icy.model.roi.ROI3D;
 import org.bioimageanalysis.icy.model.roi.mask.BooleanMask2D;
 import org.bioimageanalysis.icy.model.roi.mask.BooleanMask3D;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.util.VarException;
 
@@ -72,7 +74,7 @@ public class DilateROI extends MorphROI {
      * @return a new set of dilated ROI with type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] dilateROI(final ROI[] inputRoi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
+    public static ROI @NotNull [] dilateROI(final ROI @NotNull [] inputRoi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
         final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
         for (final ROI roi : inputRoi) {
@@ -98,7 +100,7 @@ public class DilateROI extends MorphROI {
      * @return a new set of dilated ROI with type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] dilateROIByPercentage(final ROI[] inputRoi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
+    public static ROI @NotNull [] dilateROIByPercentage(final ROI @NotNull [] inputRoi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
         final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
         for (final ROI roi : inputRoi) {
@@ -142,7 +144,7 @@ public class DilateROI extends MorphROI {
      * @return a new, dilated ROI of type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI dilateROI(final ROI roi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
+    public static @Nullable ROI dilateROI(final ROI roi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
         final int rx = xRadius, rrx = rx * rx;
         final int ry = yRadius, rry = ry * ry;
         final int rz = zRadius, rrz = rz * rz;

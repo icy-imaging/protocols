@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,10 @@
 
 package plugins.adufour.protocols.gui.link;
 
+import org.bioimageanalysis.icy.model.roi.ROI;
 import org.bioimageanalysis.icy.model.sequence.Sequence;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
@@ -31,6 +34,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 public abstract class DragDropZone extends JButton implements VarListener<Boolean>, TypeChangeListener {
     protected static final int DRAGnDROP_ACTION = TransferHandler.LINK;
@@ -52,7 +56,8 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
      * @param input the input variable to link to
      * @return the drop zone
      */
-    public static <T> DragDropZone createDropZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> input) {
+    @Contract("_, _, _ -> new")
+    public static <T> @NotNull DragDropZone createDropZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> input) {
         return new DropZone<>(workFlow, block, input);
     }
 
@@ -64,7 +69,8 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
      * @param variable the input variable to link
      * @return the drag zone
      */
-    public static <T> DragDropZone createDragZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> variable) {
+    @Contract("_, _, _ -> new")
+    public static <T> @NotNull DragDropZone createDragZone(final WorkFlow workFlow, final BlockDescriptor block, final Var<T> variable) {
         return new DragZone<>(workFlow, block, variable);
     }
 
@@ -167,7 +173,11 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         final Color cSequence = new Color(31, 72, 176);
         final Color cBoolean = new Color(229, 148, 0);
         final Color cPrimitive = new Color(156, 90, 156);
-        final Color cOther = new Color(53, 123, 53);
+        final Color cString = new Color(58, 158, 142);
+        final Color cROI = new Color(151, 26, 59);
+        //final Color cOther = new Color(53, 123, 53);
+        final Color cFile = new Color(53, 123, 53);
+        final Color cEnum = new Color(181, 178, 9);
 
         if (type == null)
             return cNull;
@@ -181,6 +191,24 @@ public abstract class DragDropZone extends JButton implements VarListener<Boolea
         if (type.isPrimitive() || Number.class.isAssignableFrom(type))
             return cPrimitive;
 
-        return cOther;
+        if (type == String.class)
+            return cString;
+
+        if (type == ROI.class || type == ROI[].class)
+            return cROI;
+
+        if (type == File.class || type == File[].class)
+            return cFile;
+
+        if (type.isEnum())
+            return cEnum;
+
+        //return cOther;
+
+        final int hash = type.hashCode();
+        final int r = (hash & 0xFF0000) >> 16;
+        final int g = (hash & 0x00FF00) >> 8;
+        final int b = hash & 0x0000FF;
+        return new Color(r, g, b);
     }
 }

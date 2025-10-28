@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.blocks.util;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 
@@ -30,7 +31,7 @@ public class NoSuchBlockException extends BlocksException {
         super("Cannot find block with ID '" + ID + "'", false);
     }
 
-    public NoSuchBlockException(final int ID, final WorkFlow container) {
+    public NoSuchBlockException(final int ID, final @NotNull WorkFlow container) {
         super("Cannot find block with ID '" + ID + "' in workflow '" + container.getBlockDescriptor().getName() + "'", false);
     }
 }

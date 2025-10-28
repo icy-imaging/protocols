@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -27,11 +27,13 @@ import org.bioimageanalysis.icy.network.search.SearchResultConsumer;
 import org.bioimageanalysis.icy.network.search.SearchResultProducer;
 import org.bioimageanalysis.icy.system.SystemUtil;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import plugins.adufour.protocols.Protocols;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -115,12 +117,12 @@ public class OnlineProtocolProducer extends OnlineSearchResultProducer {
         }
 
         @Override
-        public Image getImage() {
-            final ImageIcon icon = protocol.getIcon();
+        public @Nullable Image getImage() {
+            return protocol.getIconAsImage();
 
-            if (icon != null) return icon.getImage();
+            //if (icon != null) return icon.getImage();
 
-            return null;
+            //return null;
         }
 
         @Override
@@ -128,8 +130,9 @@ public class OnlineProtocolProducer extends OnlineSearchResultProducer {
             return description;
         }
 
+        @Contract(pure = true)
         @Override
-        public String getTooltip() {
+        public @NotNull String getTooltip() {
             return "Left click: Open   -   Right click: Online documentation";
             // return plugin.getDescription();
         }

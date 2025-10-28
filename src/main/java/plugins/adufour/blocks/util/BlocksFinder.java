@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@
 package plugins.adufour.blocks.util;
 
 import org.bioimageanalysis.icy.common.reflect.ClassUtil;
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
 import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.PluginLoader;
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
 import org.bioimageanalysis.icy.gui.component.menu.IcyMenu;
 import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
 import org.bioimageanalysis.icy.gui.component.menu.IcyPluginMenuItem;
@@ -54,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class BlocksFinder {
     /**
@@ -190,7 +191,7 @@ public class BlocksFinder {
      * @param searchText    String
      */
     public void createSearchMenu(final BlockSearchPanel menuContainer, String searchText) {
-        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
+        final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
 
         if (plugins.isEmpty()) {
             final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
@@ -270,31 +271,31 @@ public class BlocksFinder {
      * @param location      Point
      */
     public final void createJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
-        final IcyMenu mnBlocks = new IcyMenu("Blocks...", SVGIcon.WIDGETS);
+        final IcyMenu mnBlocks = new IcyMenu("Blocks...", SVGResource.WIDGETS);
         //mnBlocks.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"), 22));
 
-        final IcyMenu mnInput = new IcyMenu("Read...", SVGIcon.REDO);
+        final IcyMenu mnInput = new IcyMenu("Read...", SVGResource.REDO);
         //mnInput.setIcon(new IcyIcon(ResourceUtil.ICON_REDO, 22));
 
-        final IcyMenu mnOutput = new IcyMenu("Out...", SVGIcon.UNDO);
+        final IcyMenu mnOutput = new IcyMenu("Out...", SVGResource.UNDO);
         //mnOutput.setIcon(new IcyIcon(ResourceUtil.ICON_UNDO, 22));
 
-        final IcyMenu mnIO = new IcyMenu("I/O...", SVGIcon.SAVE);
+        final IcyMenu mnIO = new IcyMenu("I/O...", SVGResource.SAVE);
         //mnIO.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE, 22));
 
-        final IcyMenu mnSeq = new IcyMenu("Sequence...", SVGIcon.IMAGE);
+        final IcyMenu mnSeq = new IcyMenu("Sequence...", SVGResource.IMAGE);
         //mnSeq.setIcon(new IcyIcon(ResourceUtil.ICON_PHOTO, 22));
 
-        final IcyMenu mnROI = new IcyMenu("ROI...", SVGIcon.DRAW_ABSTRACT);
+        final IcyMenu mnROI = new IcyMenu("ROI...", SVGResource.DRAW_ABSTRACT);
         //mnROI.setIcon(new IcyIcon(ResourceUtil.ICON_ROI_POLYGON, 22));
 
-        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", SVGIcon.LAPS);
+        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", SVGResource.LAPS);
         //mnLoops.setIcon(new IcyIcon(ResourceUtil.ICON_RELOAD, 22));
 
-        final IcyMenu mnTools = new IcyMenu("Tools...", SVGIcon.SETTINGS);
+        final IcyMenu mnTools = new IcyMenu("Tools...", SVGResource.SETTINGS);
         //mnTools.setIcon(new IcyIcon(ResourceUtil.ICON_TOOLS, 22));
 
-        final ArrayList<PluginDescriptor> plugins = PluginLoader.getPlugins(Block.class, false, false);
+        final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
 
         if (plugins.isEmpty()) {
             final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
@@ -426,7 +427,7 @@ public class BlocksFinder {
 
         // and add the Display block last
 
-        final IcyMenuItem mnDisp = new IcyMenuItem("Display", SVGIcon.VISIBILITY);
+        final IcyMenuItem mnDisp = new IcyMenuItem("Display", SVGResource.VISIBILITY);
         mnDisp.addActionListener(arg0 -> {
             try {
                 addBlock(workFlowPane, Display.class.getDeclaredConstructor().newInstance(), location);
@@ -519,7 +520,7 @@ public class BlocksFinder {
         // });
 
         // In the meantime...
-        for (final PluginDescriptor plugin : PluginLoader.getPlugins(WorkFlow.class)) {
+        for (final PluginDescriptor plugin : ExtensionLoader.getPlugins(WorkFlow.class)) {
             final JMenuItem menuItem = new JMenuItem(getFlattened(plugin.getName()));
 
             menuItem.addActionListener(arg0 -> {
@@ -534,7 +535,7 @@ public class BlocksFinder {
         }
     }
 
-    private static void addBlock(final WorkFlowContainer workFlowPane, final Block block, final Point location) {
+    private static void addBlock(final @NotNull WorkFlowContainer workFlowPane, final Block block, final @NotNull Point location) {
         final BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor() : new BlockDescriptor(-1, block));
 
         blockDesc.setLocation(location.x, location.y);
@@ -550,7 +551,7 @@ public class BlocksFinder {
      * @param menu            the menu to break into smaller sub-menus
      * @param maxItemsPerMenu the maximum number of items to display in each sub-menu
      */
-    private void splitLongMenus(final JMenu menu, final int maxItemsPerMenu) {
+    private void splitLongMenus(final @NotNull JMenu menu, final int maxItemsPerMenu) {
         final ArrayList<Component> components = new ArrayList<>(Arrays.asList(menu.getPopupMenu().getComponents()));
 
         if (components.size() > maxItemsPerMenu) {
@@ -596,7 +597,7 @@ public class BlocksFinder {
      * @return a flattened (i.e. pretty-printed) String based on the name of the
      * string
      */
-    public static String getFlattened(final String string) {
+    public static @NotNull String getFlattened(final @NotNull String string) {
         final String[] words = string.split("(?=[A-Z])");
 
         final StringBuilder output = new StringBuilder(words[0]);

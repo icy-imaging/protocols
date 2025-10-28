@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package plugins.adufour.blocks.lang;
 import org.bioimageanalysis.icy.common.reflect.ClassUtil;
 import org.bioimageanalysis.icy.common.string.StringUtil;
 import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.PluginInstaller;
 import org.bioimageanalysis.icy.extension.plugin.PluginRepositoryLoader;
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.gui.plugin.PluginErrorReport;
@@ -29,6 +28,8 @@ import org.bioimageanalysis.icy.io.xml.XMLPersistent;
 import org.bioimageanalysis.icy.io.xml.XMLUtil;
 import org.bioimageanalysis.icy.network.NetworkUtil;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import plugins.adufour.blocks.tools.Display;
@@ -45,8 +46,8 @@ import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Class defining all the metadata associated to a {@link Block}.
@@ -537,7 +538,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @SuppressWarnings("unchecked")
     @Override
-    public void variableAdded(final VarList list, final Var<?> variable) {
+    public void variableAdded(final VarList list, final @NotNull Var<?> variable) {
         variable.addListener(this);
 
         for (final BlockListener listener : listeners)
@@ -546,7 +547,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @SuppressWarnings("unchecked")
     @Override
-    public void variableRemoved(final VarList list, final Var<?> variable) {
+    public void variableRemoved(final VarList list, final @NotNull Var<?> variable) {
         variable.removeListener(this);
 
         // although we removed a variable, there is no "removed" notifier.
@@ -588,7 +589,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
             // status.setValue("Installing " + simpleName + "...");
 
-            PluginInstaller.install(pd, false);
+            //PluginInstaller.install(pd, false); // TODO enable this once fixed in kernel
 
             throw new BlocksReloadedException();
         }
@@ -598,7 +599,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @Override
     public boolean loadFromXML(final Node node) {
-        boolean noWarnings = true;
+        final boolean noWarnings = true;
 
         final Element blockNode = (Element) node;
 
@@ -722,7 +723,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return definedName;
     }
 
-    public static BlockDescriptor findBlockDescriptor(final int blockId, final List<BlockDescriptor> blocks) {
+    public static @Nullable BlockDescriptor findBlockDescriptor(final int blockId, final @NotNull List<BlockDescriptor> blocks) {
         for (final BlockDescriptor bd : blocks)
             if (bd.getID().equals(blockId))
                 return bd;
@@ -735,7 +736,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param blocks        list of {@link BlockDescriptor}
      * @return Input block {@link InputBlock} with given commandLineId or <i>null</i> if it doesn't exist
      */
-    public static BlockDescriptor findInputBlockDescriptor(final String commandLineId, final List<BlockDescriptor> blocks) {
+    public static @Nullable BlockDescriptor findInputBlockDescriptor(final String commandLineId, final @NotNull List<BlockDescriptor> blocks) {
         for (final BlockDescriptor block : blocks)
             if (block.isInput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
                 return block;
@@ -748,7 +749,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
      * @param blocks        list of {@link BlockDescriptor}
      * @return Output block {@link OutputBlock} with given commandLineId or <i>null</i> if it doesn't exist
      */
-    public static BlockDescriptor findOutputBlockDescriptor(final String commandLineId, final List<BlockDescriptor> blocks) {
+    public static @Nullable BlockDescriptor findOutputBlockDescriptor(final String commandLineId, final @NotNull List<BlockDescriptor> blocks) {
         for (final BlockDescriptor block : blocks)
             if (block.isOutput() && StringUtil.equals(block.getCommandLineID(), commandLineId))
                 return block;
@@ -756,7 +757,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return null;
     }
 
-    private static BlockDescriptor getBlockDescriptor(final int blockId, final Set<BlockDescriptor> bds) {
+    private static @Nullable BlockDescriptor getBlockDescriptor(final int blockId, final @NotNull Set<BlockDescriptor> bds) {
         for (final BlockDescriptor bd : bds)
             if (bd.getID().equals(blockId))
                 return bd;
@@ -764,7 +765,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return null;
     }
 
-    private String getNewVarId(final String oldVarId, final Map<BlockDescriptor, BlockDescriptor> copies) {
+    private @NotNull String getNewVarId(final @NotNull String oldVarId, final Map<BlockDescriptor, BlockDescriptor> copies) {
         // search for workflow shadow exposed variable
         final int index = oldVarId.indexOf(":");
 
@@ -948,7 +949,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
         return cpy;
     }
 
-    private static void cloneLinks(final Iterable<Link<?>> iterable, final Map<BlockDescriptor, BlockDescriptor> copies, final WorkFlow dest) {
+    private static void cloneLinks(final @NotNull Iterable<Link<?>> iterable, final Map<BlockDescriptor, BlockDescriptor> copies, final WorkFlow dest) {
         for (final Link<?> l : iterable) {
             if (l.srcBlock.getBlock() instanceof Loop || l.dstBlock.getBlock() instanceof Loop) {
                 IcyLogger.warn(BlockDescriptor.class, "Cannot copy a link to a loop variable.");

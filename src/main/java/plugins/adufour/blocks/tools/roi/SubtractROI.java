@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package plugins.adufour.blocks.tools.roi;
 
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.model.roi.ROI;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarROIArray;
 
@@ -43,13 +44,13 @@ public class SubtractROI extends Plugin implements ROIBlock {
     }
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         inputMap.add("List of ROI #1", roiA);
         inputMap.add("List of ROI #2", roiB);
     }
 
     @Override
-    public void declareOutput(final VarList outputMap) {
+    public void declareOutput(final @NotNull VarList outputMap) {
         outputMap.add("subtraction output ROI", roiOut);
     }
 
@@ -62,7 +63,7 @@ public class SubtractROI extends Plugin implements ROIBlock {
      * @throws InterruptedException          if the user interrupts the process
      * @throws UnsupportedOperationException if the operation cannot be done
      */
-    public static ROI[] subtractROI(final ROI[] roiA, final ROI[] roiB) throws UnsupportedOperationException, InterruptedException {
+    public static ROI @NotNull [] subtractROI(final ROI @NotNull [] roiA, final ROI[] roiB) throws UnsupportedOperationException, InterruptedException {
         final ArrayList<ROI> out = new ArrayList<>(roiA.length);
 
         for (final ROI a : roiA) {

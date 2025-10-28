@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,9 +18,10 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import org.bioimageanalysis.icy.gui.component.icon.SVGIcon;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
 import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.blocks.lang.Loop;
@@ -54,7 +55,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
 
     final protected Box varBox;
 
-    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", SVGIcon.CLOSE);
+    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", SVGResource.CLOSE);
 
     public WorkFlowPanel(final WorkFlowContainer wfPane, final BlockDescriptor blockDesc) {
         super(wfPane, blockDesc);
@@ -131,7 +132,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(final @NotNull ActionEvent e) {
         if (e.getSource() == menuRemoveEnclosure) {
             innerFlowPane.selectAllBlocks();
             workFlowPane.getWorkFlow().removeBlock(blockDesc, true);
@@ -246,7 +247,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
     }
 
     @Override
-    public void paintChildren(final Graphics g) {
+    public void paintChildren(final @NotNull Graphics g) {
         final Graphics gg = g.create();
 
         super.paintChildren(g);

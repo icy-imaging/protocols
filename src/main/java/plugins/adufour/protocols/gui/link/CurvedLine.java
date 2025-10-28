@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package plugins.adufour.protocols.gui.link;
 
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.protocols.gui.block.BlockPanel;
 import plugins.adufour.vars.lang.Var;
@@ -52,7 +53,7 @@ public class CurvedLine extends Line {
     }
 
     @Override
-    public void updateShape(final Path2D path, final Ellipse2D closeButton) {
+    public void updateShape(final @NotNull Path2D path, final @NotNull Ellipse2D closeButton) {
         final float border = 30;
         path.append(new CubicCurve2D.Float(x1, y1, x1 + border, y1, x2 - border, y2, x2, y2), false);
         final Rectangle r = path.getBounds();

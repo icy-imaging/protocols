@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
 
 package plugins.adufour.protocols.gui;
 
-import com.ochafik.io.JTextAreaOutputStream;
 import org.bioimageanalysis.icy.gui.component.button.IcyToggleButton;
 import org.bioimageanalysis.icy.io.FileUtil;
 import org.bioimageanalysis.icy.io.Saver;
@@ -26,6 +25,7 @@ import org.bioimageanalysis.icy.model.image.IcyBufferedImage;
 import org.bioimageanalysis.icy.model.image.IcyBufferedImageUtil;
 import org.bioimageanalysis.icy.system.IcyHandledException;
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
@@ -45,7 +45,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Objects;
 
 public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyChangeListener {
     private final WorkFlowContainer workFlowContainer;
@@ -54,9 +56,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
 
     private final JSplitPane splitPane;
 
-    private final JPanel logPanel;
-
-    private final JTextAreaOutputStream logStream;
+    private final JTextArea logArea;
 
     private final VarString statusMessage = new VarString("status", "status");
 
@@ -76,11 +76,10 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     @SuppressWarnings("unused")
     private ProtocolPanel(final File file, final WorkFlow workFlow, final MainFrame frame) {
         // Prepare the log panel
-        final JTextArea logArea = new JTextArea();
+        logArea = new JTextArea();
         logArea.setOpaque(false);
-        logStream = new JTextAreaOutputStream(logArea);
 
-        logPanel = new JPanel(new BorderLayout());
+        final JPanel logPanel = new JPanel(new BorderLayout());
         logPanel.setOpaque(false);
         logPanel.add(new JLabel("Execution log", JLabel.CENTER), BorderLayout.NORTH);
         final JScrollPane logScrollPane = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -157,7 +156,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
 
     @Override
-    public <T> void blockVariableChanged(final WorkFlow source, final BlockDescriptor block, final Var<T> variable, final T newValue) {
+    public <T> void blockVariableChanged(final WorkFlow source, final @NotNull BlockDescriptor block, final Var<T> variable, final T newValue) {
         // Mark the protocol as changed if a user input has changed
         if (block.inputVars.contains(variable) && variable.getReference() == null) {
             setDirty(true);
@@ -311,7 +310,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
     }
 
     @Override
-    public void propertyChange(final PropertyChangeEvent evt) {
+    public void propertyChange(final @NotNull PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(WORKFLOW_REPLACED)) {
             setWorkFlow((WorkFlow) evt.getNewValue());
         }
@@ -324,7 +323,7 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         }
         this.workFlow = workFlow;
         this.workFlow.addListener(this);
-        this.workFlow.setLogStream(new PrintStream(logStream));
+        this.workFlow.setLogStream(new PrintStream(new RedirectingOutputStream(logArea)));
     }
 
     public void dispose() {
@@ -361,14 +360,8 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
         embedPopupMenu.show(invoker, 0, invoker.getHeight());
     }
 
-    public void updateRunButton(final IcyToggleButton button) {
-        switch (workFlow.getBlockDescriptor().getStatus()) {
-            case RUNNING:
-                button.setSelected(true);
-                break;
-            default:
-                button.setSelected(false);
-        }
+    public void updateRunButton(final @NotNull IcyToggleButton button) {
+        button.setSelected(Objects.requireNonNull(workFlow.getBlockDescriptor().getStatus()) == BlockStatus.RUNNING);
     }
 
     /**
@@ -389,5 +382,18 @@ public class ProtocolPanel extends JPanel implements WorkFlowListener, PropertyC
 
     public void removeBlockListener(final BlockListener blockListener) {
         workFlow.getBlockDescriptor().removeBlockListener(blockListener);
+    }
+
+    public static class RedirectingOutputStream extends OutputStream {
+        private final JTextArea textArea;
+
+        public RedirectingOutputStream(final JTextArea textArea) {
+            this.textArea = textArea;
+        }
+
+        @Override
+        public void write(final int b) {
+            textArea.append(String.valueOf((char) b));
+        }
     }
 }

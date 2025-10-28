@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package plugins.adufour.blocks.tools.io;
 import org.bioimageanalysis.icy.Icy;
 import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
 import org.bioimageanalysis.icy.model.swimmingPool.SwimmingObject;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarMutable;
@@ -36,7 +37,7 @@ public class SendToSwimmingPool extends Plugin implements Block {
     private final VarMutable data = new VarMutable("Data", null);
 
     @Override
-    public void declareInput(final VarList inputMap) {
+    public void declareInput(final @NotNull VarList inputMap) {
         inputMap.add("Data", data);
     }
 

@@ -7,29 +7,31 @@
     <parent>
         <groupId>org.bioimageanalysis.icy</groupId>
         <artifactId>pom-icy</artifactId>
-        <version>3.0.0-a.4</version>
+        <version>3.0.0-a.5</version>
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>4.0.0-a.3</version>
+    <version>4.0.0-a.5</version>
 
     <name>Protocols</name>
     <description>
         Protocols (GUI part) plugin for Icy
     </description>
 
+    <url></url>
+
+    <scm>
+        <url></url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>kernel-extensions</artifactId>
+            <artifactId>kernel-extension</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bioimageanalysis.icy</groupId>
             <artifactId>ezplug</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bioimageanalysis.icy</groupId>
-            <artifactId>ochafik</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ import org.bioimageanalysis.icy.model.roi.ROI3D;
 import org.bioimageanalysis.icy.model.roi.mask.BooleanMask2D;
 import org.bioimageanalysis.icy.model.roi.mask.BooleanMask3D;
 import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import plugins.adufour.vars.lang.VarROIArray;
 import plugins.adufour.vars.util.VarException;
 
@@ -72,7 +74,7 @@ public class ErodeROI extends MorphROI {
      * @return a new set of eroded ROI with type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] erodeROI(final ROI[] inputRoi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
+    public static ROI @NotNull [] erodeROI(final ROI @NotNull [] inputRoi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
         final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
         for (final ROI roi : inputRoi) {
@@ -98,7 +100,7 @@ public class ErodeROI extends MorphROI {
      * @return a new set of eroded ROI with type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI[] erodeROIByPercentage(final ROI[] inputRoi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
+    public static ROI @NotNull [] erodeROIByPercentage(final ROI @NotNull [] inputRoi, final int xPct, final int yPct, final int zPct) throws InterruptedException {
         final ArrayList<ROI> out = new ArrayList<>(inputRoi.length);
 
         for (final ROI roi : inputRoi) {
@@ -142,7 +144,7 @@ public class ErodeROI extends MorphROI {
      * @return a new, eroded ROI of type "area"
      * @throws InterruptedException if the user interrupts the process
      */
-    public static ROI erodeROI(final ROI roi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
+    public static @Nullable ROI erodeROI(final ROI roi, final int xRadius, final int yRadius, final int zRadius) throws InterruptedException {
         // The basis of this erosion operator is to remove all pixels within a distance of "radius"
         // from the border. Since we have easy access to the contour points of the ROI, we will
         // start from there and instead use a radius of "radius - 1" when searching for pixels to

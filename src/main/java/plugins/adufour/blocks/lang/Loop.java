@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package plugins.adufour.blocks.lang;
 
 import org.bioimageanalysis.icy.system.IcyHandledException;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.ReLoop;
 import plugins.adufour.blocks.util.BlocksException;
@@ -195,7 +196,7 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    protected <T> void checkScope(final Link<T> link) throws ScopeException {
+    protected <T> void checkScope(final @NotNull Link<T> link) throws ScopeException {
         try {
             super.checkScope(link);
         }
@@ -207,7 +208,7 @@ public class Loop extends WorkFlow {
     }
 
     @Override
-    protected <T> void checkLoop(final Link<T> link) throws LoopException {
+    protected <T> void checkLoop(final @NotNull Link<T> link) throws LoopException {
         try {
             super.checkLoop(link);
         }

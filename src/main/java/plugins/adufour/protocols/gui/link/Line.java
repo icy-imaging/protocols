@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package plugins.adufour.protocols.gui.link;
 
 import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Link;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.protocols.gui.block.BlockPanel;
@@ -89,7 +90,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * @param dstPanel        the destination panel of the link
      * @param exposedVariable the exposed variable
      */
-    public Line(final BlockPanel srcPanel, final BlockPanel dstPanel, final Var<?> exposedVariable) {
+    public Line(final @NotNull BlockPanel srcPanel, final BlockPanel dstPanel, final @NotNull Var<?> exposedVariable) {
         this.link = null;
         this.srcPanel = srcPanel;
         this.dstPanel = dstPanel;
@@ -166,7 +167,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      */
     public abstract void updateShape(Path2D thePath, Ellipse2D theCloseButton);
 
-    public void paint(final Graphics2D g) {
+    public void paint(final @NotNull Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         if (isSelected) {
@@ -186,7 +187,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
             paintCloseButton(g);
     }
 
-    private void paintCloseButton(final Graphics g) {
+    private void paintCloseButton(final @NotNull Graphics g) {
         final Graphics2D g2 = (Graphics2D) g.create();
         g2.fill(closeButton);
         g2.setColor(Color.white);
@@ -195,7 +196,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
         g2.dispose();
     }
 
-    protected void updateCloseButtonShape(final Shape s) {
+    protected void updateCloseButtonShape(final @NotNull Shape s) {
         final Rectangle r = s.getBounds();
         closeButton.setFrame(r.x + r.width / 2f - 6, r.y + r.height / 2f - 6, 13, 13);
     }
@@ -207,7 +208,7 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
      * @param p the point to check
      * @return true if p is within the virtual close button, false otherwise
      */
-    public boolean isOverCloseButton(final Point p) {
+    public boolean isOverCloseButton(final @NotNull Point p) {
         return isOverCloseButton(p.x, p.y);
     }
 
@@ -238,12 +239,12 @@ public abstract class Line extends Line2D.Float implements ComponentListener, Mo
     }
 
     @Override
-    public void componentMoved(final ComponentEvent arg0) {
+    public void componentMoved(final @NotNull ComponentEvent arg0) {
         updateLine((BlockPanel) arg0.getSource());
     }
 
     @Override
-    public void componentResized(final ComponentEvent arg0) {
+    public void componentResized(final @NotNull ComponentEvent arg0) {
         updateLine((BlockPanel) arg0.getSource());
     }
 

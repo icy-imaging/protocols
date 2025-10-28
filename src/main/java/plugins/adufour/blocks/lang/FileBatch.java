@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024. Institut Pasteur.
+ * Copyright (c) 2010-2025. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package plugins.adufour.blocks.lang;
 import org.bioimageanalysis.icy.Icy;
 import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
 import org.bioimageanalysis.icy.io.FileUtil;
+import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.gui.FileMode;
 import plugins.adufour.vars.gui.model.FileTypeModel;
@@ -74,7 +75,7 @@ public class FileBatch extends Batch implements FileFilter {
     }
 
     @Override
-    public boolean accept(final File f) {
+    public boolean accept(final @NotNull File f) {
         final String ext = extension.getValue();
         return f.isDirectory() || ext.isEmpty() || f.getPath().toLowerCase().endsWith(ext.toLowerCase());
     }
@@ -128,7 +129,7 @@ public class FileBatch extends Batch implements FileFilter {
     }
 
     @Override
-    public void declareLoopVariables(final List<Var<?>> loopVariables) {
+    public void declareLoopVariables(final @NotNull List<Var<?>> loopVariables) {
         super.declareLoopVariables(loopVariables);
 
         loopVariables.add(extension);

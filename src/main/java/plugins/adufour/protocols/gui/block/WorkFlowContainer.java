@@ -457,7 +457,7 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             for (final Link<?> l : workFlow.getLinkSelection())
                 workFlow.removeLink(l.dstVar);
             while (!workFlow.getBlockSelection().isEmpty()) {
-                final BlockDescriptor tmp = workFlow.getBlockSelection().getFirst();
+                final BlockDescriptor tmp = workFlow.getBlockSelection().get(0);
                 if (tmp.getBlock() instanceof WorkFlow)
                     ((WorkFlow) tmp.getBlock()).newSelection();
                 workFlow.removeBlock(tmp, true);

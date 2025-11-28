@@ -1,66 +1,62 @@
-# Protocols
-
 <!-- badges: start -->
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Twitter](https://img.shields.io/twitter/follow/Icy_BioImaging?style=social)](https://twitter.com/Icy_BioImaging)
-[![Image.sc forum](https://img.shields.io/badge/discourse-forum-brightgreen.svg?style=flat)](https://forum.image.sc/tag/icy)
+![Version 4.0.0 alpha 5](https://img.shields.io/badge/v4.0.0-alpha_5-royalblue)
+![Java 17+](https://img.shields.io/badge/OpenJDK-17+-5382A1?labelColor=E76F00)
+[![License: LGPL v3](https://img.shields.io/badge/LGPLv3-008033?logo=GPLv3&logoSize=auto)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Twitter](https://img.shields.io/twitter/follow/Icy_BioImaging)](https://x.com/Icy_BioImaging)
+[![Image.sc forum](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fforum.image.sc%2Ftag%2Ficy.json&query=%24.topic_list.tags.0.topic_count&suffix=%20topics&label=forum&color=0AA0B4)](https://forum.image.sc/tag/icy)
 <!-- badges: end -->
 
-This is the repository for the source code of *Protocols*, a plugin for the [bioimage analysis software Icy](http://icy.bioimageanalysis.org/), which was developed by members or former members of the [Biological Image Analysis unit at Institut Pasteur](https://research.pasteur.fr/en/team/bioimage-analysis/). This plugin is licensed under GPL3 license.     
-Icy is developed and maintained by [Biological Image Analysis unit at Institut Pasteur](https://research.pasteur.fr/en/team/bioimage-analysis/). The [source code of Icy](https://gitlab.pasteur.fr/bia/icy) is also licensed under a GPL3 license.     
+# Protocols
 
+This is the repository for the source code of *Protocols*, an extension for the [bioimage analysis software Icy](https://icy.bioimageanalysis.org/), which was developed by members or former members of the [Biological Image Analysis unit at Institut Pasteur](https://research.pasteur.fr/en/team/bioimage-analysis/). This plugin is licensed under the LGPL3 license.     
+Icy is developed and maintained by [Biological Image Analysis unit at Institut Pasteur](https://research.pasteur.fr/en/team/bioimage-analysis/). The [source code of Icy](https://gitlab.pasteur.fr/bia/icy/icy) is also licensed under the LGPL3 license.
 
+## Extension description
 
-## Plugin description
-
-<!-- Short description of goals of package, with descriptive links to the documentation website --> 
-
-Design your own <strong>bioimage analysis workflow, graphically, </strong>and automate it on many images (<strong>batch processing</strong>).<strong>
-</strong>
+Design your own **bioimage analysis workflow, graphically**, and automate it on many images (**batch processing**).
 
 No programming knowledge required! Protocols can be shared and re-used straight from the Icy website.
 
-Watch this 30 minutes<a href="https://www.youtube.com/watch?v=5SJqhKjCbMQ"> introduction to protocols</a> during the NEUBIAS Academy @home webinar (go directly to <a class="yt-simple-endpoint style-scope yt-formatted-string" dir="auto" spellcheck="false" href="https://www.youtube.com/watch?v=5SJqhKjCbMQ&amp;t=1758s">29:18</a> to skip the general introduction to Icy) and see the corresponding slides (<a href="https://marionlouveaux.github.io/bioimage_analysis_with_icy/">whole webinar</a> or <a href="https://marionlouveaux.github.io/bioimage_analysis_with_icy/#23">protocol part only</a>).        
-A more detailed user documentation can be found on the Protocols documentation page on the Icy website: http://icy.bioimageanalysis.org/plugin/protocols/               
-
+Watch this [introduction to protocols](https://www.youtube.com/watch?v=5SJqhKjCbMQ) (~30 minutes) during the NEUBIAS Academy @home webinar (go directly to [29:18](https://youtu.be/5SJqhKjCbMQ?si=g6H3UWoFbuAEvChd&t=1758) to skip the general introduction to Icy) and see the corresponding slides ([whole webinar](https://marionlouveaux.github.io/bioimage_analysis_with_icy/) or [protocol part only](https://marionlouveaux.github.io/bioimage_analysis_with_icy/#23)).        
+More detailed user documentation can be found on the Protocols documentation page on the Icy website: https://icy.bioimageanalysis.org/plugin/protocols/
 
 ## Installation instructions
 
-For end-users, refer to the documentation on the Icy website on [how to install an Icy plugin](http://icy.bioimageanalysis.org/tutorial/how-to-install-an-icy-plugin/).      
+### Install from Icy website
 
-For developers, see our [Contributing guidelines](https://gitlab.pasteur.fr/bia/icy/-/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://gitlab.pasteur.fr/bia/icy/-/blob/master/CODE-OF-CONDUCT.md).      
+*Work In Progress*
 
-<!--  Here we should have some explanations on how to fork this repo (for an example see https://gitlab.pasteur.fr/bia/wellPlateReader). Add any info related to Maven etc. How the project is build (for an example see https://gitlab.pasteur.fr/bia/wellPlateReader). Any additional setup required (authentication tokens, etc).  -->
+### Install from source code
 
+#### Requirements
+- JDK 17+
+- Maven 3.6.3+
 
-## Main functions and usage
+#### Steps
+1. Clone from git repository using `git clone` command
+2. Open your terminal and navigate to the folder containing the cloned repository
+3. Run `mvn` command
+4. The extension was automatically installed in your local maven repository `~/.m2/repository/`, and registered in your Icy workspace
 
-<!-- list main functions, explain architecture, classname, give info on how to get started with the plugin. If applicable, how the package compares to other similar packages and/or how it relates to other packages -->
+## Import in your extension
 
-Classname: `plugins.adufour.protocols.Protocols`
+Add this dependency block in your `pom.xml`
+```xml
+<dependency>
+    <groupId>org.bioimageanalysis.icy</groupId>
+    <artifactId>protocols</artifactId>
+</dependency>
+```
 
+## Citation
 
-
-## Citation 
-
-Please cite this plugins as follows:          
-
+Please cite this extension as follows:
 
 Please also cite the Icy software and mention the version of Icy you used (bottom right corner of the GUI or first lines of the Output tab):     
 de Chaumont, F. et al. (2012) Icy: an open bioimage informatics platform for extended reproducible research, [Nature Methods](https://www.nature.com/articles/nmeth.2075), 9, pp. 690-696       
-http://icy.bioimageanalysis.org    
+https://icy.bioimageanalysis.org
 
+## Author(s)
 
-
-## Author(s)      
-
-Alexandre Dufour, Stephane Dallongeville
-
-
-## Additional information
-
-
-
-
-
-
+- Alexandre Dufour
+- Stéphane Dallongeville

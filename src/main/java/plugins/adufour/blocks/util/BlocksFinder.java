@@ -563,7 +563,7 @@ public class BlocksFinder {
                 final int n = Math.min(components.size(), maxItemsPerMenu - 1);
 
                 for (int i = 0; i < n; i++)
-                    currentMenu.add(components.removeFirst());
+                    currentMenu.add(components.remove(0));
 
                 if (!components.isEmpty())
                     currentMenu = (JMenu) currentMenu.add(new JMenu("More..."));

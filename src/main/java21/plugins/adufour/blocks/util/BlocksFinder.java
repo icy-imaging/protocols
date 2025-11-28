@@ -1,0 +1,627 @@
+/*
+ * Copyright (c) 2010-2025. Institut Pasteur.
+ *
+ * This file is part of Icy.
+ * Icy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Icy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Icy. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package plugins.adufour.blocks.util;
+
+import org.bioimageanalysis.icy.common.reflect.ClassUtil;
+import org.bioimageanalysis.icy.extension.ExtensionLoader;
+import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
+import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
+import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenu;
+import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
+import org.bioimageanalysis.icy.gui.component.menu.IcyPluginMenuItem;
+import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import org.jetbrains.annotations.NotNull;
+import plugins.adufour.blocks.lang.Block;
+import plugins.adufour.blocks.lang.BlockDescriptor;
+import plugins.adufour.blocks.lang.Loop;
+import plugins.adufour.blocks.lang.WorkFlow;
+import plugins.adufour.blocks.tools.Display;
+import plugins.adufour.blocks.tools.ReLoop;
+import plugins.adufour.blocks.tools.ToolsBlock;
+import plugins.adufour.blocks.tools.input.InputBlock;
+import plugins.adufour.blocks.tools.io.IOBlock;
+import plugins.adufour.blocks.tools.output.OutputBlock;
+import plugins.adufour.blocks.tools.roi.ROIBlock;
+import plugins.adufour.blocks.tools.sequence.SequenceBlock;
+import plugins.adufour.protocols.gui.BlockSearchPanel;
+import plugins.adufour.protocols.gui.block.WorkFlowContainer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+public class BlocksFinder {
+    /**
+     * Indicates whether annotated methods should be parsed and made available as
+     * blocks
+     */
+    public final boolean parseAnnotations = false;
+
+    /**
+     * class for handling Drag and Drop on the menu items
+     *
+     * @author Ludovic Laborde, Alexandre Dufour
+     */
+    public static class DND_MenuItem extends IcyPluginMenuItem implements MouseListener, Transferable, DragSourceListener, DragGestureListener {
+        private final DragSource source;
+        private final PluginDescriptor descriptor;
+
+        private final List<MenuItemListener> menuItemListeners;
+
+        public DND_MenuItem(final PluginDescriptor d) {
+            super(d);
+            setOpaque(false);
+
+            for (final MouseListener listener : getMouseListeners())
+                removeMouseListener(listener);
+
+            descriptor = d;
+            menuItemListeners = new ArrayList<>();
+
+            final TransferHandler handler = new TransferHandler() {
+                @Override
+                public Transferable createTransferable(final JComponent c) {
+                    return new DND_MenuItem(descriptor);
+                }
+            };
+
+            source = new DragSource();
+            source.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY, this);
+
+            setTransferHandler(handler);
+            addMouseListener(this);
+        }
+
+        public PluginDescriptor getDescriptor() {
+            return descriptor;
+        }
+
+        @Override
+        public void dragGestureRecognized(final DragGestureEvent dge) {
+            source.startDrag(dge, DragSource.DefaultMoveDrop, new DND_MenuItem(descriptor), this);
+        }
+
+        @Override
+        public @NotNull Object getTransferData(final DataFlavor flavor) {
+            return this;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            try {
+                return new DataFlavor[]{new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList")};
+            }
+            catch (final ClassNotFoundException e) {
+                IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(final DataFlavor flavor) {
+            return true;
+        }
+
+        @Override
+        public void mouseClicked(final MouseEvent arg0) {
+            setBackground(Color.GRAY);
+            notifyListeners();
+        }
+
+        public void addMenuItemListener(final MenuItemListener l) {
+            menuItemListeners.add(l);
+        }
+
+        // updates the search panel
+        private void notifyListeners() {
+            for (final MenuItemListener l : menuItemListeners)
+                l.displayDoc(descriptor);
+        }
+
+        @Override
+        public void dragDropEnd(final DragSourceDropEvent dsde) {
+            setBackground(Color.GRAY);
+            notifyListeners();
+        }
+
+        @Override
+        public void dragEnter(final DragSourceDragEvent dsde) {
+        }
+
+        @Override
+        public void dragExit(final DragSourceEvent dse) {
+        }
+
+        @Override
+        public void dragOver(final DragSourceDragEvent dsde) {
+        }
+
+        @Override
+        public void dropActionChanged(final DragSourceDragEvent dsde) {
+        }
+
+        @Override
+        public void mouseEntered(final MouseEvent arg0) {
+        }
+
+        @Override
+        public void mouseExited(final MouseEvent arg0) {
+        }
+
+        @Override
+        public void mousePressed(final MouseEvent arg0) {
+        }
+
+        @Override
+        public void mouseReleased(final MouseEvent arg0) {
+        }
+    }
+
+    /**
+     * Searches for a block using the specified search text, and populates the
+     * specified search panel with the search results
+     *
+     * @param menuContainer BlockSearchPanel
+     * @param searchText    String
+     */
+    public void createSearchMenu(final BlockSearchPanel menuContainer, String searchText) {
+        final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
+
+        if (plugins.isEmpty()) {
+            final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
+            item.setFont(item.getFont().deriveFont(Font.ITALIC));
+            menuContainer.add(item);
+            return;
+        }
+
+        for (final PluginDescriptor descriptor : plugins) {
+
+            final Class<? extends Plugin> _class = descriptor.getPluginClass();
+            final Class<? extends Block> blockClass = _class.asSubclass(Block.class);
+
+            if (ClassUtil.isAbstract(blockClass))
+                continue;
+            if (ClassUtil.isPrivate(blockClass))
+                continue;
+
+            // ALEX (2014-06-17): removing annotations for now
+            // // handle default annotated blocks defined in protocols
+            // if (blockClass.isAnnotationPresent(BlockSearchAnnotation.class))
+            // {
+            // Annotation annotation =
+            // blockClass.getAnnotation(BlockSearchAnnotation.class);
+            // BlockSearchAnnotation blockSearchAnnotation = (BlockSearchAnnotation)
+            // annotation;
+            //
+            // // search conditions
+            // if
+            // (!(blockSearchAnnotation.name().toLowerCase().contains(searchText.toLowerCase())
+            // ||
+            // blockSearchAnnotation.category().toLowerCase().contains(searchText.toLowerCase())
+            // || blockSearchAnnotation.description().toLowerCase()
+            // .contains(searchText.toLowerCase()))) continue;
+            // }
+
+            // handle other external plugins
+            // search conditions
+
+            String testString = "block";
+            testString += descriptor.getName();
+            testString += blockClass.getSimpleName();
+            testString += descriptor.getDescription();
+            testString += descriptor.getAuthor();
+            testString = testString.toLowerCase();
+
+            searchText = searchText.trim().toLowerCase();
+            final String searchTextNoSpaces = searchText.replace(" ", "");
+
+            if (testString.contains(searchText) || testString.contains(searchTextNoSpaces)) {
+                final DND_MenuItem menuItem = new DND_MenuItem(descriptor);
+                menuItem.addMenuItemListener(menuContainer);
+                menuItem.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+                menuItem.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                String name = blockClass.getSimpleName();
+                name = descriptor.getName().equalsIgnoreCase(name) ? getFlattened(name) : descriptor.getName();
+
+                // Remove the "block" word at the end of the class name
+                if (name.toLowerCase().endsWith("block"))
+                    name = name.substring(0, name.length() - 5);
+
+                if (blockClass.isAnnotationPresent(Deprecated.class)) {
+                    name = "(deprecated) " + name;
+                }
+                menuItem.setText(name);
+                menuContainer.add(menuItem);
+            }
+        }
+    }
+
+    /**
+     * Create a JMenu component with all existing classes implementing {@link Block}
+     *
+     * @param menuContainer Container
+     * @param workFlowPane  WorkFlowContainer
+     * @param location      Point
+     */
+    public final void createJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
+        final IcyMenu mnBlocks = new IcyMenu("Blocks...", SVGResource.WIDGETS);
+        //mnBlocks.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"), 22));
+
+        final IcyMenu mnInput = new IcyMenu("Read...", SVGResource.REDO);
+        //mnInput.setIcon(new IcyIcon(ResourceUtil.ICON_REDO, 22));
+
+        final IcyMenu mnOutput = new IcyMenu("Out...", SVGResource.UNDO);
+        //mnOutput.setIcon(new IcyIcon(ResourceUtil.ICON_UNDO, 22));
+
+        final IcyMenu mnIO = new IcyMenu("I/O...", SVGResource.SAVE);
+        //mnIO.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE, 22));
+
+        final IcyMenu mnSeq = new IcyMenu("Sequence...", SVGResource.IMAGE);
+        //mnSeq.setIcon(new IcyIcon(ResourceUtil.ICON_PHOTO, 22));
+
+        final IcyMenu mnROI = new IcyMenu("ROI...", SVGResource.DRAW_ABSTRACT);
+        //mnROI.setIcon(new IcyIcon(ResourceUtil.ICON_ROI_POLYGON, 22));
+
+        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", SVGResource.LAPS);
+        //mnLoops.setIcon(new IcyIcon(ResourceUtil.ICON_RELOAD, 22));
+
+        final IcyMenu mnTools = new IcyMenu("Tools...", SVGResource.SETTINGS);
+        //mnTools.setIcon(new IcyIcon(ResourceUtil.ICON_TOOLS, 22));
+
+        final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
+
+        if (plugins.isEmpty()) {
+            final JMenuItem item = new JMenuItem("The plug-in list has been updated.\nPlease close and re-open the Protocols editor.");
+            item.setFont(item.getFont().deriveFont(Font.ITALIC));
+            menuContainer.add(item);
+            return;
+        }
+
+        for (final PluginDescriptor descriptor : plugins) {
+            final Class<? extends Plugin> clazz = descriptor.getPluginClass();
+            try {
+                final Class<? extends Block> blockClass = clazz.asSubclass(Block.class);
+
+                if (ClassUtil.isAbstract(blockClass))
+                    continue;
+                if (ClassUtil.isPrivate(blockClass))
+                    continue;
+                if (blockClass.isAnnotationPresent(Deprecated.class))
+                    continue;
+
+                // create the menu item
+                final IcyPluginMenuItem menuItem = new IcyPluginMenuItem(descriptor);
+
+                // remove the internal action listener
+                menuItem.removeActionListener(menuItem);
+
+                String name = blockClass.getSimpleName();
+
+                name = descriptor.getName().equalsIgnoreCase(name) ? getFlattened(name) : descriptor.getName();
+
+                // Remove the "block" word at the end of the class name
+                if (name.toLowerCase().endsWith("block"))
+                    name = name.substring(0, name.length() - 5);
+
+                menuItem.setText(name);
+
+                if (!descriptor.getDescription().isEmpty()) {
+                    menuItem.setToolTipText("<html>" + descriptor.getDescription().replaceAll("\n", "<br/>") + "</html>");
+                }
+
+                menuItem.addActionListener(arg0 -> {
+                    try {
+                        addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
+                    }
+                    catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+                        IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+                    }
+                });
+
+                // place the menu item where appropriate
+
+                if (blockClass == Display.class) {
+                    // will be dealt with outside this loop
+                    continue;
+                }
+                else if (ClassUtil.isSubClass(blockClass, Loop.class)
+                        && !blockClass.isAnnotationPresent(Deprecated.class)) {
+                    final JMenuItem item = new JMenuItem(getFlattened(blockClass.getSimpleName()));
+                    item.addActionListener(arg0 -> {
+                        try {
+                            addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
+                        }
+                        catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+                            IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+                        }
+                    });
+                    mnLoops.add(item);
+                }
+                else if (InputBlock.class.isAssignableFrom(blockClass)) {
+                    mnInput.add(menuItem);
+                }
+                else if (OutputBlock.class.isAssignableFrom(blockClass)) {
+                    mnOutput.add(menuItem);
+                }
+                else if (SequenceBlock.class.isAssignableFrom(blockClass)) {
+                    mnSeq.add(menuItem);
+                }
+                else if (IOBlock.class.isAssignableFrom(blockClass)) {
+                    mnIO.add(menuItem);
+                }
+                else if (ROIBlock.class.isAssignableFrom(blockClass)) {
+                    mnROI.add(menuItem);
+                }
+                else if (ToolsBlock.class.isAssignableFrom(blockClass)) {
+                    if (blockClass == ReLoop.class)
+                        continue; // TODO
+
+                    mnTools.add(menuItem);
+                }
+                else {
+                    // default case: put the rest in the "Blocks" menu
+                    mnBlocks.add(menuItem);
+                }
+
+                if (parseAnnotations) {
+                    // find annotated methods
+                    final ArrayList<BlockAnnotations> blocks = BlockAnnotations.findBlockMethods(clazz);
+
+                    for (final BlockAnnotations annotatedMethod : blocks) {
+                        final JMenuItem item2 = new JMenuItem(clazz.getSimpleName() + "." + annotatedMethod.getName());
+                        item2.setToolTipText(annotatedMethod.getDescription());
+                        item2.addActionListener(e -> addBlock(workFlowPane, annotatedMethod.createBlock(), location));
+                        mnBlocks.add(item2);
+                    }
+                }
+            }
+            catch (final ClassCastException e1) {
+                // Ignore it
+            }
+        }
+
+        splitLongMenus(mnBlocks, 15);
+        splitLongMenus(mnInput, 15);
+        splitLongMenus(mnOutput, 15);
+        splitLongMenus(mnSeq, 15);
+        splitLongMenus(mnROI, 15);
+        splitLongMenus(mnIO, 15);
+        splitLongMenus(mnLoops, 15);
+        splitLongMenus(mnTools, 15);
+
+        menuContainer.add(mnBlocks);
+        menuContainer.add(mnInput);
+        menuContainer.add(mnOutput);
+        menuContainer.add(mnSeq);
+        menuContainer.add(mnROI);
+        menuContainer.add(mnIO);
+        menuContainer.add(mnLoops);
+        menuContainer.add(mnTools);
+
+        // and add the Display block last
+
+        final IcyMenuItem mnDisp = new IcyMenuItem("Display", SVGResource.VISIBILITY);
+        mnDisp.addActionListener(arg0 -> {
+            try {
+                addBlock(workFlowPane, Display.class.getDeclaredConstructor().newInstance(), location);
+            }
+            catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+                IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+            }
+        });
+        //mnDisp.setIcon(new IcyIcon(ImageUtil.scaleQuality(ResourceUtil.getAlphaIconAsImage("eye_open.png"), 22, 22)));
+        menuContainer.add(mnDisp);
+
+        // // 3rd-party block providers (very soon...)
+        //
+        // JMenu mnOthers = new JMenu("Others...");
+        // mnOthers.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"),
+        // 22));
+        //
+        // for (PluginDescriptor providerPlugin :
+        // PluginLoader.getPlugins(BlockProvider.class, true,
+        // false, false))
+        // {
+        // try
+        // {
+        // BlockProvider provider =
+        // providerPlugin.getPluginClass().asSubclass(BlockProvider.class).newInstance();
+        //
+        // Map<String, Block> blocks = provider.getBlocks();
+        //
+        // for(String blockName : blocks.keySet())
+        // {
+        // final Block block = blocks.get(blockName);
+        // final JMenuItem item = new JMenuItem(blockName);
+        // item.addActionListener(new ActionListener()
+        // {
+        // @Override
+        // public void actionPerformed(ActionEvent arg0)
+        // {
+        // try
+        // {
+        // addBlock(workFlowPane, block.getClass().newInstance(), location);
+        // }
+        // catch (InstantiationException e1)
+        // {
+        // e1.printStackTrace();
+        // }
+        // catch (IllegalAccessException e1)
+        // {
+        // e1.printStackTrace();
+        // }
+        // }
+        // });
+        // mnOthers.add(item);
+        // }
+        // }
+        // catch (Exception e)
+        // {
+        // e.printStackTrace();
+        // }
+        // }
+        // splitLongMenus(mnOthers, 15);
+        // menuContainer.add(mnOthers);
+    }
+
+    /**
+     * Create a JMenu component with all existing classes implementing {@link Block}
+     *
+     * @param menuContainer Container
+     * @param workFlowPane  WorkFlowContainer
+     */
+    public static void createEmbedJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane) {
+        // One day, when Java 8 rules...
+        // PluginLoader.getPlugins(WorkFlow.class).stream()
+        // // get the plug-in class
+        // .map(PluginDescriptor::getPluginClass)
+        // // Create a menu item for each element
+        // .forEach(enclosure -> {
+        // String menuName = getFlattened(enclosure.getSimpleName());
+        // JMenuItem menuItem = new JMenuItem(menuName);
+        // menuItem.addActionListener(a -> {
+        // try
+        // {
+        // workFlowPane.embedWorkFlow((Class<? extends WorkFlow>) enclosure);
+        // }
+        // catch (Exception e)
+        // {
+        // throw new RuntimeException(e);
+        // }
+        // });
+        // menuContainer.add(menuItem);
+        // });
+
+        // In the meantime...
+        for (final PluginDescriptor plugin : ExtensionLoader.getPlugins(WorkFlow.class)) {
+            final JMenuItem menuItem = new JMenuItem(getFlattened(plugin.getName()));
+
+            menuItem.addActionListener(arg0 -> {
+                try {
+                    workFlowPane.embedWorkFlow(plugin.getPluginClass().asSubclass(WorkFlow.class));
+                }
+                catch (final Exception e) {
+                    IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
+                }
+            });
+            menuContainer.add(menuItem);
+        }
+    }
+
+    private static void addBlock(final @NotNull WorkFlowContainer workFlowPane, final Block block, final @NotNull Point location) {
+        final BlockDescriptor blockDesc = (block instanceof WorkFlow ? ((WorkFlow) block).getBlockDescriptor() : new BlockDescriptor(-1, block));
+
+        blockDesc.setLocation(location.x, location.y);
+
+        workFlowPane.getWorkFlow().addBlock(blockDesc);
+    }
+
+    /**
+     * Breaks the list of items in the specified menu, by creating sub-menus
+     * containing the specified number of items, and a "More..." menu to access
+     * subsequent items.
+     *
+     * @param menu            the menu to break into smaller sub-menus
+     * @param maxItemsPerMenu the maximum number of items to display in each sub-menu
+     */
+    private void splitLongMenus(final @NotNull JMenu menu, final int maxItemsPerMenu) {
+        final ArrayList<Component> components = new ArrayList<>(Arrays.asList(menu.getPopupMenu().getComponents()));
+
+        if (components.size() > maxItemsPerMenu) {
+            menu.removeAll();
+
+            JMenu currentMenu = menu;
+
+            while (!components.isEmpty()) {
+                final int n = Math.min(components.size(), maxItemsPerMenu - 1);
+
+                for (int i = 0; i < n; i++)
+                    currentMenu.add(components.removeFirst());
+
+                if (!components.isEmpty())
+                    currentMenu = (JMenu) currentMenu.add(new JMenu("More..."));
+            }
+
+            if (!components.isEmpty())
+                throw new RuntimeException("Error while splitting menus: " + components.size() + " are remaining.");
+        }
+
+        // do this recursively for sub-menus
+        for (final Component component : menu.getPopupMenu().getComponents()) {
+            if (component instanceof JMenu)
+                splitLongMenus((JMenu) component, maxItemsPerMenu);
+        }
+    }
+
+    /**
+     * Creates a flattened version of the provided String. The flattening operation
+     * splits the string by inserting spaces between words starting with an upper
+     * case letter, and converts upper case letters to lowercase (with the
+     * except of the first word). Note that <b>consecutive upper case letters</b>
+     * <b>will remain grouped</b>, as they are considered to represent an acronym.<br>
+     * <br>
+     * <u>NOTE:</u> This method is optimized for class names that follow the Java
+     * naming convention. <br>
+     * Examples:<br>
+     * MyGreatClass -&lt; "My great class"<br>
+     * MyXYZClass -&lt; "My XYZ class"
+     *
+     * @param string the string to flatten
+     * @return a flattened (i.e. pretty-printed) String based on the name of the
+     * string
+     */
+    public static @NotNull String getFlattened(final @NotNull String string) {
+        final String[] words = string.split("(?=[A-Z])");
+
+        final StringBuilder output = new StringBuilder(words[0]);
+        if (words.length > 1) {
+            final int nextWordIndex = 1;
+
+            for (int i = nextWordIndex; i < words.length; i++) {
+                final String word = words[i];
+                if (word.length() == 1) {
+                    // single letter
+                    if (words[i - 1].length() == 1) {
+                        // append to the previous letter (acronym)
+                        output.append(word);
+                    }
+                    else {
+                        // new isolated letter or acronym
+                        output.append(" ").append(word);
+                    }
+                }
+                else
+                    output.append(" ").append(word.toLowerCase());
+            }
+        }
+
+        return output.toString();
+    }
+}

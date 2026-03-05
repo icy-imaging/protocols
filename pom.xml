@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.bioimageanalysis.icy</groupId>
         <artifactId>pom-icy</artifactId>
-        <version>3.0.0-a.5</version>
+        <version>3.0.0-a.6</version>
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>4.0.0-a.5</version>
+    <version>4.0.0-a.6</version>
 
     <name>Protocols</name>
     <description>Protocols (GUI part) plugin for Icy</description>

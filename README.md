@@ -1,5 +1,5 @@
 <!-- badges: start -->
-![Version 4.0.0 alpha 5](https://img.shields.io/badge/v4.0.0-alpha_5-royalblue)
+![Version 4.0.0 alpha 6](https://img.shields.io/badge/v4.0.0-alpha_6-royalblue)
 ![Java 17+](https://img.shields.io/badge/OpenJDK-17+-5382A1?labelColor=E76F00)
 [![License: LGPL v3](https://img.shields.io/badge/LGPLv3-008033?logo=GPLv3&logoSize=auto)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Twitter](https://img.shields.io/twitter/follow/Icy_BioImaging)](https://x.com/Icy_BioImaging)
@@ -53,10 +53,11 @@ Add this dependency block in your `pom.xml`
 Please cite this extension as follows:
 
 Please also cite the Icy software and mention the version of Icy you used (bottom right corner of the GUI or first lines of the Output tab):     
-de Chaumont, F. et al. (2012) Icy: an open bioimage informatics platform for extended reproducible research, [Nature Methods](https://www.nature.com/articles/nmeth.2075), 9, pp. 690-696       
+de Chaumont, F. et al. (2012) Icy: an open bioimage informatics platform for extended reproducible research, [Nature Methods](https://www.nature.com/articles/nmeth.2075), 9, pp. 690–696       
 https://icy.bioimageanalysis.org
 
 ## Author(s)
 
 - Alexandre Dufour
 - Stéphane Dallongeville
+- Thomas Musset

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,15 +18,15 @@
 
 package plugins.adufour.blocks.util;
 
-import org.bioimageanalysis.icy.common.reflect.ClassUtil;
-import org.bioimageanalysis.icy.extension.ExtensionLoader;
-import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
-import org.bioimageanalysis.icy.gui.component.menu.IcyMenu;
-import org.bioimageanalysis.icy.gui.component.menu.IcyMenuItem;
-import org.bioimageanalysis.icy.gui.component.menu.IcyPluginMenuItem;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import fr.icy.common.reflect.ClassUtil;
+import fr.icy.extension.ExtensionLoader;
+import fr.icy.extension.plugin.PluginDescriptor;
+import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.menu.IcyMenu;
+import fr.icy.gui.component.menu.IcyMenuItem;
+import fr.icy.gui.component.menu.IcyPluginMenuItem;
+import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;

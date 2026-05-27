@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 
 package plugins.adufour.blocks.lang;
 
-import org.bioimageanalysis.icy.common.exception.UnsupportedFormatException;
-import org.bioimageanalysis.icy.io.Loader;
-import org.bioimageanalysis.icy.io.SequenceFileImporter;
-import org.bioimageanalysis.icy.model.sequence.MetaDataUtil;
+import fr.icy.common.exception.UnsupportedFormatException;
+import fr.icy.io.Loader;
+import fr.icy.io.SequenceFileImporter;
+import fr.icy.model.sequence.MetaDataUtil;
 import plugins.adufour.vars.gui.FileMode;
 import plugins.adufour.vars.gui.model.FileTypeModel;
 import plugins.adufour.vars.lang.VarFile;

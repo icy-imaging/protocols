@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import org.bioimageanalysis.icy.gui.dialog.ConfirmDialog;
-import org.bioimageanalysis.icy.io.FileUtil;
-import org.bioimageanalysis.icy.io.Loader;
-import org.bioimageanalysis.icy.io.SequenceFileImporter;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
-import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import fr.icy.gui.dialog.ConfirmDialog;
+import fr.icy.io.FileUtil;
+import fr.icy.io.Loader;
+import fr.icy.io.SequenceFileImporter;
+import fr.icy.system.logging.IcyLogger;
+import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.*;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;

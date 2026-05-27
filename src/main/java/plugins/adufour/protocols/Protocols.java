@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 
 package plugins.adufour.protocols;
 
-import org.bioimageanalysis.icy.Icy;
-import org.bioimageanalysis.icy.common.Version;
-import org.bioimageanalysis.icy.extension.ExtensionLoader;
-import org.bioimageanalysis.icy.extension.plugin.abstract_.PluginActionable;
-import org.bioimageanalysis.icy.extension.plugin.annotation_.IcyPluginName;
-import org.bioimageanalysis.icy.io.FileUtil;
-import org.bioimageanalysis.icy.io.xml.XMLUtil;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
-import org.bioimageanalysis.icy.system.preferences.PluginsPreferences;
-import org.bioimageanalysis.icy.system.preferences.XMLPreferences;
-import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import fr.icy.Icy;
+import fr.icy.common.Version;
+import fr.icy.extension.ExtensionLoader;
+import fr.icy.extension.plugin.abstract_.PluginActionable;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.io.FileUtil;
+import fr.icy.io.xml.XMLUtil;
+import fr.icy.system.logging.IcyLogger;
+import fr.icy.system.preferences.PluginsPreferences;
+import fr.icy.system.preferences.XMLPreferences;
+import fr.icy.system.thread.ThreadUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

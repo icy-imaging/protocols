@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 
 package plugins.adufour.blocks.util;
 
-import org.bioimageanalysis.icy.common.reflect.ClassUtil;
-import org.bioimageanalysis.icy.extension.ExtensionLoader;
-import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.PluginRepositoryLoader;
-import org.bioimageanalysis.icy.extension.plugin.PluginUpdater;
-import org.bioimageanalysis.icy.io.xml.XMLUtil;
-import org.bioimageanalysis.icy.network.NetworkUtil;
-import org.bioimageanalysis.icy.system.IcyExceptionHandler;
-import org.bioimageanalysis.icy.system.IcyHandledException;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
-import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import fr.icy.common.reflect.ClassUtil;
+import fr.icy.extension.ExtensionLoader;
+import fr.icy.extension.plugin.PluginDescriptor;
+import fr.icy.extension.plugin.PluginRepositoryLoader;
+import fr.icy.extension.plugin.PluginUpdater;
+import fr.icy.io.xml.XMLUtil;
+import fr.icy.network.NetworkUtil;
+import fr.icy.system.IcyExceptionHandler;
+import fr.icy.system.IcyHandledException;
+import fr.icy.system.logging.IcyLogger;
+import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,26 +18,26 @@
 
 package plugins.adufour.protocols.gui;
 
-import org.bioimageanalysis.icy.Icy;
-import org.bioimageanalysis.icy.common.listener.AcceptListener;
-import org.bioimageanalysis.icy.extension.ExtensionLoader;
-import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.gui.component.button.IcyButton;
-import org.bioimageanalysis.icy.gui.component.button.IcyToggleButton;
-import org.bioimageanalysis.icy.gui.component.icon.IcyIconPack;
-import org.bioimageanalysis.icy.gui.component.icon.SVGResource;
-import org.bioimageanalysis.icy.gui.component.tabbedpane.CloseableTabbedPane;
-import org.bioimageanalysis.icy.gui.frame.IcyFrame;
-import org.bioimageanalysis.icy.gui.frame.IcyFrameEvent;
-import org.bioimageanalysis.icy.gui.frame.IcyFrameListener;
-import org.bioimageanalysis.icy.gui.frame.progress.AnnounceFrame;
-import org.bioimageanalysis.icy.io.Loader;
-import org.bioimageanalysis.icy.io.xml.XMLUtil;
-import org.bioimageanalysis.icy.system.FileDrop;
-import org.bioimageanalysis.icy.system.IcyExceptionHandler;
-import org.bioimageanalysis.icy.system.IcyHandledException;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
-import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import fr.icy.Icy;
+import fr.icy.common.listener.AcceptListener;
+import fr.icy.extension.ExtensionLoader;
+import fr.icy.extension.plugin.PluginDescriptor;
+import fr.icy.gui.component.button.IcyButton;
+import fr.icy.gui.component.button.IcyToggleButton;
+import fr.icy.gui.component.icon.IcyIconPack;
+import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.tabbedpane.CloseableTabbedPane;
+import fr.icy.gui.frame.IcyFrame;
+import fr.icy.gui.frame.IcyFrameEvent;
+import fr.icy.gui.frame.IcyFrameListener;
+import fr.icy.gui.frame.progress.AnnounceFrame;
+import fr.icy.io.Loader;
+import fr.icy.io.xml.XMLUtil;
+import fr.icy.system.FileDrop;
+import fr.icy.system.IcyExceptionHandler;
+import fr.icy.system.IcyHandledException;
+import fr.icy.system.logging.IcyLogger;
+import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

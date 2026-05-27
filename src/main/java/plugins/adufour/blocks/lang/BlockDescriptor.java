@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 
 package plugins.adufour.blocks.lang;
 
-import org.bioimageanalysis.icy.common.reflect.ClassUtil;
-import org.bioimageanalysis.icy.common.string.StringUtil;
-import org.bioimageanalysis.icy.extension.plugin.PluginDescriptor;
-import org.bioimageanalysis.icy.extension.plugin.PluginRepositoryLoader;
-import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.gui.plugin.PluginErrorReport;
-import org.bioimageanalysis.icy.io.xml.XMLPersistent;
-import org.bioimageanalysis.icy.io.xml.XMLUtil;
-import org.bioimageanalysis.icy.network.NetworkUtil;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import fr.icy.common.reflect.ClassUtil;
+import fr.icy.common.string.StringUtil;
+import fr.icy.extension.plugin.PluginDescriptor;
+import fr.icy.extension.plugin.PluginRepositoryLoader;
+import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.gui.plugin.PluginErrorReport;
+import fr.icy.io.xml.XMLPersistent;
+import fr.icy.io.xml.XMLUtil;
+import fr.icy.network.NetworkUtil;
+import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Element;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,14 +18,14 @@
 
 package plugins.adufour.blocks.tools.roi;
 
-import org.bioimageanalysis.icy.common.geom.rectangle.Rectangle5D;
-import org.bioimageanalysis.icy.common.string.StringUtil;
-import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.model.OMEUtil;
-import org.bioimageanalysis.icy.model.image.IcyBufferedImage;
-import org.bioimageanalysis.icy.model.image.IcyBufferedImageUtil;
-import org.bioimageanalysis.icy.model.roi.ROI;
-import org.bioimageanalysis.icy.model.sequence.Sequence;
+import fr.icy.common.geom.rectangle.Rectangle5D;
+import fr.icy.common.string.StringUtil;
+import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.model.OMEUtil;
+import fr.icy.model.image.IcyBufferedImage;
+import fr.icy.model.image.IcyBufferedImageUtil;
+import fr.icy.model.roi.ROI;
+import fr.icy.model.sequence.Sequence;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarGenericArray;

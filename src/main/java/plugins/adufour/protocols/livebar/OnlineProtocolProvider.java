@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 
 package plugins.adufour.protocols.livebar;
 
-import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.extension.plugin.interface_.PluginSearchProvider;
-import org.bioimageanalysis.icy.network.search.SearchResultProducer;
+import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.interface_.PluginSearchProvider;
+import fr.icy.network.search.SearchResultProducer;
 
 public class OnlineProtocolProvider extends Plugin implements PluginSearchProvider {
     @Override

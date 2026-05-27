@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,13 +18,13 @@
 
 package plugins.adufour.blocks.lang;
 
-import org.bioimageanalysis.icy.Icy;
-import org.bioimageanalysis.icy.common.math.UnitUtil;
-import org.bioimageanalysis.icy.common.string.StringUtil;
-import org.bioimageanalysis.icy.extension.plugin.abstract_.Plugin;
-import org.bioimageanalysis.icy.gui.dialog.ConfirmDialog;
-import org.bioimageanalysis.icy.system.IcyHandledException;
-import org.bioimageanalysis.icy.system.thread.ThreadUtil;
+import fr.icy.Icy;
+import fr.icy.common.math.UnitUtil;
+import fr.icy.common.string.StringUtil;
+import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.gui.dialog.ConfirmDialog;
+import fr.icy.system.IcyHandledException;
+import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
 import plugins.adufour.blocks.tools.input.InputBlock;

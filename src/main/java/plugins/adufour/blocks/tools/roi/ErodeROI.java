@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025. Institut Pasteur.
+ * Copyright (c) 2010-2026. Institut Pasteur.
  *
  * This file is part of Icy.
  * Icy is free software: you can redistribute it and/or modify
@@ -18,15 +18,15 @@
 
 package plugins.adufour.blocks.tools.roi;
 
-import org.bioimageanalysis.extension.kernel.roi.roi2d.ROI2DArea;
-import org.bioimageanalysis.extension.kernel.roi.roi3d.ROI3DArea;
-import org.bioimageanalysis.icy.common.geom.point.Point3D;
-import org.bioimageanalysis.icy.model.roi.ROI;
-import org.bioimageanalysis.icy.model.roi.ROI2D;
-import org.bioimageanalysis.icy.model.roi.ROI3D;
-import org.bioimageanalysis.icy.model.roi.mask.BooleanMask2D;
-import org.bioimageanalysis.icy.model.roi.mask.BooleanMask3D;
-import org.bioimageanalysis.icy.system.logging.IcyLogger;
+import fr.icy.extension.kernel.roi.roi2d.ROI2DArea;
+import fr.icy.extension.kernel.roi.roi3d.ROI3DArea;
+import fr.icy.common.geom.point.Point3D;
+import fr.icy.model.roi.ROI;
+import fr.icy.model.roi.ROI2D;
+import fr.icy.model.roi.ROI3D;
+import fr.icy.model.roi.mask.BooleanMask2D;
+import fr.icy.model.roi.mask.BooleanMask3D;
+import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugins.adufour.vars.lang.VarROIArray;

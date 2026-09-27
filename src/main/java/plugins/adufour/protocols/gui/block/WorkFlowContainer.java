@@ -22,7 +22,6 @@ import fr.icy.gui.dialog.ConfirmDialog;
 import fr.icy.io.FileUtil;
 import fr.icy.io.Loader;
 import fr.icy.io.SequenceFileImporter;
-import fr.icy.system.logging.IcyLogger;
 import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.*;
@@ -54,8 +53,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener, DropTargetListener, KeyListener {
+    private static final Logger LOGGER = Logger.getLogger(WorkFlowContainer.class.getName());
+
     protected class BlockSelector extends MouseAdapter {
         int pressedX, pressedY;
         ArrayList<Link<?>> currentlySelectedLinks = new ArrayList<>();
@@ -278,7 +281,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             final BlockPanel dstBlockPanel = getBlockPanel(link.dstBlock);
 
             if ((srcBlockPanel == null) || (dstBlockPanel == null)) {
-                IcyLogger.warn(WorkFlowContainer.class, "Cannot recover link between " + link.srcBlock.getDefinedName() + " and " + link.dstBlock.getDefinedName() + " !");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot recover link between " + link.srcBlock.getDefinedName() + " and " + link.dstBlock.getDefinedName() + " !");
             }
             else {
                 linkLines.put(link, new RoundedSquareLine(srcBlockPanel, dstBlockPanel, link));
@@ -568,8 +572,10 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
     private void removeGraphicalLink(final Link<?> link) {
         final Line line = linkLines.remove(link);
 
-        if (line == null)
-            IcyLogger.warn(WorkFlowContainer.class, "Missing link, cannot be removed properly.");
+        if (line == null) {
+            if (LOGGER.isLoggable(Level.WARNING))
+                LOGGER.log(Level.WARNING, "Missing link, cannot be removed properly.");
+        }
         else
             line.dispose();
 
@@ -744,7 +750,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
             }
         }
         catch (final UnsupportedFlavorException | IOException e) {
-            IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Unable to drop.", e);
         }
         finally {
             dtde.dropComplete(true);
@@ -768,7 +775,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                         return true;
             }
             catch (final ClassNotFoundException e) {
-                IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
+                if (LOGGER.isLoggable(Level.SEVERE))
+                    LOGGER.log(Level.SEVERE, "Unable create DataFlavor.", e);
             }
             return false;
         }
@@ -793,7 +801,8 @@ public class WorkFlowContainer extends JLayeredPane implements WorkFlowListener,
                           | NoSuchMethodException
                           | InvocationTargetException e
             ) {
-                IcyLogger.error(WorkFlowContainer.class, e, e.getLocalizedMessage());
+                if (LOGGER.isLoggable(Level.SEVERE))
+                    LOGGER.log(Level.SEVERE, "Unable to import data.", e);
             }
         }
     }

@@ -27,7 +27,6 @@ import fr.icy.io.xml.XMLUtil;
 import fr.icy.network.NetworkUtil;
 import fr.icy.system.IcyExceptionHandler;
 import fr.icy.system.IcyHandledException;
-import fr.icy.system.logging.IcyLogger;
 import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +63,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BlocksML {
+    private static final Logger LOGGER = Logger.getLogger(BlocksML.class.getName());
+
     private static final String RUNTIME = "runtime";
 
     private static final BlocksML instance = new BlocksML();
@@ -246,7 +249,8 @@ public class BlocksML {
                 for (final Var<?> var : blockData.inputVars) {
                     final BlockDescriptor owner = innerWorkFlow.getInputOwner(var);
                     if (owner == null) {
-                        IcyLogger.warn(BlocksML.class, "Could not find owner for input variable: \"" + var + "\", skipping.");
+                        if (LOGGER.isLoggable(Level.WARNING))
+                            LOGGER.log(Level.WARNING, "Could not find owner for input variable: \"" + var + "\", skipping.");
                         continue;
                     }
                     final Element varNode = XMLUtil.addElement(inputVarRoot, "variable");
@@ -261,7 +265,8 @@ public class BlocksML {
                 for (final Var<?> var : blockData.outputVars) {
                     final BlockDescriptor owner = innerWorkFlow.getOutputOwner(var);
                     if (owner == null) {
-                        IcyLogger.warn(BlocksML.class, "Could not find owner for output variable: \"" + var + "\", skipping.");
+                        if (LOGGER.isLoggable(Level.WARNING))
+                            LOGGER.log(Level.WARNING, "Could not find owner for output variable: \"" + var + "\", skipping.");
                         continue;
                     }
                     final Element varNode = XMLUtil.addElement(outputVarRoot, "variable");
@@ -368,7 +373,8 @@ public class BlocksML {
 
             // we are live!
             final String message = "[Protocols] Installing required plugins...";
-            IcyLogger.info(BlocksML.class, message);
+            if (LOGGER.isLoggable(Level.INFO))
+                LOGGER.log(Level.INFO, message);
             //AnnounceFrame announcement = null;
 
             /*if (!Icy.getMainInterface().isHeadLess())
@@ -846,7 +852,7 @@ public class BlocksML {
      * @throws BlocksException If an error occurs while loading the workflow.
      */
     public synchronized void loadWorkFlow_V4(final Element workFlowRoot, final WorkFlow workFlow) throws BlocksException {
-        //boolean hasWarnings = false;
+        boolean hasWarnings = false;
 
         // Prepare a list of blocks to collapse after loading
         final ArrayList<BlockDescriptor> blocksToCollapse = new ArrayList<>();
@@ -921,7 +927,9 @@ public class BlocksML {
                         final Var<?> var = blockDescriptor.inputVars.get(uid);
 
                         if (var == null) {
-                            IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
+                            if (LOGGER.isLoggable(Level.SEVERE))
+                                LOGGER.log(Level.SEVERE, "Error while loading protocol.", new NoSuchVariableException(blockDescriptor, uid));
+                            hasWarnings = true;
                             continue;
                         }
 
@@ -935,11 +943,9 @@ public class BlocksML {
                                 blockDescriptor.inputVars.setVisible(var, visible);
                             }
                             catch (final NoSuchVariableException e) {
-                                /*if (!hasWarnings) {
-                                    System.err.println("Error(s) while loading protocol:");
-                                    hasWarnings = true;
-                                }*/
-                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
+                                if (LOGGER.isLoggable(Level.SEVERE))
+                                    LOGGER.log(Level.SEVERE, "Error while loading protocol.", new NoSuchVariableException(blockDescriptor, uid));
+                                hasWarnings = true;
                             }
                         }
                     }
@@ -960,11 +966,9 @@ public class BlocksML {
                             blockDescriptor.outputVars.setVisible(var, visible);
                         }
                         catch (final NoSuchVariableException e) {
-                            /*if (!hasWarnings) {
-                                System.err.println("Error(s) while loading protocol:");
-                                hasWarnings = true;
-                            }*/
-                            IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
+                            if (LOGGER.isLoggable(Level.SEVERE))
+                                LOGGER.log(Level.SEVERE, "Error while loading protocol.", new NoSuchVariableException(blockDescriptor, uid));
+                            hasWarnings = true;
                             // throw new NoSuchVariableException(blockInfo, uid);
                         }
                     }
@@ -989,11 +993,9 @@ public class BlocksML {
                                 blockDescriptor.inputVars.addRuntimeVariable(uid, (VarMutable) var);
                             }
                             else {
-                                /*if (!hasWarnings) {
-                                    System.err.println("Error(s) while loading protocol:");
-                                    hasWarnings = true;
-                                }*/
-                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
+                                if (LOGGER.isLoggable(Level.SEVERE))
+                                    LOGGER.log(Level.SEVERE, "Error while loading protocol.", new NoSuchVariableException(blockDescriptor, uid));
+                                hasWarnings = true;
                                 continue;
                                 // throw new NoSuchVariableException(blockInfo, uid);
                             }
@@ -1060,11 +1062,9 @@ public class BlocksML {
                                 blockDescriptor.outputVars.addRuntimeVariable(uid, (VarMutable) var);
                             }
                             else {
-                                /*if (!hasWarnings) {
-                                    System.err.println("Error(s) while loading protocol:");
-                                    hasWarnings = true;
-                                }*/
-                                IcyLogger.error(BlocksML.class, new NoSuchVariableException(blockDescriptor, uid), "Error while loading protocol.");
+                                if (LOGGER.isLoggable(Level.SEVERE))
+                                    LOGGER.log(Level.SEVERE, "Error while loading protocol.", new NoSuchVariableException(blockDescriptor, uid));
+                                hasWarnings = true;
                                 continue;
                                 // throw new NoSuchVariableException(blockInfo, uid);
                             }
@@ -1128,7 +1128,9 @@ public class BlocksML {
                 srcVar = srcBlock.inputVars.get(srcVarID);
 
             if (srcVar == null) {
-                IcyLogger.warn(BlocksML.class, "Cannot create a link from variable " + srcVarID + " (from block " + srcBlock + "). It may have been removed or renamed.");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot create a link from variable " + srcVarID + " (from block " + srcBlock + "). It may have been removed or renamed.");
+                hasWarnings = true;
                 continue;
             }
 
@@ -1157,7 +1159,9 @@ public class BlocksML {
             final Var<Object> dstVar = dstBlock.inputVars.get(dstVarID);
 
             if (dstVar == null) {
-                IcyLogger.warn(BlocksML.class, "Cannot link to variable " + dstVarID + " (from block " + dstBlock + "). It may have been removed or renamed.");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot link to variable " + dstVarID + " (from block " + dstBlock + "). It may have been removed or renamed.");
+                hasWarnings = true;
                 continue;
             }
 

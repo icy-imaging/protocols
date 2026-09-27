@@ -20,7 +20,6 @@ package plugins.adufour.blocks.tools;
 
 import fr.icy.Icy;
 import fr.icy.extension.plugin.abstract_.Plugin;
-import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.util.VarList;
@@ -28,14 +27,19 @@ import plugins.adufour.vars.lang.Var;
 import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.util.VarListener;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Display extends Plugin implements Block {
+    private static final Logger LOGGER = Logger.getLogger(Display.class.getName());
+
     private final VarMutable object = new VarMutable("object", null);
 
     @Override
     public void run() {
-        if (Icy.getMainInterface().isHeadLess()) {
+        if (Icy.getMainInterface().isHeadLess() && LOGGER.isLoggable(Level.INFO)) {
             // Print to the standard output stream
-            IcyLogger.info(Display.class, object.getValueAsString());
+            LOGGER.log(Level.INFO, object.getValueAsString());
         }
     }
 

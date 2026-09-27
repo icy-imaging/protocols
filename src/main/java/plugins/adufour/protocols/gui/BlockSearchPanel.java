@@ -22,7 +22,7 @@ import fr.icy.common.string.StringUtil;
 import fr.icy.extension.plugin.PluginDescriptor;
 import fr.icy.extension.plugin.abstract_.Plugin;
 import fr.icy.gui.component.field.IcyTextFieldHint;
-import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.icon.IcySVG;
 import fr.icy.gui.frame.progress.AnnounceFrame;
 import fr.icy.network.NetworkUtil;
 import org.jetbrains.annotations.Contract;
@@ -64,7 +64,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
     private final JScrollPane blockInfoDisplay;
 
     public BlockSearchPanel() {
-        searchField = new IcyTextFieldHint(SVGResource.SEARCH, DEFAULT_SEARCH_TEXT);
+        searchField = new IcyTextFieldHint(IcySVG.SEARCH, DEFAULT_SEARCH_TEXT);
         final Box searchBar = Box.createHorizontalBox();
 
         finder = new BlocksFinder();
@@ -177,7 +177,7 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
 
         String name = d.getName();
         final StringBuilder description = new StringBuilder("<h3>Public description:</h3>");
-        final String author = d.getAuthor();
+        //final String author = d.getAuthor();
 
         // if (_class.isAnnotationPresent(BlockSearchAnnotation.class))
         // {
@@ -205,8 +205,8 @@ public class BlockSearchPanel extends JPanel implements MenuItemListener {
         String doc = "<html><body style=\"font-family: Tahoma\">";
         doc += "<h2 align=\"center\">" + name + "</h2>";
         doc += description;
-        if (!author.isEmpty()) doc += "<p><b>Author: </b>" + author + "</p>";
-        if (!d.getWeb().isEmpty()) doc += "<p><a href=\"" + d.getWeb() + "\" ><b>More information...</b></a><br/>";
+        //if (!author.isEmpty()) doc += "<p><b>Author: </b>" + author + "</p>";
+        //if (!d.getWeb().isEmpty()) doc += "<p><a href=\"" + d.getWeb() + "\" ><b>More information...</b></a><br/>";
         doc += "</body></html>";
 
         blockInfo.setText(doc);

@@ -26,7 +26,6 @@ import fr.icy.model.roi.ROI2D;
 import fr.icy.model.roi.ROI3D;
 import fr.icy.model.roi.mask.BooleanMask2D;
 import fr.icy.model.roi.mask.BooleanMask3D;
-import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import plugins.adufour.vars.lang.VarROIArray;
@@ -34,12 +33,16 @@ import plugins.adufour.vars.util.VarException;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Joel Rogers
  * @author Alexandre Dufour
  */
 public class ErodeROI extends MorphROI {
+    private static final Logger LOGGER = Logger.getLogger(ErodeROI.class.getName());
+
     public ErodeROI() {
         roiOUT = new VarROIArray("Eroded ROI");
     }
@@ -242,7 +245,8 @@ public class ErodeROI extends MorphROI {
             return r3.getNumberOfPoints() > 0 ? r3 : null;
         }
 
-        IcyLogger.warn(ErodeROI.class, "Unsupported ROI: " + roi.getName());
+        if (LOGGER.isLoggable(Level.WARNING))
+            LOGGER.log(Level.WARNING, "Unsupported ROI: " + roi.getName());
         return null;
     }
 }

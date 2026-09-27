@@ -25,7 +25,6 @@ import fr.icy.io.FileUtil;
 import fr.icy.io.xml.XMLPersistent;
 import fr.icy.io.xml.XMLUtil;
 import fr.icy.network.NetworkUtil;
-import fr.icy.system.logging.IcyLogger;
 import org.w3c.dom.Node;
 import plugins.adufour.protocols.Protocols;
 
@@ -34,8 +33,12 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ProtocolDescriptor implements XMLPersistent {
+    private static final Logger LOGGER = Logger.getLogger(ProtocolDescriptor.class.getName());
+
     private String filePath;
 
     private String fileDownloadURL;
@@ -96,7 +99,8 @@ public class ProtocolDescriptor implements XMLPersistent {
             return new File(filePath);
         }
         catch (final IOException e) {
-            IcyLogger.error(ProtocolDescriptor.class, e, e.getLocalizedMessage());
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Unable to download protocol file.", e);
             return null;
         }
     }

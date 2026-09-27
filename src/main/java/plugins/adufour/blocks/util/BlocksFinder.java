@@ -22,11 +22,10 @@ import fr.icy.common.reflect.ClassUtil;
 import fr.icy.extension.ExtensionLoader;
 import fr.icy.extension.plugin.PluginDescriptor;
 import fr.icy.extension.plugin.abstract_.Plugin;
-import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.icon.IcySVG;
 import fr.icy.gui.component.menu.IcyMenu;
 import fr.icy.gui.component.menu.IcyMenuItem;
 import fr.icy.gui.component.menu.IcyPluginMenuItem;
-import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.lang.BlockDescriptor;
@@ -55,8 +54,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BlocksFinder {
+    private static final Logger LOGGER = Logger.getLogger(BlocksFinder.class.getName());
+
     /**
      * Indicates whether annotated methods should be parsed and made available as
      * blocks
@@ -118,7 +121,8 @@ public class BlocksFinder {
                 return new DataFlavor[]{new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList")};
             }
             catch (final ClassNotFoundException e) {
-                IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
+                if (LOGGER.isLoggable(Level.SEVERE))
+                    LOGGER.log(Level.SEVERE, "Unable to create DataFlavor.", e);
             }
             return null;
         }
@@ -235,7 +239,7 @@ public class BlocksFinder {
             testString += descriptor.getName();
             testString += blockClass.getSimpleName();
             testString += descriptor.getDescription();
-            testString += descriptor.getAuthor();
+            //testString += descriptor.getAuthor();
             testString = testString.toLowerCase();
 
             searchText = searchText.trim().toLowerCase();
@@ -271,28 +275,28 @@ public class BlocksFinder {
      * @param location      Point
      */
     public final void createJMenu(final Container menuContainer, final WorkFlowContainer workFlowPane, final Point location) {
-        final IcyMenu mnBlocks = new IcyMenu("Blocks...", SVGResource.WIDGETS);
+        final IcyMenu mnBlocks = new IcyMenu("Blocks…", IcySVG.WIDGETS);
         //mnBlocks.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("box.png"), 22));
 
-        final IcyMenu mnInput = new IcyMenu("Read...", SVGResource.REDO);
+        final IcyMenu mnInput = new IcyMenu("Read…", IcySVG.REDO);
         //mnInput.setIcon(new IcyIcon(ResourceUtil.ICON_REDO, 22));
 
-        final IcyMenu mnOutput = new IcyMenu("Out...", SVGResource.UNDO);
+        final IcyMenu mnOutput = new IcyMenu("Out…", IcySVG.UNDO);
         //mnOutput.setIcon(new IcyIcon(ResourceUtil.ICON_UNDO, 22));
 
-        final IcyMenu mnIO = new IcyMenu("I/O...", SVGResource.SAVE);
+        final IcyMenu mnIO = new IcyMenu("I/O…", IcySVG.SAVE);
         //mnIO.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE, 22));
 
-        final IcyMenu mnSeq = new IcyMenu("Sequence...", SVGResource.IMAGE);
+        final IcyMenu mnSeq = new IcyMenu("Sequence…", IcySVG.IMAGE);
         //mnSeq.setIcon(new IcyIcon(ResourceUtil.ICON_PHOTO, 22));
 
-        final IcyMenu mnROI = new IcyMenu("ROI...", SVGResource.DRAW_ABSTRACT);
+        final IcyMenu mnROI = new IcyMenu("ROI…", IcySVG.DRAW_ABSTRACT);
         //mnROI.setIcon(new IcyIcon(ResourceUtil.ICON_ROI_POLYGON, 22));
 
-        final IcyMenu mnLoops = new IcyMenu("Loop / Batch...", SVGResource.LAPS);
+        final IcyMenu mnLoops = new IcyMenu("Loop / Batch…", IcySVG.LAPS);
         //mnLoops.setIcon(new IcyIcon(ResourceUtil.ICON_RELOAD, 22));
 
-        final IcyMenu mnTools = new IcyMenu("Tools...", SVGResource.SETTINGS);
+        final IcyMenu mnTools = new IcyMenu("Tools…", IcySVG.SETTINGS);
         //mnTools.setIcon(new IcyIcon(ResourceUtil.ICON_TOOLS, 22));
 
         final Set<PluginDescriptor> plugins = ExtensionLoader.getPlugins(Block.class, false, false);
@@ -341,7 +345,8 @@ public class BlocksFinder {
                         addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                     }
                     catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                        IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+                        if (LOGGER.isLoggable(Level.SEVERE))
+                            LOGGER.log(Level.SEVERE, "Unable to add block.", e1);
                     }
                 });
 
@@ -359,7 +364,8 @@ public class BlocksFinder {
                             addBlock(workFlowPane, blockClass.getDeclaredConstructor().newInstance(), location);
                         }
                         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                            IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+                            if (LOGGER.isLoggable(Level.SEVERE))
+                                LOGGER.log(Level.SEVERE, "Unable to add block.", e1);
                         }
                     });
                     mnLoops.add(item);
@@ -427,13 +433,14 @@ public class BlocksFinder {
 
         // and add the Display block last
 
-        final IcyMenuItem mnDisp = new IcyMenuItem("Display", SVGResource.VISIBILITY);
+        final IcyMenuItem mnDisp = new IcyMenuItem("Display", IcySVG.VISIBILITY);
         mnDisp.addActionListener(arg0 -> {
             try {
                 addBlock(workFlowPane, Display.class.getDeclaredConstructor().newInstance(), location);
             }
             catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-                IcyLogger.error(BlocksFinder.class, e1, e1.getLocalizedMessage());
+                if (LOGGER.isLoggable(Level.SEVERE))
+                    LOGGER.log(Level.SEVERE, "Unable to add block.", e1);
             }
         });
         //mnDisp.setIcon(new IcyIcon(ImageUtil.scaleQuality(ResourceUtil.getAlphaIconAsImage("eye_open.png"), 22, 22)));
@@ -528,7 +535,8 @@ public class BlocksFinder {
                     workFlowPane.embedWorkFlow(plugin.getPluginClass().asSubclass(WorkFlow.class));
                 }
                 catch (final Exception e) {
-                    IcyLogger.error(BlocksFinder.class, e, e.getLocalizedMessage());
+                    if (LOGGER.isLoggable(Level.SEVERE))
+                        LOGGER.log(Level.SEVERE, "Unable to embed workflow.", e);
                 }
             });
             menuContainer.add(menuItem);

@@ -20,7 +20,6 @@ package plugins.adufour.blocks.lang;
 
 import fr.icy.io.xml.XMLPersistent;
 import fr.icy.io.xml.XMLUtil;
-import fr.icy.system.logging.IcyLogger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import plugins.adufour.blocks.util.BlocksException;
@@ -30,12 +29,17 @@ import plugins.adufour.vars.lang.VarMutable;
 import plugins.adufour.vars.lang.VarMutableArray;
 import plugins.adufour.vars.util.MutableType;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Class describing a link between two variables within a work flow
  *
  * @author Alexandre Dufour
  */
 public class Link<T> implements XMLPersistent {
+    private static final Logger LOGGER = Logger.getLogger(Link.class.getName());
+
     private final WorkFlow workFlow;
 
     public BlockDescriptor srcBlock;
@@ -87,7 +91,8 @@ public class Link<T> implements XMLPersistent {
             theSrcVar = theSrcBlock.inputVars.get(srcVarID);
 
         if (theSrcVar == null) {
-            IcyLogger.error(Link.class, "Cannot create a link from variable " + srcVarID + " (from block " + theSrcBlock + ")");
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Cannot create a link from variable " + srcVarID + " (from block " + theSrcBlock + ")");
             return false;
         }
 

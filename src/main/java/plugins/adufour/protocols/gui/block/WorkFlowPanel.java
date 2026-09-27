@@ -18,7 +18,7 @@
 
 package plugins.adufour.protocols.gui.block;
 
-import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.icon.IcySVG;
 import fr.icy.gui.component.menu.IcyMenuItem;
 import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +55,7 @@ public class WorkFlowPanel extends BlockPanel implements VarVisibilityListener {
 
     final protected Box varBox;
 
-    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", SVGResource.CLOSE);
+    protected final IcyMenuItem menuRemoveEnclosure = new IcyMenuItem("Remove block but keep contents", IcySVG.CLOSE);
 
     public WorkFlowPanel(final WorkFlowContainer wfPane, final BlockDescriptor blockDesc) {
         super(wfPane, blockDesc);

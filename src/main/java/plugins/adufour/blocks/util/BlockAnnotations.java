@@ -20,7 +20,6 @@ package plugins.adufour.blocks.util;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
 import fr.icy.model.sequence.Sequence;
-import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.vars.lang.*;
@@ -32,6 +31,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility class that parses block annotations and generates blocks from valid methods
@@ -41,6 +42,8 @@ import java.util.Iterator;
  * @see BlockMethod
  */
 public class BlockAnnotations {
+    private static final Logger LOGGER = Logger.getLogger(BlockAnnotations.class.getName());
+
     /**
      * Annotation used to mark a method as block-compatible
      *
@@ -155,7 +158,8 @@ public class BlockAnnotations {
                     if (outputVariable != null) outputVariable.setValue(result);
                 }
                 catch (final Exception e) {
-                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
+                    if (LOGGER.isLoggable(Level.SEVERE))
+                        LOGGER.log(Level.SEVERE, "An error occurred while trying to run.", e);
                 }
             }
 
@@ -173,7 +177,8 @@ public class BlockAnnotations {
                     }
                 }
                 catch (final Exception e) {
-                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
+                    if (LOGGER.isLoggable(Level.SEVERE))
+                        LOGGER.log(Level.SEVERE, "An error occurred while trying to declare output.", e);
                 }
 
                 if (outputVariable != null) outputMap.add("output", outputVariable);
@@ -203,7 +208,8 @@ public class BlockAnnotations {
                     }
                 }
                 catch (final Exception e) {
-                    IcyLogger.error(BlockAnnotations.class, e, e.getLocalizedMessage());
+                    if (LOGGER.isLoggable(Level.SEVERE))
+                        LOGGER.log(Level.SEVERE, "An error occurred while trying to declare input.", e);
                 }
             }
         };

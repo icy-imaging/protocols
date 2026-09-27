@@ -23,7 +23,6 @@ import fr.icy.extension.plugin.PluginDescriptor;
 import fr.icy.gui.LookAndFeelUtil;
 import fr.icy.gui.component.button.IcyButton;
 import fr.icy.gui.component.icon.IcySVG;
-import fr.icy.gui.component.icon.SVGResource;
 import fr.icy.gui.component.menu.IcyMenuItem;
 import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
@@ -256,39 +255,39 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
     /**
      * Indicates that the block is dirty (results aren't ready)
      */
-    private static final Icon ICON_DIRTY = new IcySVG(SVGResource.WARNING).getIcon(ICON_SIZE, Color.ORANGE.darker());
+    private static final Icon ICON_DIRTY = IcySVG.WARNING.getIcon(ICON_SIZE, Color.ORANGE.darker());
 
     /**
      * Indicates that the block is currently running
      */
-    private static final Icon ICON_RUNNING = new IcySVG(SVGResource.BOLT).getIcon(ICON_SIZE, Color.BLUE.brighter());
+    private static final Icon ICON_RUNNING = IcySVG.BOLT.getIcon(ICON_SIZE, Color.BLUE.brighter());
 
     /**
      * Indicates that the block has finished running (the result is ready)
      */
-    private static final Icon ICON_READY = new IcySVG(SVGResource.CHECK_CIRCLE).getIcon(ICON_SIZE, Color.GREEN.darker());
+    private static final Icon ICON_READY = IcySVG.CHECK_CIRCLE.getIcon(ICON_SIZE, Color.GREEN.darker());
 
     /**
      * Indicates that the block generated an error
      */
-    private static final Icon ICON_ERROR = new IcySVG(SVGResource.ERROR).getIcon(ICON_SIZE, Color.RED.darker());
+    private static final Icon ICON_ERROR = IcySVG.ERROR.getIcon(ICON_SIZE, Color.RED.darker());
 
-    private static final Icon ICON_DRAG = new IcySVG(SVGResource.DRAG_PAN).getIcon(ICON_SIZE);
+    private static final Icon ICON_DRAG = IcySVG.DRAG_PAN.getIcon(ICON_SIZE);
 
     protected final JToolBar toolBar;
 
     protected final JPanel jPanelContent = new JPanel(new GridBagLayout());
 
     protected final JButton bMenu = new JButton(ICON_BLOCKS);
-    protected final IcyButton bRunUntilHere = new IcyButton(SVGResource.PLAY_CIRCLE);
+    protected final IcyButton bRunUntilHere = new IcyButton(IcySVG.PLAY_CIRCLE);
     protected final JButton bID = new JButton("");
     protected final JLabel dragLabel = new JLabel(ICON_DRAG);
     protected final JLabel bStatus = new JLabel(ICON_DIRTY);
     protected final JPopupMenu menu = new JPopupMenu();
     protected final JCheckBox menuKeepResults = new JCheckBox("Remember results");
     // protected final JPanel menuCommandLineID = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", SVGResource.UNFOLD_LESS);
-    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", SVGResource.DELETE);
+    protected final IcyMenuItem menuCollapse = new IcyMenuItem("Collapse", IcySVG.UNFOLD_LESS);
+    protected final IcyMenuItem menuRemove = new IcyMenuItem("Remove block", IcySVG.DELETE);
 
     //private final ShadowRenderer renderer = new ShadowRenderer(SHADOW_SIZE, 0.5f, Color.BLACK);
 
@@ -317,7 +316,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
 
     //private final JLabel name;
     private final JTextField name;
-    private final IcyButton btnEdit = new IcyButton(SVGResource.EDIT);
+    private final IcyButton btnEdit = new IcyButton(IcySVG.EDIT);
 
     private boolean selected = false;
 
@@ -737,7 +736,7 @@ public class BlockPanel extends JPanel implements ActionListener, BlockListener 
             fieldID.setToolTipText(tooltip);
             menuCLID.add(fieldID);
 
-            final IcyButton bStoreFieldID = new IcyButton(SVGResource.CHECK);
+            final IcyButton bStoreFieldID = new IcyButton(IcySVG.CHECK);
             bStoreFieldID.setFlat(true);
             //bStoreFieldID.setFocusable(false);
             //bStoreFieldID.setBorderPainted(false);

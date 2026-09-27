@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility block that reads multiple image files from disk into a {@link org.bioimageanalysis.icy.model.sequence.Sequence}
+ * Utility block that reads multiple image files from disk into a {@link fr.icy.model.sequence.Sequence}
  *
  * @author Alexandre Dufour
  */

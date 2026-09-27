@@ -18,7 +18,6 @@
 
 package plugins.adufour.protocols.gui.link;
 
-import fr.icy.system.logging.IcyLogger;
 import plugins.adufour.blocks.lang.BlockDescriptor;
 import plugins.adufour.blocks.lang.WorkFlow;
 import plugins.adufour.vars.lang.Var;
@@ -28,6 +27,8 @@ import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Button defining an area on a panel to where an variable can be dropped from another panel
@@ -36,6 +37,8 @@ import java.awt.event.ActionListener;
  * @author Alexandre Dufour
  */
 class DropZone<T> extends DragDropZone implements ActionListener, DropTargetListener {
+    private static final Logger LOGGER = Logger.getLogger(DropZone.class.getName());
+
     private final DropTarget dropTarget;
     private final JPopupMenu errorPopup = new JPopupMenu();
 
@@ -106,6 +109,9 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
                 errorPopup.setLocation(location.x + 10, location.y + 20);
                 errorPopup.setVisible(true);
             }
+
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Unable to accept drag.", exception);
         }
         catch (final Error error) {
             setErrorLinkIcon();
@@ -116,9 +122,10 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
                 final Point location = getLocationOnScreen();
                 errorPopup.setLocation(location.x + 10, location.y + 20);
                 errorPopup.setVisible(true);
-
-                IcyLogger.error(DropZone.class, error, error.getLocalizedMessage());
             }
+
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Unable to accept drag.", error);
         }
     }
 
@@ -135,7 +142,8 @@ class DropZone<T> extends DragDropZone implements ActionListener, DropTargetList
             e.dropComplete(true);
         }
         catch (final Exception e1) {
-            IcyLogger.error(DropZone.class, e1, "Error while dropping.");
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Error while dropping.", e1);
             e.dropComplete(false);
         }
     }

@@ -27,7 +27,6 @@ import fr.icy.gui.plugin.PluginErrorReport;
 import fr.icy.io.xml.XMLPersistent;
 import fr.icy.io.xml.XMLUtil;
 import fr.icy.network.NetworkUtil;
-import fr.icy.system.logging.IcyLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Element;
@@ -48,6 +47,8 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class defining all the metadata associated to a {@link Block}.
@@ -56,6 +57,8 @@ import java.util.List;
  */
 @SuppressWarnings("rawtypes")
 public class BlockDescriptor implements Runnable, VarListener, VarListListener, XMLPersistent {
+    private static final Logger LOGGER = Logger.getLogger(BlockDescriptor.class.getName());
+
     public enum BlockStatus {
         /**
          * The result is not up-to-date. This status is active at startup and whenever a variable is
@@ -599,7 +602,7 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
 
     @Override
     public boolean loadFromXML(final Node node) {
-        final boolean noWarnings = true;
+        boolean noWarnings = true;
 
         final Element blockNode = (Element) node;
 
@@ -633,12 +636,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 final Var<?> var = inputVars.get(uid);
 
                 if (var == null) {
-                    /*if (noWarnings) {
-                        System.err.println("Error(s) while loading protocol:");
-                        noWarnings = false;
-                    }
-                    System.err.println(new NoSuchVariableException(this, uid).getMessage());*/
-                    IcyLogger.warn(BlockDescriptor.class, new NoSuchVariableException(this, uid), "Error while loading protocol.");
+                    if (LOGGER.isLoggable(Level.WARNING))
+                        LOGGER.log(Level.WARNING, "Error while loading protocol.", new NoSuchVariableException(this, uid));
+                    noWarnings = false;
                     continue;
                 }
 
@@ -671,12 +671,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
                 final Var<?> var = outputVars.get(uid);
 
                 if (var == null) {
-                    /*if (noWarnings) {
-                        System.err.println("Error(s) while loading protocol:");
-                        noWarnings = false;
-                    }
-                    System.err.println(new NoSuchVariableException(this, uid).getMessage());*/
-                    IcyLogger.warn(BlockDescriptor.class, new NoSuchVariableException(this, uid), "Error while loading protocol.");
+                    if (LOGGER.isLoggable(Level.WARNING))
+                        LOGGER.log(Level.WARNING, "Error while loading protocol.", new NoSuchVariableException(this, uid));
+                    noWarnings = false;
                     continue;
                 }
 
@@ -701,7 +698,9 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             throw new BlocksException("Cannot create block (" + e1.getMessage() + ") => class not found", true);
         }
         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            IcyLogger.error(BlockDescriptor.class, e, e.getLocalizedMessage());
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Cannot load from XML.", e);
+            noWarnings = false;
         }
 
         return noWarnings;
@@ -805,7 +804,8 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
             newBlock = blockClass.getDeclaredConstructor().newInstance();
         }
         catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
-            IcyLogger.error(BlockDescriptor.class, e1, e1.getLocalizedMessage());
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Cannot instantiate block.", e1);
         }
 
         cpy = (newBlock instanceof WorkFlow ? ((WorkFlow) newBlock).getBlockDescriptor() : new BlockDescriptor(-1, newBlock));
@@ -952,11 +952,13 @@ public class BlockDescriptor implements Runnable, VarListener, VarListListener, 
     private static void cloneLinks(final @NotNull Iterable<Link<?>> iterable, final Map<BlockDescriptor, BlockDescriptor> copies, final WorkFlow dest) {
         for (final Link<?> l : iterable) {
             if (l.srcBlock.getBlock() instanceof Loop || l.dstBlock.getBlock() instanceof Loop) {
-                IcyLogger.warn(BlockDescriptor.class, "Cannot copy a link to a loop variable.");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot copy a link to a loop variable.");
                 continue;
             }
             if (l.srcBlock.getBlock() instanceof WorkFlow || l.dstBlock.getBlock() instanceof WorkFlow) {
-                IcyLogger.warn(BlockDescriptor.class, "Cannot copy a link to an exposed variable.");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot copy a link to an exposed variable.");
                 continue;
             }
             try {

@@ -24,7 +24,7 @@ import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarSequence;
 
 /**
- * Utility block reading a {@link org.bioimageanalysis.icy.model.sequence.Sequence} object
+ * Utility block reading a {@link fr.icy.model.sequence.Sequence} object
  *
  * @author Alexandre Dufour
  */

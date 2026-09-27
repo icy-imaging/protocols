@@ -25,7 +25,6 @@ import fr.icy.extension.plugin.abstract_.PluginActionable;
 import fr.icy.extension.plugin.annotation_.IcyPluginName;
 import fr.icy.io.FileUtil;
 import fr.icy.io.xml.XMLUtil;
-import fr.icy.system.logging.IcyLogger;
 import fr.icy.system.preferences.PluginsPreferences;
 import fr.icy.system.preferences.XMLPreferences;
 import fr.icy.system.thread.ThreadUtil;
@@ -51,13 +50,17 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Protocols plugin
  */
 @IcyPluginName("Protocols")
 public class Protocols extends PluginActionable {
-    public static final Version VERSION = new Version(4, 0, 0);
+    private static final Logger LOGGER = Logger.getLogger(Protocols.class.getName());
+
+    public static final Version VERSION = new Version(4, 0, 0, Version.DevelopmentStage.ALPHA, 8);
 
     // "command" on Mac, "ctrl" on others
     public static final int MENU_SHORTCUT_KEY;
@@ -143,7 +146,8 @@ public class Protocols extends PluginActionable {
                 if (attachedFile != null) node.put("fileName", attachedFile.getAbsolutePath());
             }
             catch (final TransformerException e) {
-                IcyLogger.warn(Protocols.class, e, "Couldn't store protocol " + protocol.getName() + ".");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Couldn't store protocol " + protocol.getName() + ".", e);
             }
         }
 
@@ -157,7 +161,8 @@ public class Protocols extends PluginActionable {
                 ((PluginActionable) ExtensionLoader.getPlugin(Protocols.class.getName()).getPluginClass().getDeclaredConstructor().newInstance()).run();
             }
             catch (final Exception e) {
-                IcyLogger.error(Protocols.class, e, e.getLocalizedMessage());
+                if (LOGGER.isLoggable(Level.SEVERE))
+                    LOGGER.log(Level.SEVERE, "Unable to launch Protocols plug-in.", e);
             }
         });
     }
@@ -210,7 +215,8 @@ public class Protocols extends PluginActionable {
                         return;
                     }
                     catch (final BlocksException e2) {
-                        IcyLogger.error(Protocols.class, e2, e2.getLocalizedMessage());
+                        if (LOGGER.isLoggable(Level.SEVERE))
+                            LOGGER.log(Level.SEVERE, "Unable to load protocol " + panel.getFile().getAbsolutePath(), e2);
                     }
                 }
             }
@@ -242,14 +248,16 @@ public class Protocols extends PluginActionable {
                             return;
                         }
                         catch (final BlocksException e2) {
-                            IcyLogger.error(Protocols.class, e2, e2.getLocalizedMessage());
+                            if (LOGGER.isLoggable(Level.SEVERE))
+                                LOGGER.log(Level.SEVERE, "Unable to load protocol " + panel.getFile().getAbsolutePath(), e2);
                         }
                     }
                 }
             }
         }
         catch (final ParserConfigurationException | SAXException | IOException e) {
-            IcyLogger.error(Protocols.class, e, e.getLocalizedMessage());
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, "Unable to load protocols.", e);
         }
 
         mainFrame.addToDesktopPane();
@@ -319,7 +327,8 @@ public class Protocols extends PluginActionable {
         // Discard invalid files
         if (xml == null) throw new IllegalArgumentException(protocolFile + " is not a valid protocol file");
 
-        IcyLogger.info(Protocols.class, "Loading workflow...");
+        if (LOGGER.isLoggable(Level.INFO))
+        LOGGER.log(Level.INFO, "Loading workflow…");
         final WorkFlow workFlow = new WorkFlow(true);
         BlocksML.getInstance().loadWorkFlow(xml, workFlow);
 

@@ -25,7 +25,7 @@ import fr.icy.extension.plugin.PluginDescriptor;
 import fr.icy.gui.component.button.IcyButton;
 import fr.icy.gui.component.button.IcyToggleButton;
 import fr.icy.gui.component.icon.IcyIconPack;
-import fr.icy.gui.component.icon.SVGResource;
+import fr.icy.gui.component.icon.IcySVG;
 import fr.icy.gui.component.tabbedpane.CloseableTabbedPane;
 import fr.icy.gui.frame.IcyFrame;
 import fr.icy.gui.frame.IcyFrameEvent;
@@ -36,7 +36,6 @@ import fr.icy.io.xml.XMLUtil;
 import fr.icy.system.FileDrop;
 import fr.icy.system.IcyExceptionHandler;
 import fr.icy.system.IcyHandledException;
-import fr.icy.system.logging.IcyLogger;
 import fr.icy.system.thread.ThreadUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -71,19 +70,23 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListener, CloseableTabbedPane.CloseableTabbedPaneListener, AcceptListener, ChangeListener, BlockListener, FileDrop.FileDropListener {
+    private static final Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
+
     private static final String UNTITLED = "untitled";
 
     private final JToolBar toolBar;
 
-    private final IcyButton bNew = new IcyButton("New", SVGResource.NOTE_ADD);
-    private final IcyButton bLoad = new IcyButton("Load", SVGResource.FOLDER_OPEN);
-    private final IcyButton bSave = new IcyButton("Save", SVGResource.SAVE);
-    private final IcyButton bSaveAs = new IcyButton("Save as", SVGResource.SAVE_AS);
+    private final IcyButton bNew = new IcyButton("New", IcySVG.NOTE_ADD);
+    private final IcyButton bLoad = new IcyButton("Load", IcySVG.FOLDER_OPEN);
+    private final IcyButton bSave = new IcyButton("Save", IcySVG.SAVE);
+    private final IcyButton bSaveAs = new IcyButton("Save as", IcySVG.SAVE_AS);
     //private final IcyButton bEmbed = new IcyButton("Embed", SVGIcon.OPEN_IN_NEW);
-    private final IcyToggleButton bRun = new IcyToggleButton("Run", new IcyIconPack(SVGResource.PLAY_CIRCLE, SVGResource.STOP_CIRCLE));
-    private final IcyButton bClean = new IcyButton("Reset", SVGResource.DEVICE_RESET);
+    private final IcyToggleButton bRun = new IcyToggleButton("Run", new IcyIconPack(IcySVG.PLAY_CIRCLE, IcySVG.STOP_CIRCLE));
+    private final IcyButton bClean = new IcyButton("Reset", IcySVG.DEVICE_RESET);
 
     private final CloseableTabbedPane closeableTabbedPane = new CloseableTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 
@@ -253,7 +256,8 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
             final Link clone = linkClone(wf, l);
 
             if (clone == null) {
-                IcyLogger.warn(MainFrame.class, "Cannot copy a link to an exposed variable.");
+                if (LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.log(Level.WARNING, "Cannot copy a link to an exposed variable.");
                 continue;
             }
 
@@ -588,7 +592,8 @@ public class MainFrame extends IcyFrame implements IcyFrameListener, ActionListe
                                 message += "\n\n" + BlocksML.getInstance().toString(xml);
                             }
                             catch (final TransformerFactoryConfigurationError | TransformerException e2) {
-                                IcyLogger.error(MainFrame.class, e2, e2.getLocalizedMessage());
+                                if (LOGGER.isLoggable(Level.SEVERE))
+                                    LOGGER.log(Level.SEVERE, "Unable to perform XML transformation.", e2);
                             }
 
                             //$FALL-THROUGH$ Send the report anyway

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.input;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarIntegerArrayNative;
@@ -28,6 +31,9 @@ import plugins.adufour.vars.lang.VarIntegerArrayNative;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Integers")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Input", "Integers"})
 public class Integers extends Plugin implements InputBlock {
     @Override
     public void declareInput(final @NotNull VarList inputMap) {

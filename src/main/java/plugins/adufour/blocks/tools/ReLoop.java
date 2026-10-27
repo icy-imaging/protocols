@@ -19,10 +19,16 @@
 package plugins.adufour.blocks.tools;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarMutable;
 
+@IcyPluginName("Re-loop")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "Loop"})
 public class ReLoop extends Plugin implements ToolsBlock {
     public final VarMutable initValue = new VarMutable("init", null);
 

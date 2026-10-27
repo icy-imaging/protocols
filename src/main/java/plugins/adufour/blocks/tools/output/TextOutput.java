@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.output;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarString;
@@ -28,6 +31,9 @@ import plugins.adufour.vars.lang.VarString;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Text output")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Output", "Text"})
 public class TextOutput extends Plugin implements OutputBlock {
     @Override
     public void run() {

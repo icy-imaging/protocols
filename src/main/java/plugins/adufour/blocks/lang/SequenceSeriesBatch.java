@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.lang;
 
 import fr.icy.common.exception.UnsupportedFormatException;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.Loader;
 import fr.icy.io.SequenceFileImporter;
 import fr.icy.model.sequence.MetaDataUtil;
@@ -39,6 +42,9 @@ import java.io.File;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Sequence sries batch")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow", "Loop", "Batch"})
 public class SequenceSeriesBatch extends Batch {
     private VarFile multiSeriesFile;
 

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.roi;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.roi.ROI;
 import fr.icy.model.sequence.Sequence;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +32,9 @@ import plugins.adufour.vars.lang.VarSequence;
 
 import java.util.ArrayList;
 
+@IcyPluginName("Get ROI from sequence")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Sequence"})
 public class GetROIFromSequence extends Plugin implements ROIBlock {
     public enum ROIFilter {
         SELECTED, NON_SELECTED, ALL

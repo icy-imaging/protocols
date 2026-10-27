@@ -20,16 +20,16 @@ package plugins.adufour.blocks.tools.sequence;
 
 import fr.icy.Icy;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarSequence;
 
-//@BlockSearchAnnotation(
-//	name="show sequence",
-//	category="sequence",
-//	description="",
-//	author="adufour"
-//)
+@IcyPluginName("Show sequence")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Sequence", "Show"})
 public class ShowSequence extends Plugin implements SequenceBlock {
     private final VarSequence sequence = new VarSequence("sequence", null);
 

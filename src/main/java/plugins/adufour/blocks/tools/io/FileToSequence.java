@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.io;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.Loader;
 import fr.icy.model.sequence.Sequence;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +38,9 @@ import java.io.File;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("File to sequence")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "IO", "File", "Sequence"})
 public class FileToSequence extends Plugin implements IOBlock {
     private final VarFile inputFile = new VarFile("input file", null);
     private final VarSequence outputSequence = new VarSequence("sequence", null);

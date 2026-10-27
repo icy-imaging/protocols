@@ -18,6 +18,9 @@
 
 package plugins.adufour.blocks.lang;
 
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.system.IcyHandledException;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.BlockDescriptor.BlockStatus;
@@ -43,6 +46,9 @@ import java.util.List;
  * @see SequenceFileBatch
  * @see SequenceSeriesBatch
  */
+@IcyPluginName("Loop")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow", "Loop"})
 public class Loop extends WorkFlow {
     private final ArrayList<Var<?>> loopVariables = new ArrayList<>();
 

@@ -19,11 +19,17 @@
 package plugins.adufour.blocks.tools;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarInteger;
 import plugins.adufour.vars.lang.VarMutableArray;
 
+@IcyPluginName("Get list size")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "List", "Size"})
 public class ListSize extends Plugin implements ToolsBlock {
     private final VarMutableArray list = new VarMutableArray("List", null);
 

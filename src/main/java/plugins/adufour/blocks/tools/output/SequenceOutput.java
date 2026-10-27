@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.output;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarSequence;
@@ -28,6 +31,9 @@ import plugins.adufour.vars.lang.VarSequence;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Sequence output")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Output", "Sequence"})
 public class SequenceOutput extends Plugin implements OutputBlock {
     private final VarSequence vs = new VarSequence("sequence", null);
 

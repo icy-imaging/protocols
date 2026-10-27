@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.output;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.gui.FileMode;
@@ -30,6 +33,9 @@ import plugins.adufour.vars.lang.VarFileArray;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Files output")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Output", "Files"})
 public class FilesOutput extends Plugin implements OutputBlock {
     @Override
     public void run() {

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.blocks.util.VarListListener;
@@ -30,6 +33,9 @@ import plugins.adufour.vars.util.VarReferencingPolicy;
 
 import java.lang.reflect.Array;
 
+@IcyPluginName("Accumulator")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "Accumulate"})
 public class Accumulator extends Plugin implements ToolsBlock, TypeChangeListener {
     private Class<?> type = null;
 

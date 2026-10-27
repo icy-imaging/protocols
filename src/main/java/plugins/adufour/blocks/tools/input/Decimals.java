@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.input;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarDoubleArrayNative;
@@ -28,6 +31,9 @@ import plugins.adufour.vars.lang.VarDoubleArrayNative;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Decimals")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Input", "Decimals"})
 public class Decimals extends Plugin implements InputBlock {
     @Override
     public void declareInput(final @NotNull VarList inputMap) {

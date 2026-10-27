@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.io;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.tools.sequence.SequenceBlock;
@@ -29,6 +32,9 @@ import plugins.adufour.vars.util.VarException;
 
 import java.io.File;
 
+@IcyPluginName("Get sequence folder")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "IO", "Sequence", "Folder"})
 public class GetSequenceFolder extends Plugin implements SequenceBlock, IOBlock {
     private final VarSequence sequence = new VarSequence("Sequence", null);
 

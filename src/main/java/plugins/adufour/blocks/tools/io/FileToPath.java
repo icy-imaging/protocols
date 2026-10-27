@@ -19,11 +19,17 @@
 package plugins.adufour.blocks.tools.io;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarFile;
 import plugins.adufour.vars.lang.VarString;
 
+@IcyPluginName("File to path")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "IO", "File", "Path"})
 public class FileToPath extends Plugin implements IOBlock {
     private final VarString path = new VarString("path", "", 1);
 

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.roi;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.roi.ROI;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
@@ -26,6 +29,9 @@ import plugins.adufour.vars.lang.VarROIArray;
 
 import java.util.ArrayList;
 
+@IcyPluginName("Substract ROI")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Substract"})
 public class SubtractROI extends Plugin implements ROIBlock {
     private final VarROIArray roiA = new VarROIArray("List of ROI #1");
 

@@ -18,6 +18,9 @@
 
 package plugins.adufour.blocks.lang;
 
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
@@ -31,6 +34,9 @@ import java.util.List;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Range loop")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow", "Loop"})
 public class RangeLoop extends Loop {
     private VarInteger startIndex;
     private VarInteger endIndex;

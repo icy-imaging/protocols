@@ -21,6 +21,9 @@ package plugins.adufour.blocks.tools.roi;
 import fr.icy.common.geom.rectangle.Rectangle5D;
 import fr.icy.common.string.StringUtil;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.OMEUtil;
 import fr.icy.model.image.IcyBufferedImage;
 import fr.icy.model.image.IcyBufferedImageUtil;
@@ -35,6 +38,9 @@ import plugins.adufour.vars.lang.VarSequence;
 import java.awt.*;
 import java.util.ArrayList;
 
+@IcyPluginName("Crop sequence to ROI")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Crop", "Sequence"})
 public class CropSequenceToROI extends Plugin implements ROIBlock {
     private final VarSequence input = new VarSequence("Sequence to crop", null);
 

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.input;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarSequenceArray;
@@ -28,6 +31,9 @@ import plugins.adufour.vars.lang.VarSequenceArray;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Sequences")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Input", "Sequences"})
 public class Sequences extends Plugin implements InputBlock {
     @Override
     public void run() {

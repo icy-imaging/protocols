@@ -21,6 +21,9 @@ package plugins.adufour.blocks.tools.roi;
 import fr.icy.extension.kernel.roi.roi2d.ROI2DArea;
 import fr.icy.extension.kernel.roi.roi3d.ROI3DArea;
 import fr.icy.common.geom.point.Point3D;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.roi.ROI;
 import fr.icy.model.roi.ROI2D;
 import fr.icy.model.roi.ROI3D;
@@ -40,6 +43,9 @@ import java.util.logging.Logger;
  * @author Joel Rogers
  * @author Alexandre Dufour
  */
+@IcyPluginName("Erode ROI")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Erode"})
 public class ErodeROI extends MorphROI {
     private static final Logger LOGGER = Logger.getLogger(ErodeROI.class.getName());
 

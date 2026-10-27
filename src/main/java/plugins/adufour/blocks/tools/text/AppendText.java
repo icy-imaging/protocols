@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.text;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.sequence.Sequence;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.tools.ToolsBlock;
@@ -26,6 +29,9 @@ import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.VarObject;
 import plugins.adufour.vars.lang.VarString;
 
+@IcyPluginName("Append text")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "Text"})
 public class AppendText extends Plugin implements ToolsBlock {
     private final VarObject in = new VarObject("input", null);
     private final VarString separator = new VarString("Separator", "_");

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.lang;
 
 import fr.icy.Icy;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.gui.frame.progress.AnnounceFrame;
 import fr.icy.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +48,9 @@ import java.util.List;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("File batch")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow", "Loop", "Batch"})
 public class FileBatch extends Batch implements FileFilter {
     // loop variables //
 

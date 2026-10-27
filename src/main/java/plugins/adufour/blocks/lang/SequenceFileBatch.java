@@ -18,6 +18,9 @@
 
 package plugins.adufour.blocks.lang;
 
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.Loader;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.vars.lang.VarSequence;
@@ -37,6 +40,9 @@ import java.io.File;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Sequence File batch")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow", "Loop", "Batch"})
 public class SequenceFileBatch extends FileBatch {
     VarSequence element;
 

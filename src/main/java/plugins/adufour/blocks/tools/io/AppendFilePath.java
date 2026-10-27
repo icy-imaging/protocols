@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools.io;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
@@ -29,6 +32,9 @@ import plugins.adufour.vars.lang.VarString;
 
 import java.io.File;
 
+@IcyPluginName("Append file path")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "IO", "File", "Path"})
 public class AppendFilePath extends Plugin implements IOBlock {
     private final VarMutable in = new VarMutable("Current file", null);
 

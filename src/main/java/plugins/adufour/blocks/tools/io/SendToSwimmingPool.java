@@ -20,6 +20,9 @@ package plugins.adufour.blocks.tools.io;
 
 import fr.icy.Icy;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.swimmingPool.SwimmingObject;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
@@ -33,6 +36,9 @@ import javax.swing.*;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Send to swimming pool")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "IO", "Swimming", "Pool"})
 public class SendToSwimmingPool extends Plugin implements Block {
     private final VarMutable data = new VarMutable("Data", null);
 

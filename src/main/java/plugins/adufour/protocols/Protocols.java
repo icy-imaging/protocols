@@ -22,7 +22,9 @@ import fr.icy.Icy;
 import fr.icy.common.Version;
 import fr.icy.extension.ExtensionLoader;
 import fr.icy.extension.plugin.abstract_.PluginActionable;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
 import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.io.FileUtil;
 import fr.icy.io.xml.XMLUtil;
 import fr.icy.system.preferences.PluginsPreferences;
@@ -57,6 +59,8 @@ import java.util.logging.Logger;
  * Protocols plugin
  */
 @IcyPluginName("Protocols")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags("Protocols")
 public class Protocols extends PluginActionable {
     private static final Logger LOGGER = Logger.getLogger(Protocols.class.getName());
 

@@ -22,6 +22,9 @@ import fr.icy.Icy;
 import fr.icy.common.math.UnitUtil;
 import fr.icy.common.string.StringUtil;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.gui.dialog.ConfirmDialog;
 import fr.icy.system.IcyHandledException;
 import fr.icy.system.thread.ThreadUtil;
@@ -44,6 +47,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+@IcyPluginName("Workflow")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Workflow"})
 public class WorkFlow extends Plugin implements Block, Iterable<BlockDescriptor>, BlockListener, WorkFlowListener {
     private final BlockDescriptor descriptor = new BlockDescriptor(-1, this);
 

@@ -22,6 +22,9 @@ import fr.icy.extension.kernel.roi.roi2d.ROI2DArea;
 import fr.icy.extension.kernel.roi.roi3d.ROI3DArea;
 import fr.icy.common.geom.point.Point5D;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.roi.ROI;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
@@ -30,6 +33,9 @@ import plugins.adufour.vars.lang.VarROIArray;
 
 import java.awt.geom.Point2D;
 
+@IcyPluginName("Translate ROI")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Translate"})
 public class TranslateROI extends Plugin implements ROIBlock {
     private final VarROIArray inputROI = new VarROIArray("Input ROI");
 

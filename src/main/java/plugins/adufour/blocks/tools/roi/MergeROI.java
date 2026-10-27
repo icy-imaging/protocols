@@ -20,6 +20,9 @@ package plugins.adufour.blocks.tools.roi;
 
 import fr.icy.common.geom.shape.ShapeUtil;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import fr.icy.model.roi.ROI;
 import fr.icy.model.roi.ROIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +33,9 @@ import plugins.adufour.vars.lang.VarROIArray;
 import java.util.Arrays;
 import java.util.List;
 
+@IcyPluginName("Merge ROI")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "ROI", "Merge"})
 public class MergeROI extends Plugin implements ROIBlock {
     private final VarEnum<ShapeUtil.BooleanOperator> operation = new VarEnum<>("Merge operation", ShapeUtil.BooleanOperator.AND);
 

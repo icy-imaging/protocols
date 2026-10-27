@@ -20,6 +20,9 @@ package plugins.adufour.blocks.tools;
 
 import fr.icy.Icy;
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.lang.Block;
 import plugins.adufour.blocks.util.VarList;
@@ -30,6 +33,9 @@ import plugins.adufour.vars.util.VarListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@IcyPluginName("Display")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "Display"})
 public class Display extends Plugin implements Block {
     private static final Logger LOGGER = Logger.getLogger(Display.class.getName());
 

@@ -19,6 +19,9 @@
 package plugins.adufour.blocks.tools;
 
 import fr.icy.extension.plugin.abstract_.Plugin;
+import fr.icy.extension.plugin.annotation_.IcyPluginCategory;
+import fr.icy.extension.plugin.annotation_.IcyPluginName;
+import fr.icy.extension.plugin.annotation_.IcyPluginTags;
 import org.jetbrains.annotations.NotNull;
 import plugins.adufour.blocks.util.VarList;
 import plugins.adufour.vars.lang.Var;
@@ -34,6 +37,9 @@ import plugins.adufour.vars.util.VarListener;
  *
  * @author Alexandre Dufour
  */
+@IcyPluginName("Indexer")
+@IcyPluginCategory("Protocols")
+@IcyPluginTags({"Protocols", "Tool", "Index"})
 public class Indexer extends Plugin implements ToolsBlock {
     private final VarMutableArray array = new VarMutableArray("array", null);
     private final VarInteger index = new VarInteger("index", 0);
